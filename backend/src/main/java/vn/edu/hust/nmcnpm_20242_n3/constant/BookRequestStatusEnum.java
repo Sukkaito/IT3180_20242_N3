@@ -5,8 +5,3 @@ public enum BookRequestStatusEnum {
     DENIED,
     PENDING,
 }
-/* Trang thai cua mot yeu cau lien quan den sach:
-   Yeu cau duoc chap than
-   Yeu cau bi tu choi
-   Yeu cau cho xu ly
- */
