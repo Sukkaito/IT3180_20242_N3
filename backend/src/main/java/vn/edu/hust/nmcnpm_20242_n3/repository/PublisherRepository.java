@@ -9,6 +9,7 @@ import java.util.Optional;
 @Repository
 public interface PublisherRepository extends CrudRepository<Publisher, Integer> {
     Optional<Publisher> findByName(String name);
-    void deleteByName(String name);
     boolean existsByName(String name);
+    Optional<Publisher> findById(Integer id);
+    void deleteById(Integer id);
 }

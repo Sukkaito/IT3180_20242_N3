@@ -1,12 +1,11 @@
 package vn.edu.hust.nmcnpm_20242_n3.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import vn.edu.hust.nmcnpm_20242_n3.dto.CategoryDTO;
 import vn.edu.hust.nmcnpm_20242_n3.entity.Category;
 import vn.edu.hust.nmcnpm_20242_n3.service.CategoryService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -19,40 +18,29 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @PostMapping
-    public ResponseEntity<Category> addCategory(@RequestBody CategoryDTO categoryDTO) {
-        try {
-            Category category = categoryService.addCategory(categoryDTO);
-            return new ResponseEntity<>(category, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e.getMessage());
-        }
+    @GetMapping // Get All
+    public List<Category> getAllCategories() {
+        return categoryService.getAllCategories();
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<Category> findCategoryByName(@RequestParam String name) {
+    @GetMapping("/search/{name}") // Get By Name
+    public Category getCategoryByName(@PathVariable String name) {
         return categoryService.findByName(name)
-                .map(category -> new ResponseEntity<>(category, HttpStatus.OK))
-                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Category with name " + name + " not found"));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<?> updateCategoryByName(@RequestParam String name, @RequestBody CategoryDTO categoryDTO){
-        try{
-            Category updatedCategory=categoryService.updateByName(name, categoryDTO);
-            return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
-        } catch (IllegalArgumentException e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
+    @PostMapping // Add New
+    public Category addCategory(@RequestBody Category category) {
+        return categoryService.addCategory(category);
     }
 
-    @DeleteMapping
-    public ResponseEntity<String> deleteCategoryByName(@RequestParam String name) {
-        try {
-            categoryService.deleteByName(name);
-            return new ResponseEntity<>("Category deleted successfully", HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e.getMessage());
-        }
+    @PutMapping("/update/{id}") // Update By Id
+    public Category updateCategory(@PathVariable int id, @RequestBody Category category) {
+        return categoryService.updateById(id, category);
+    }
+
+    @DeleteMapping("/delete/{id}") // Delete By Id
+    public void deleteCategory(@PathVariable int id) {
+        categoryService.deleteById(id);
     }
 }

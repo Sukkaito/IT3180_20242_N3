@@ -9,6 +9,7 @@ import java.util.Optional;
 @Repository
 public interface CategoryRepository extends CrudRepository<Category, Integer> {
     Optional<Category> findByName(String name);
-    void deleteByName(String name);
     boolean existsByName(String name);
+    Optional<Category> findById(Integer id);
+    void deleteById(Integer id);
 }

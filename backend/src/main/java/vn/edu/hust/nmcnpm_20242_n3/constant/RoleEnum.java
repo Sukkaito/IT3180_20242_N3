@@ -4,7 +4,3 @@ public enum RoleEnum {
     ADMIN,
     USER
 }
-/* Vai tro cua tai khoan:
-   Admin
-   Nguoi dung
- */

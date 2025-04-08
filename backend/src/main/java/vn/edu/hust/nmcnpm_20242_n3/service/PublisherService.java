@@ -3,10 +3,10 @@ package vn.edu.hust.nmcnpm_20242_n3.service;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import vn.edu.hust.nmcnpm_20242_n3.dto.PublisherDTO;
 import vn.edu.hust.nmcnpm_20242_n3.entity.Publisher;
 import vn.edu.hust.nmcnpm_20242_n3.repository.PublisherRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,40 +19,38 @@ public class PublisherService {
         this.publisherRepository = publisherRepository;
     }
 
-    public Publisher addPublisher(PublisherDTO publisherDTO) {
-        if (publisherRepository.existsByName(publisherDTO.getName())) {
-            throw new IllegalArgumentException("Publisher with name " + publisherDTO.getName() + " already exists");
-        }
-
-        Publisher publisher = new Publisher();
-        publisher.setName(publisherDTO.getName());
-        return publisherRepository.save(publisher);
+    public List<Publisher> getAllPublishers() {
+        return (List<Publisher>) publisherRepository.findAll();
     }
 
     public Optional<Publisher> findByName(String name) {
         return publisherRepository.findByName(name);
     }
 
-    @Transactional
-    public void deleteByName(String name) {
-        if (!publisherRepository.existsByName(name)) {
-            throw new IllegalArgumentException("Publisher with name " + name + " does not exist");
-        }
-        publisherRepository.deleteByName(name);
+    public Publisher findById(int id) {
+        return publisherRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Publisher not found with ID: " + id));
     }
-    public Publisher updateByName(String name, PublisherDTO publisherDTO) {
-        Publisher publisher = findByName(name)
-                .orElseThrow(() -> new IllegalArgumentException("Publisher not found"));
-        publisher.setName(publisherDTO.getName());
+
+    public Publisher addPublisher(Publisher publisher) {
+        if (publisherRepository.existsByName(publisher.getName())) {
+            throw new IllegalArgumentException("Publisher with name " + publisher.getName() + " already exists");
+        }
         return publisherRepository.save(publisher);
     }
 
-    public Publisher getOrCreatePublisher(String name) {
-        return publisherRepository.findByName(name)
-                .orElseGet(() -> {
-                    Publisher newPublisher = new Publisher();
-                    newPublisher.setName(name);
-                    return publisherRepository.save(newPublisher);
-                });
+    public Publisher updateById(int id, Publisher publisher) {
+        Publisher existingPublisher = publisherRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Publisher not found"));
+        existingPublisher.setName(publisher.getName());
+        return publisherRepository.save(existingPublisher);
+    }
+
+    @Transactional
+    public void deleteById(int id) {
+        if (!publisherRepository.existsById(id)) {
+            throw new IllegalArgumentException("Publisher with ID " + id + " does not exist");
+        }
+        publisherRepository.deleteById(id);
     }
 }

@@ -4,26 +4,35 @@ import java.util.Set;
 
 public class BookDTO {
 
+    private int id;
     private String title;
     private String description;
-    private String publisherName;
-    private Set<String> authorNames;
-    private Set<String> categoryNames;
+    private int publisherId;
+    private Set<Integer> authorIds;
+    private Set<Integer> categoryIds;
 
     // Constructors
     public BookDTO() {
     }
 
-    public BookDTO(String title, String description, String publisherName,
-                   Set<String> authorNames, Set<String> categoryNames) {
+    public BookDTO(int id, String title, String description, int publisherId, Set<Integer> authorIds, Set<Integer> categoryIds) {
         this.title = title;
         this.description = description;
-        this.publisherName = publisherName;
-        this.authorNames = authorNames;
-        this.categoryNames = categoryNames;
+        this.publisherId = publisherId;
+        this.authorIds = authorIds;
+        this.categoryIds = categoryIds;
     }
 
     // Getters and Setters
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -40,27 +49,27 @@ public class BookDTO {
         this.description = description;
     }
 
-    public String getPublisherName() {
-        return publisherName;
+    public int getPublisherId() {
+        return publisherId;
     }
 
-    public void setPublisherName(String publisherName) {
-        this.publisherName = publisherName;
+    public void setPublisherId(int publisherId) {
+        this.publisherId = publisherId;
     }
 
-    public Set<String> getAuthorNames() {
-        return authorNames;
+    public Set<Integer> getAuthorIds() {
+        return authorIds;
     }
 
-    public void setAuthorNames(Set<String> authorNames) {
-        this.authorNames = authorNames;
+    public void setAuthorIds(Set<Integer> authorIds) {
+        this.authorIds = authorIds;
     }
 
-    public Set<String> getCategoryNames() {
-        return categoryNames;
+    public Set<Integer> getCategoryIds() {
+        return categoryIds;
     }
 
-    public void setCategoryNames(Set<String> categoryNames) {
-        this.categoryNames = categoryNames;
+    public void setCategoryIds(Set<Integer> categoryIds) {
+        this.categoryIds = categoryIds;
     }
 }
