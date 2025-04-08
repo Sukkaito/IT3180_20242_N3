@@ -24,11 +24,6 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/register" element={<Register />} />
 
         // Todo: Add authentication and authorization wrappers
-        <Route path="/admin" element={<div><Outlet /></div>} >
-          <Route index element={<div>Admin Home</div>} />
-          <Route path="dashboard" element={<div>Admin Dashboard</div>} />
-        </Route>
-
         <Route path="/user" element={<div><Outlet /></div>} >
           <Route index element={<Navigate to="home" replace />} />
           <Route path="home" element={<UserPage />} />
