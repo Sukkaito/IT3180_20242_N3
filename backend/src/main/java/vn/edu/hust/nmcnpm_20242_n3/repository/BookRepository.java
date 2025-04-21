@@ -1,17 +1,30 @@
 package vn.edu.hust.nmcnpm_20242_n3.repository;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import vn.edu.hust.nmcnpm_20242_n3.entity.Book;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookRepository extends CrudRepository<Book, Integer> {
-    Book findByBookId(int id);
-    void deleteByBookId(int id);
-    List<Book> findByTitleContaining(String title);
-    List<Book> findByAuthors_NameContaining(String authorName);
-    List<Book> findByPublisher_NameContaining(String publisher);
-    List<Book> findByCategories_NameContaining(String category);
+    Optional<Book> findByTitle(String title);
+    Optional<Book> findById(int id);  // Cập nhật kiểu dữ liệu
+
+    void deleteById(Integer id);  // Cập nhật kiểu dữ liệu
+
+    @Query("SELECT b FROM Book b WHERE b.title LIKE %:title%")
+    List<Book> searchByTitle(@Param("title") String title);
+
+    @Query("SELECT b FROM Book b JOIN b.publisher p WHERE p.id = :publisherId")
+    List<Book> searchByPublisherId(@Param("publisherId") int publisherId);
+
+    @Query("SELECT b FROM Book b JOIN b.categories c WHERE c.id = :categoryId")
+    List<Book> searchByCategoryId(@Param("categoryId") int categoryId);
+
+    @Query("SELECT b FROM Book b JOIN b.authors a WHERE a.id = :authorId")
+    List<Book> searchByAuthorId(@Param("authorId") int authorId);
 }

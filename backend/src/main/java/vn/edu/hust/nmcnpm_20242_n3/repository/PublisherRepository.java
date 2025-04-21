@@ -1,4 +1,15 @@
 package vn.edu.hust.nmcnpm_20242_n3.repository;
 
-public interface PublisherRepository {
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+import vn.edu.hust.nmcnpm_20242_n3.entity.Publisher;
+
+import java.util.Optional;
+
+@Repository
+public interface PublisherRepository extends CrudRepository<Publisher, Integer> {
+    Optional<Publisher> findByName(String name);
+    boolean existsByName(String name);
+    Optional<Publisher> findById(Long id);
+    void deleteById(Integer id);
 }

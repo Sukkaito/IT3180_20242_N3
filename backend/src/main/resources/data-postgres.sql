@@ -16,12 +16,19 @@ INSERT INTO authors (id, name) VALUES
         (3, 'Robert C. Martin'),
         (4, 'Stephen Hawking');
 
+-- Insert Publishers
+INSERT INTO publishers (id, name) VALUES
+    (1, 'Secker & Warburg'),
+    (2, 'Bloomsbury Publishing'),
+    (3, 'Prentice Hall'),
+    (4, 'Bantam Books');
+
 -- Insert Books
-INSERT INTO books (book_id, title, description) VALUES
-        (1, '1984', 'A dystopian novel set in a totalitarian regime'),
-        (2, 'Harry Potter and the Philosopher''s Stone', 'The first book in the Harry Potter series'),
-        (3, 'Clean Code', 'A handbook of agile software craftsmanship'),
-        (4, 'A Brief History of Time', 'A book about modern physics for non-scientists');
+INSERT INTO books (book_id, title, description, publisher_id) VALUES
+(1, '1984', 'A dystopian novel set in a totalitarian regime', 1), -- Publisher ID 1
+(2, 'Harry Potter and the Philosopher''s Stone', 'The first book in the Harry Potter series', 2), -- Publisher ID 2
+(3, 'Clean Code', 'A handbook of agile software craftsmanship', 3), -- Publisher ID 3
+(4, 'A Brief History of Time', 'A book about modern physics for non-scientists', 4); -- Publisher ID 4
 
 -- Insert Book Copies
 INSERT INTO book_copies (id, original_book_book_id, status) VALUES
