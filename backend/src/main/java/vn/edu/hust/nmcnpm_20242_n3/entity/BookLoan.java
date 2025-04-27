@@ -46,9 +46,93 @@ public class BookLoan {
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     Date LoanedAt;
+
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     Date UpdatedAt;
+
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public BookCopy getBookCopy() {
+        return bookCopy;
+    }
+
+    public void setBookCopy(BookCopy bookCopy) {
+        this.bookCopy = bookCopy;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user2) {
+        this.user = user2;
+    }
+
+    public Date getLoanDate() {
+        return loanDate;
+    }
+
+    public void setLoanDate(Date loanDate) {
+        this.loanDate = loanDate;
+    }
+
+    public Date getReturnDate() {
+        return returnDate;
+    }
+
+    public void setReturnDate(Date returnDate) {
+        this.returnDate = returnDate;
+    }
+
+    public Date getActualReturnDate() {
+        return actualReturnDate;
+    }
+
+    public void setActualReturnDate(Date actualReturnDate) {
+        this.actualReturnDate = actualReturnDate;
+    }
+
+    public BookLoanStatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(BookLoanStatusEnum status) {
+        this.status = status;
+    }
+
+    public String getCurrentBookRequestId() {
+        return currentBookRequestId;
+    }
+
+    public void setCurrentBookRequestId(String currentBookRequestId) {
+        this.currentBookRequestId = currentBookRequestId;
+    }
+
+    public Date getLoanedAt() {
+        return LoanedAt;
+    }
+
+    public void setLoanedAt(Date loanedAt) {
+        LoanedAt = loanedAt;
+    }
+
+    public Date getUpdatedAt() {
+        return UpdatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        UpdatedAt = updatedAt;
+    }
+
+
 
     @PrePersist
     protected void onCreate() {
