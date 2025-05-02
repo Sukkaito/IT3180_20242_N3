@@ -91,3 +91,8 @@ INSERT INTO book_loans (id, book_copy_id, user_id, loan_date, return_date, actua
     ('3', 3, 'b24d5066-6321-4de8-af43-9a852d55a0a6', NOW() - INTERVAL '30 days', NOW(), NOW() - INTERVAL '2 days', 'RETURNED', NULL, NOW() - INTERVAL '30 days', NOW() - INTERVAL '2 days'),
     ('4', 4, 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', NOW() - INTERVAL '15 days', NOW() + INTERVAL '15 days', NULL, 'REQUEST_RETURNING', NULL, NOW() - INTERVAL '15 days', NOW());
 
+-- Insert Staff
+INSERT INTO staff (id, name, email, role) VALUES
+    ('abcd1234-5678-9012-3456-789012345678', 'James Carter', 'jamesc@library.com', 'LIBRARIAN'),
+    ('5678efgh-9012-3456-7890-123456789012', 'Olivia Brooks', 'oliviab@library.com', 'LIBRARIAN'),
+    ('9012ijkl-3456-7890-1234-567890123456', 'Lily Thompson', 'lilyth@library.com', 'MANAGER');
