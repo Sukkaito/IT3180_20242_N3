@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+
 import java.util.Date;
 
 // Needed for HTTP requests and responses
@@ -30,6 +31,8 @@ public class BookLoan {
     @Temporal(TemporalType.TIMESTAMP)
     Date loanDate;
 
+
+    @Column(nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     Date returnDate;
 
@@ -59,6 +62,14 @@ public class BookLoan {
     @PreUpdate
     protected void onUpdate() {
         UpdatedAt = new Date();
+    }
+
+    public BookLoan() {
+    }
+    public BookLoan(BookCopy bookcopy, User user) {
+        this.bookCopy = bookcopy;
+        this.user = user;
+        this.status = BookLoanStatusEnum.BORROWED;
     }
 }
 

@@ -46,5 +46,15 @@ public class User {
     protected void onUpdate() {
         UpdatedAt = new Date();
     }
+
+    public User() {
+    }
+
+    public User(String name, String userName, String email, String password) {
+        this.name = name;
+        this.userName = userName;
+        this.email = email;
+        this.password = password;
+    }
 }
 
