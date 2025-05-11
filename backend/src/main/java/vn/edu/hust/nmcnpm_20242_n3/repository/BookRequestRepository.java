@@ -1,0 +1,17 @@
+package vn.edu.hust.nmcnpm_20242_n3.repository;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import vn.edu.hust.nmcnpm_20242_n3.entity.BookRequest;
+
+
+@Repository
+public interface BookRequestRepository extends CrudRepository<BookRequest, String> {
+
+    @Query("SELECT b FROM BookRequest b WHERE b.id = :bookRequestId and b.userid = :userId and b.status = PENDING")
+    List<BookRequest> checkIfUserHasRequest(@Param("bookRequestId") Integer bookRequestId,@Param("userId") String userId);
+}

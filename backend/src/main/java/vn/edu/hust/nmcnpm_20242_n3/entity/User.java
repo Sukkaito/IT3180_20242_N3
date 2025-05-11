@@ -6,6 +6,9 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import vn.edu.hust.nmcnpm_20242_n3.constant.BookLoanStatusEnum;
+import vn.edu.hust.nmcnpm_20242_n3.constant.UserStatusEnum;
+
 import java.util.Date;
 
 // Needed for HTTP requests and responses
@@ -35,11 +38,13 @@ public class User {
     Date UpdatedAt;
     @ManyToOne
     Role role;
-
+    @Enumerated(EnumType.STRING)
+    UserStatusEnum status;
     @PrePersist
     protected void onCreate() {
         CreatedAt = new Date();
         UpdatedAt = new Date();
+        status = UserStatusEnum.FREE;
     }
 
     @PreUpdate

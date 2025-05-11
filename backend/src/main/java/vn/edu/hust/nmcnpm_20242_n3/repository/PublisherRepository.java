@@ -11,4 +11,5 @@ public interface PublisherRepository extends CrudRepository<Publisher, Integer> 
     Optional<Publisher> findByName(String name);
     boolean existsByName(String name);
     void deleteById(Integer id);
+    Optional<Publisher> findById(Integer id);
 }
