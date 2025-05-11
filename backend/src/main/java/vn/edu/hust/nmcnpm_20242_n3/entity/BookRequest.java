@@ -30,9 +30,6 @@ public class BookRequest {
     @ManyToOne(cascade = CascadeType.ALL)
     User user;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    String userId;
-
     @Enumerated(EnumType.STRING)
     BookRequestStatusEnum status;
 

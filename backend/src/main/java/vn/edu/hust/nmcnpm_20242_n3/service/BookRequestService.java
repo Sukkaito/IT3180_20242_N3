@@ -53,7 +53,6 @@ public class BookRequestService {
         // Create a new book request
         BookRequest bookRequest = new BookRequest();
         bookRequest.setUser(user);
-        bookRequest.setUserId(user.getId());
         bookRequest.setBookCopy(bookCopy);
         bookCopy.setStatus(BookCopyStatusEnum.UNAVAILABLE);
         bookRequest.setStatus(BookRequestStatusEnum.PENDING);
@@ -68,7 +67,7 @@ public class BookRequestService {
         }
         // Update book request status
         bookRequest.setStatus(BookRequestStatusEnum.ACCEPTED);  
-        bookLoanService.newBookLoan(bookRequest.getUserId(), bookRequest.getBookCopy().getId());
+        bookLoanService.newBookLoan(bookRequest.getUser().getId(), bookRequest.getBookCopy().getId());
         return bookRequestRepository.save(bookRequest);
     }
     @Transactional
@@ -112,7 +111,6 @@ public class BookRequestService {
         // Create a new book request
         BookRequest bookRequest = new BookRequest();
         bookRequest.setUser(user);
-        bookRequest.setUserId(user.getId());
         bookRequest.setBookCopy(bookCopy);
         bookRequest.setStatus(BookRequestStatusEnum.PENDING);
         return bookRequestRepository.save(bookRequest);

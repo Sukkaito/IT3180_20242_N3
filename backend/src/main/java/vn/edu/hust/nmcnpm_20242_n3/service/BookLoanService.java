@@ -54,6 +54,7 @@ public class BookLoanService {
         BookLoan bookLoan = new BookLoan();
         bookLoan.setUser(user);
         bookLoan.setBookCopy(bookCopy);
+        bookLoan.setLoan_duration(30);
         bookLoan.setStatus(BookLoanStatusEnum.BORROWED);
         bookLoan.setLoanedAt(new Date());
         

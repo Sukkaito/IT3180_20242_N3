@@ -16,6 +16,7 @@ import java.util.Date;
 @Table(name = "book_loans")
 public class BookLoan {
     //define default loan duration to be 30 days
+    @Column(name = "loan_duration", nullable = false)
     public int loan_duration = 30;
 
     @Id
@@ -24,8 +25,6 @@ public class BookLoan {
 
     @ManyToOne(cascade = CascadeType.ALL)
     BookCopy bookCopy;
-    @ManyToOne(cascade = CascadeType.ALL)
-    String bookCopyId;
     @ManyToOne(cascade = CascadeType.ALL)
     User user;
 
@@ -64,7 +63,7 @@ public class BookLoan {
     protected void onCreate() {
         LoanedAt = new Date();
         UpdatedAt = new Date();
-        bookCopyId = bookCopy.getId();
+        loan_duration = 30; // Set default loan duration to 30 days
     }
 
     @PreUpdate
