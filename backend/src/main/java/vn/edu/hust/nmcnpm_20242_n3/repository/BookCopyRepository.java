@@ -10,4 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BookCopyRepository extends CrudRepository<BookCopy, String> {
     Optional<BookCopy> findFirstByOriginalBook_BookIdAndStatus(Integer bookId, BookCopyStatusEnum status);
+   
 }
