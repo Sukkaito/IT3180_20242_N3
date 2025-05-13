@@ -1,10 +1,9 @@
 package vn.edu.hust.nmcnpm_20242_n3.service;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import vn.edu.hust.nmcnpm_20242_n3.entity.Book;
 import vn.edu.hust.nmcnpm_20242_n3.repository.BookLoanRepository;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookCopy;
@@ -40,9 +39,11 @@ public class BookLoanService {
         return bookLoanRepository.getUserListByBookCopyId(bookCopyId);
     }
 
-    public List<BookLoan> getBorrowedBooksByUserId(String userId) {
+    public List<Book> getBorrowedBooksByUserId(String userId) {
         return bookLoanRepository.findBorrowedBooksByUserId(userId);
     }
+
+
 
 
 }

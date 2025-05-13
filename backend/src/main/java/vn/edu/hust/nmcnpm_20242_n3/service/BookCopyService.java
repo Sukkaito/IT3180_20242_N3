@@ -18,16 +18,12 @@ public class BookCopyService {
     @Autowired
     private BookCopyRepository bookCopyRepository;
 
-    public boolean isBookCopyAvailable(String bookId) {
-        return bookCopyRepository.existsByBookCopyIdAndStatus(bookId, BookCopyStatusEnum.AVAILABLE.name());
-    }
-
     public boolean isBookCopyExists(String bookCopyId) {
         return bookCopyRepository.existsById(bookCopyId);
     }
 
     public List<BookCopy> getAllAvailableBookCopies() {
-        return bookCopyRepository.findByStatus(BookCopyStatusEnum.AVAILABLE.name());
+        return bookCopyRepository.findByStatus(BookCopyStatusEnum.valueOf(BookCopyStatusEnum.AVAILABLE.name()));
     }
 
     public Object getBookCopyById(String bookCopyId) {

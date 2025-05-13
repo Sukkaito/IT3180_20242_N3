@@ -19,14 +19,13 @@ public class BookCopy {
     @ManyToOne
     Book originalBook;
 
+    @Getter
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     BookCopyStatusEnum status;
-    public BookCopyStatusEnum getStatus() {
-            return status;
-        }
 
     public Object orElseThrow(Object o) {
+        return o;
     }
 
     @PrePersist

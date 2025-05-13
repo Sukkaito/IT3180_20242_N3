@@ -35,7 +35,7 @@ public class BookLoanController {
         }
     }
 
-    @GetMapping("/users-by-bookcopy-id/{userId}")
+    @GetMapping("/users-by-book-copy-id/{bookCopyId}")
     public ResponseEntity<?> getUserListByBookCopyId(@PathVariable String bookCopyId) {
         try {
             var users = bookLoanService.getUserListByBookCopyId(bookCopyId);
