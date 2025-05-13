@@ -1,15 +1,14 @@
 package vn.edu.hust.nmcnpm_20242_n3.repository;
 
-import org.hibernate.annotations.processing.SQL;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
 import org.springframework.stereotype.Repository;
-import org.springframework.beans.factory.annotation.Autowired;
 import vn.edu.hust.nmcnpm_20242_n3.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookLoanRepository extends JpaRepository<BookLoan, Long> {
@@ -17,7 +16,12 @@ public interface BookLoanRepository extends JpaRepository<BookLoan, Long> {
     BookLoan findByUserId(String userId);
     void deleteByUserId(String userId);
 
+
     @Query("SELECT bl.user FROM BookLoan bl WHERE bl.bookCopy.id = ?1")
     List<User> getUserListByBookCopyId(String bookCopyId);
+
+    @Query("SELECT bl FROM BookLoan bl WHERE bl.user.id = ?1 AND bl.status = 'BORROWED'")
+    List<BookLoan> findBorrowedBooksByUserId(String userId);
+
 }
 

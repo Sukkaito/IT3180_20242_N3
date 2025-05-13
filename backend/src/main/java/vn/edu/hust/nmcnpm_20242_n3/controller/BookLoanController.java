@@ -35,14 +35,26 @@ public class BookLoanController {
         }
     }
 
-    @GetMapping("/users-by-user-id/{userId}")
-    public ResponseEntity<?> getUserListByUserId(@PathVariable String userId) {
+    @GetMapping("/users-by-bookcopy-id/{userId}")
+    public ResponseEntity<?> getUserListByBookCopyId(@PathVariable String bookCopyId) {
         try {
-            var users = bookLoanService.getUserListByBookCopyId(userId);
+            var users = bookLoanService.getUserListByBookCopyId(bookCopyId);
             return new ResponseEntity<>(users, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/borrowed-books-by-user-id/{userId}")
+    public ResponseEntity<?> getBorrowedBooksByUserId(@PathVariable String userId) {
+        try {
+            var borrowedBooks = bookLoanService.getBorrowedBooksByUserId(userId);
+            return new ResponseEntity<>(borrowedBooks, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 
 }

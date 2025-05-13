@@ -69,7 +69,15 @@ public class BookLoan {
     public BookLoan(BookCopy bookcopy, User user) {
         this.bookCopy = bookcopy;
         this.user = user;
-        this.status = BookLoanStatusEnum.BORROWED;
+        this.status = BookLoanStatusEnum.REQUEST_BORROWING;
     }
+
+    public BookLoan(BookCopy bookcopy, User user, BookLoanStatusEnum status) {
+        this.bookCopy = bookcopy;
+        this.user = user;
+        this.status = status;
+    }
+
+
 }
 

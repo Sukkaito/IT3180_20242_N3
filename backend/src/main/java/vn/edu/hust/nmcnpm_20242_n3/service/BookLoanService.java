@@ -39,4 +39,10 @@ public class BookLoanService {
     public List<User> getUserListByBookCopyId(String bookCopyId) {
         return bookLoanRepository.getUserListByBookCopyId(bookCopyId);
     }
+
+    public List<BookLoan> getBorrowedBooksByUserId(String userId) {
+        return bookLoanRepository.findBorrowedBooksByUserId(userId);
+    }
+
+
 }

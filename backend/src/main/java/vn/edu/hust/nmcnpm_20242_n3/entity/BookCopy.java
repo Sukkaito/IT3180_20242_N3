@@ -22,4 +22,17 @@ public class BookCopy {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     BookCopyStatusEnum status;
+    public BookCopyStatusEnum getStatus() {
+            return status;
+        }
+
+    public Object orElseThrow(Object o) {
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        status = BookCopyStatusEnum.AVAILABLE;
+    }
+
+
 }
