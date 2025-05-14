@@ -34,9 +34,20 @@ public class FineService {
     public Fine updateFine(String id, Fine fine) {
         Fine existingFine = fineRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Fine not found with ID: " + id));
+    if (fine.getAmount() <= 0) {
+        throw new IllegalArgumentException("Fine amount must be greater than zero.");
+    }
+    if (fine.getDescription() == null || fine.getDescription().isEmpty()) {
+        throw new IllegalArgumentException("Description cannot be null or empty.");
+    }
+    if (fine.getUser() == null || fine.getUser().getId() == null) {
+        throw new IllegalArgumentException("User information is missing or invalid.");
+    }
+    if (fine.getBookLoan() == null || fine.getBookLoan().getId() == null) {
+        throw new IllegalArgumentException("Book loan information is missing or invalid.");
+    }
         existingFine.setAmount(fine.getAmount());
         existingFine.setDescription(fine.getDescription());
-        existingFine.setUpdatedAt(new Date());
         return fineRepository.save(existingFine);
     }
 

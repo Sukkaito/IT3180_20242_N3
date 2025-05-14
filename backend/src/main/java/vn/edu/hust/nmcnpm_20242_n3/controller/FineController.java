@@ -31,10 +31,23 @@ public class FineController {
         return new ResponseEntity<>(fineService.getFineById(id), HttpStatus.OK);
     }
 
-    @PostMapping 
-    public ResponseEntity<Fine> addFine(@RequestBody Fine fine) {
-        return new ResponseEntity<>(fineService.addFine(fine), HttpStatus.CREATED);
+    @PostMapping
+public ResponseEntity<Fine> addFine(@RequestBody Fine fine) {
+    if (fine.getUser() == null || fine.getUser().getId() == null) {
+        throw new IllegalArgumentException("User information is missing or invalid.");
     }
+    if (fine.getBookLoan() == null || fine.getBookLoan().getId() == null) {
+        throw new IllegalArgumentException("Book loan information is missing or invalid.");
+    }
+    if (fine.getAmount() <= 0) {
+        throw new IllegalArgumentException("Fine amount must be greater than zero.");
+    }
+    if (fine.getDescription() == null || fine.getDescription().isEmpty()) {
+        throw new IllegalArgumentException("Description cannot be null or empty.");
+    }
+    return new ResponseEntity<>(fineService.addFine(fine), HttpStatus.CREATED);
+}
+    
 
     @PutMapping("/{id}") 
     public ResponseEntity<Fine> updateFine(@PathVariable String id, @RequestBody Fine fine) {
