@@ -21,52 +21,52 @@ public class FineController {
         this.fineService = fineService;
     }
 
-    @GetMapping 
+    @GetMapping
     public ResponseEntity<List<Fine>> getAllFines() {
         return new ResponseEntity<>(fineService.getAllFines(), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}") 
+    @GetMapping("/{id}")
     public ResponseEntity<Fine> getFineById(@PathVariable String id) {
         return new ResponseEntity<>(fineService.getFineById(id), HttpStatus.OK);
     }
 
     @PostMapping
-public ResponseEntity<Fine> addFine(@RequestBody Fine fine) {
-    if (fine.getUser() == null || fine.getUser().getId() == null) {
-        throw new IllegalArgumentException("User information is missing or invalid.");
+    public ResponseEntity<Fine> addFine(@RequestBody Fine fine) {
+        if (fine.getUser() == null || fine.getUser().getId() == null) {
+            throw new IllegalArgumentException("User information is missing or invalid.");
+        }
+        if (fine.getBookLoan() == null || fine.getBookLoan().getId() == null) {
+            throw new IllegalArgumentException("Book loan information is missing or invalid.");
+        }
+        if (fine.getAmount() <= 0) {
+            throw new IllegalArgumentException("Fine amount must be greater than zero.");
+        }
+        if (fine.getDescription() == null || fine.getDescription().isEmpty()) {
+            throw new IllegalArgumentException("Description cannot be null or empty.");
+        }
+        return new ResponseEntity<>(fineService.addFine(fine), HttpStatus.CREATED);
     }
-    if (fine.getBookLoan() == null || fine.getBookLoan().getId() == null) {
-        throw new IllegalArgumentException("Book loan information is missing or invalid.");
-    }
-    if (fine.getAmount() <= 0) {
-        throw new IllegalArgumentException("Fine amount must be greater than zero.");
-    }
-    if (fine.getDescription() == null || fine.getDescription().isEmpty()) {
-        throw new IllegalArgumentException("Description cannot be null or empty.");
-    }
-    return new ResponseEntity<>(fineService.addFine(fine), HttpStatus.CREATED);
-}
-    
 
-    @PutMapping("/{id}") 
+    @PutMapping("/{id}")
     public ResponseEntity<Fine> updateFine(@PathVariable String id, @RequestBody Fine fine) {
         return new ResponseEntity<>(fineService.updateFine(id, fine), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}") 
-    public ResponseEntity<String> deleteFine(@PathVariable String id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteFine(@PathVariable(name = "id") String id) {
         fineService.deleteFine(id);
         return new ResponseEntity<>("Fine deleted successfully", HttpStatus.OK);
     }
 
-    @GetMapping("/user/{userId}") 
-    public ResponseEntity<List<Fine>> getFinesByUserId(@PathVariable String userId) {
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Fine>> getFinesByUserId(@PathVariable(name = "userId") String userId) {
         return new ResponseEntity<>(fineService.getFinesByUserId(userId), HttpStatus.OK);
     }
 
-    @GetMapping("/date-range") 
+    @GetMapping("/date-range")
     public ResponseEntity<List<Fine>> getFinesByDateRange(@RequestParam Date startDate, @RequestParam Date endDate) {
         return new ResponseEntity<>(fineService.getFinesByDateRange(startDate, endDate), HttpStatus.OK);
     }
+
 }
