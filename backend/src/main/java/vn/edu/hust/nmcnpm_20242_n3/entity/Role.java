@@ -1,5 +1,6 @@
 package vn.edu.hust.nmcnpm_20242_n3.entity;
 
+import lombok.Getter;
 import vn.edu.hust.nmcnpm_20242_n3.constant.RoleEnum;
 import jakarta.persistence.*;
 
@@ -11,6 +12,7 @@ public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
+    @Getter
     @Column(unique = true, nullable = false)
     @Enumerated(EnumType.STRING)
     RoleEnum name;
@@ -21,6 +23,6 @@ public class Role {
         joinColumns = @JoinColumn(name = "role_id"),
         inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
+    @Getter
     Set<Permission> permissions;
-
 }
