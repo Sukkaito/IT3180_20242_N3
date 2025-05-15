@@ -2,10 +2,15 @@ package vn.edu.hust.nmcnpm_20242_n3.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import vn.edu.hust.nmcnpm_20242_n3.dto.UserCreateDTO;
 import vn.edu.hust.nmcnpm_20242_n3.dto.UserDTO;
+import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
+import vn.edu.hust.nmcnpm_20242_n3.entity.Fine;
 import vn.edu.hust.nmcnpm_20242_n3.entity.Role;
 import vn.edu.hust.nmcnpm_20242_n3.entity.User;
 import vn.edu.hust.nmcnpm_20242_n3.constant.RoleEnum;
+import vn.edu.hust.nmcnpm_20242_n3.repository.BookLoanRepository;
+import vn.edu.hust.nmcnpm_20242_n3.repository.FineRepository;
 import vn.edu.hust.nmcnpm_20242_n3.repository.RoleRepository;
 import vn.edu.hust.nmcnpm_20242_n3.repository.UserRepository;
 
@@ -22,7 +27,7 @@ public class UserService {
     @Autowired
     private RoleRepository roleRepository;
 
-    public UserDTO createUser(UserDTO dto) throws IllegalArgumentException {
+    public UserDTO createUser(UserCreateDTO dto) throws IllegalArgumentException {
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
         }
@@ -37,11 +42,15 @@ public class UserService {
         user.setPassword(dto.getPassword());
 
         RoleEnum roleEnum = RoleEnum.valueOf(dto.getRoleName());
-        Role role = roleRepository.findByName(roleEnum).orElseThrow(() -> new RuntimeException("Role not found: " + dto.getRoleName()));
+        Role role = roleRepository.findByName(roleEnum)
+                .orElseThrow(() -> new RuntimeException("Role not found: " + dto.getRoleName()));
         user.setRole(role);
 
         User saved = userRepository.save(user);
         return mapToDTO(saved);
+    }
+    public Optional<UserDTO> getUserById(String id) {
+        return userRepository.findById(id).map(this::mapToDTO);
     }
 
     public Optional<UserDTO> getUserByEmail(String email) {
@@ -58,14 +67,6 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
-    }
-
-    public boolean existsByUsername(String username) {
-        return userRepository.existsByUserName(username);
-    }
-
     private UserDTO mapToDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
@@ -73,6 +74,43 @@ public class UserService {
         dto.setUserName(user.getUserName());
         dto.setEmail(user.getEmail());
         dto.setRoleName(user.getRole().getName().name());
+        dto.setCreatedAt(user.getCreatedAt());
+        dto.setUpdatedAt(user.getUpdatedAt());
         return dto;
+    }
+    public UserDTO updateUser(String id, UserDTO dto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setName(dto.getName());
+        user.setUserName(dto.getUserName());
+        user.setEmail(dto.getEmail());
+
+        RoleEnum roleEnum = RoleEnum.valueOf(dto.getRoleName());
+        Role role = roleRepository.findByName(roleEnum)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+        user.setRole(role);
+
+        User updated = userRepository.save(user);
+        return mapToDTO(updated);
+    }
+    public void deleteUser(String id) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("User not found");
+        }
+        userRepository.deleteById(id);
+    }
+    @Autowired
+    private BookLoanRepository bookLoanRepository;
+
+    @Autowired
+    private FineRepository fineRepository;
+
+    public List<BookLoan> getBookLoansByUserId(int userId) {
+        return bookLoanRepository.findByUserId(userId);
+    }
+
+    public List<Fine> getFinesByUserId(int userId) {
+        return fineRepository.findByUserId(userId);
     }
 }
