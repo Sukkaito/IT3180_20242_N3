@@ -106,11 +106,11 @@ public class UserService {
     @Autowired
     private FineRepository fineRepository;
 
-    public List<BookLoan> getBookLoansByUserId(int userId) {
+    public List<BookLoan> getBookLoansByUserId(String userId) {
         return bookLoanRepository.findByUserId(userId);
     }
 
-    public List<Fine> getFinesByUserId(int userId) {
+    public List<Fine> getFinesByUserId(String userId) {
         return fineRepository.findByUserId(userId);
     }
 }

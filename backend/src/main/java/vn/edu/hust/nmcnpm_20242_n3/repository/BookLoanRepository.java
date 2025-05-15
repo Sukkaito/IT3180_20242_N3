@@ -9,7 +9,7 @@ import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
 import java.util.List;
 
 @Repository
-public interface BookLoanRepository extends JpaRepository <BookLoan, Integer> {
+public interface BookLoanRepository extends JpaRepository <BookLoan, String> {
     @Query("SELECT bl FROM BookLoan bl WHERE bl.user.id = :userId")
-    List<BookLoan> findByUserId(@Param("userId") int userId);
+    List<BookLoan> findByUserId(@Param("userId") String userId);
 }

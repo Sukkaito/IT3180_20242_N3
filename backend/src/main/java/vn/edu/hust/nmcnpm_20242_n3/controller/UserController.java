@@ -76,12 +76,12 @@ public class UserController {
         return ResponseEntity.ok("User deleted");
     }
     @GetMapping("/{userId}/book-loans")
-    public ResponseEntity<List<BookLoan>> getBookLoansByUserId(@PathVariable int userId) {
+    public ResponseEntity<List<BookLoan>> getBookLoansByUserId(@PathVariable String userId) {
         List<BookLoan> loans = userService.getBookLoansByUserId(userId);
         return ResponseEntity.ok(loans);
     }
     @GetMapping("/{userId}/fines")
-    public ResponseEntity<List<Fine>> getFinesByUserId(@PathVariable int userId) {
+    public ResponseEntity<List<Fine>> getFinesByUserId(@PathVariable String userId) {
         List<Fine> fines = userService.getFinesByUserId(userId);
         return ResponseEntity.ok(fines);
     }

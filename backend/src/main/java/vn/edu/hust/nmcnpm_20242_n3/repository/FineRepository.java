@@ -8,8 +8,7 @@ import vn.edu.hust.nmcnpm_20242_n3.entity.Fine;
 
 import java.util.List;
 @Repository
-public interface FineRepository extends JpaRepository<Fine, Integer> {
+public interface FineRepository extends JpaRepository<Fine, String> {
     @Query("SELECT f FROM Fine f WHERE f.bookLoan.user.id = :userId")
-    List<Fine> findByUserId(@Param("userId") int userId);
-
+    List<Fine> findByUserId(@Param("userId") String userId);
 }
