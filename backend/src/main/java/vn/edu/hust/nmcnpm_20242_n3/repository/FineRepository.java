@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
 import vn.edu.hust.nmcnpm_20242_n3.entity.Fine;
 
 import java.util.List;
