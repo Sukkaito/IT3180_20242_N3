@@ -1,8 +1,8 @@
 package vn.edu.hust.nmcnpm_20242_n3.service;
 
-
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,16 +10,15 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookCopyStatusEnum;
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookLoanStatusEnum;
-import vn.edu.hust.nmcnpm_20242_n3.constant.UserStatusEnum;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookCopy;
 import vn.edu.hust.nmcnpm_20242_n3.entity.User;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
+import vn.edu.hust.nmcnpm_20242_n3.entity.BookRequest;
 import vn.edu.hust.nmcnpm_20242_n3.repository.BookCopyRepository;
 import vn.edu.hust.nmcnpm_20242_n3.repository.BookLoanRepository;
 import vn.edu.hust.nmcnpm_20242_n3.repository.UserRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
 
 @EnableScheduling
 @Service
@@ -30,23 +29,30 @@ public class BookLoanService {
     private final UserRepository userRepository;
 
     @Autowired
-    public BookLoanService(BookCopyRepository bookCopyRepository, BookLoanRepository bookLoanRepository, UserRepository userRepository) {
+    public BookLoanService(BookCopyRepository bookCopyRepository, BookLoanRepository bookLoanRepository,
+            UserRepository userRepository) {
         this.bookCopyRepository = bookCopyRepository;
         this.bookLoanRepository = bookLoanRepository;
         this.userRepository = userRepository;
     }
-    public List<BookLoan> getAllLoans() {
-        return (List<BookLoan>) bookLoanRepository.findAll();
+
+    public Optional<BookLoan> findBookLoanByBookCopyId(Integer bookCopyId) {
+        return bookLoanRepository.findByBookCopyId(bookCopyId);
     }
+
+    public List<BookLoan> getAllLoansByUserId(String userId) {
+        return (List<BookLoan>) bookLoanRepository.findAllByUserId(userId);
+    }
+
     @Transactional
-    public BookLoan newBookLoan(String userId, String bookCopyId) {
+    public BookLoan newBookLoan(String userId, Integer bookCopyId) {
         // Check if user exists
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         BookCopy bookCopy = bookCopyRepository.findById(bookCopyId)
                 .orElseThrow(() -> new IllegalArgumentException("Book copy not found"));
-        if (bookCopy.getStatus() != BookCopyStatusEnum.AVAILABLE) {
+        if (!bookCopy.getStatus().equals(BookCopyStatusEnum.AVAILABLE)) {
             throw new IllegalArgumentException("Book copy is not available");
         }
 
@@ -57,22 +63,12 @@ public class BookLoanService {
         bookLoan.setLoan_duration(30);
         bookLoan.setStatus(BookLoanStatusEnum.BORROWED);
         bookLoan.setLoanedAt(new Date());
-        
+
         bookCopyRepository.save(bookCopy);
 
         return bookLoanRepository.save(bookLoan);
     }
-    @Transactional
-    public BookLoan changeLoanDuration(String bookLoanId, int newDuration) {
-        BookLoan bookLoan = bookLoanRepository.findById(bookLoanId)
-                .orElseThrow(() -> new IllegalArgumentException("Book loan not found"));
-        bookLoan.setLoan_duration(newDuration);
-        //check if the new due date is before the current date
-        if (bookLoan.getDueDate() != null && bookLoan.getDueDate().before(new Date())) {
-            bookLoan.setStatus(BookLoanStatusEnum.OVERDUE);
-        }
-        return bookLoanRepository.save(bookLoan);
-    }
+
     @Scheduled(cron = "0 0 4 * * ?") // Every day at 4 AM
     @Transactional
     public void checkOverdueBookLoans() {
@@ -83,21 +79,14 @@ public class BookLoanService {
             if (loan.getDueDate() != null && loan.getDueDate().before(currentDate)) {
                 loan.setStatus(BookLoanStatusEnum.OVERDUE);
                 User user = loan.getUser();
-                user.setStatus(UserStatusEnum.BLOCKED);
                 bookLoanRepository.save(loan);
             }
         }
 
     }
-    @Transactional
-    public void ReturningBook(String bookCopyId){
-        BookLoan bookLoan = bookLoanRepository.findByBookCopyId(bookCopyId)
-                .orElseThrow(() -> new IllegalArgumentException("Book loan not found"));
-        BookCopy bookCopy = bookLoan.getBookCopy();
-        bookCopy.setStatus(BookCopyStatusEnum.AVAILABLE);
-        bookCopyRepository.save(bookCopy);
-        bookLoan.setStatus(BookLoanStatusEnum.RETURNED);
-        bookLoan.setActualReturnDate(new Date());
-        bookLoanRepository.save(bookLoan);
+
+    public Optional<BookLoan> findBookLoanByBookCopyIdAndUserIdAndStatus(Integer bookCopyId, String userId,
+            BookLoanStatusEnum status) {
+        return bookLoanRepository.findByBookCopyIdAndUserIdAndStatus(userId, bookCopyId, status);
     }
 }

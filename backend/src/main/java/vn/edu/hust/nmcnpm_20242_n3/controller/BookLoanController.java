@@ -1,4 +1,5 @@
 package vn.edu.hust.nmcnpm_20242_n3.controller;
+
 import java.util.List;
 
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
@@ -17,10 +18,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 
-
-
 @RestController
-@RequestMapping("/loaned")
+@RequestMapping("/api/loaned")
 public class BookLoanController {
 
     private BookLoanService bookLoanService;
@@ -30,9 +29,9 @@ public class BookLoanController {
         this.bookLoanService = bookLoanService;
     }
 
-    @GetMapping("/")
-    public List<BookLoan> getAllLoans() {
-        return bookLoanService.getAllLoans();
+    @GetMapping("/{userId}")
+    public List<BookLoan> getAllLoans(@PathVariable("userId") String userId) {
+        return bookLoanService.getAllLoansByUserId(userId);
     }
 
 }
