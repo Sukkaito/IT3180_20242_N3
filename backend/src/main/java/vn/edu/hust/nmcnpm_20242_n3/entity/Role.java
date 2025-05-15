@@ -23,6 +23,6 @@ public class Role {
         joinColumns = @JoinColumn(name = "role_id"),
         inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
+    @Getter
     Set<Permission> permissions;
-
 }

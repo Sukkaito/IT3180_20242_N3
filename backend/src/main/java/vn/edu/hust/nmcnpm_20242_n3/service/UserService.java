@@ -49,6 +49,10 @@ public class UserService {
         User saved = userRepository.save(user);
         return mapToDTO(saved);
     }
+    public User getUserEntityById(String id) {
+        return userRepository.findById(id)
+                .orElse(null);
+    }
     public Optional<UserDTO> getUserById(String id) {
         return userRepository.findById(id).map(this::mapToDTO);
     }
