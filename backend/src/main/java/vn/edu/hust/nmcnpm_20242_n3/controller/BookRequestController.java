@@ -53,11 +53,12 @@ public class BookRequestController {
     @PostMapping("/{userId}/new/borrow/rand")
     public ResponseEntity<?> newBorrowingRequest_Random(@PathVariable("userId") String userId,
             @RequestParam("bookId") Integer bookId) {
-        BookCopy bookCopy = bookCopyRepository
-                .findFirstByOriginalBook_BookIdAndStatus(bookId, BookCopyStatusEnum.AVAILABLE)
-                .orElseThrow(() -> new IllegalArgumentException("No such book copy found!"));
-        Integer bookCopyId = bookCopy.getId();
         try {
+            BookCopy bookCopy = bookCopyRepository
+                    .findFirstByOriginalBook_BookIdAndStatus(bookId, BookCopyStatusEnum.AVAILABLE)
+                    .orElseThrow(() -> new IllegalArgumentException("No such book copy found!"));
+            Integer bookCopyId = bookCopy.getId();
+
             return new ResponseEntity<>(bookRequestService.newBorrowingRequest(userId, bookCopyId), HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -69,7 +70,7 @@ public class BookRequestController {
             @RequestParam("bookCopyId") Integer bookCopyId) {
         try {
             return new ResponseEntity<>(bookRequestService.newReturningRequest(userId, bookCopyId), HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
@@ -77,14 +78,15 @@ public class BookRequestController {
     @PutMapping("/{userId}/cancel")
     public ResponseEntity<?> cancelRequest(@PathVariable("userId") String userId,
             @RequestParam("requestId") Integer requestId) {
-        BookRequest bookRequest = bookRequestService.findRequestById(requestId);
-        if (!bookRequest.getUser().getId().equals(userId)) {
-            return new ResponseEntity<>("You are not allowed to cancel this request", HttpStatus.FORBIDDEN);
-        }
+
         try {
+            BookRequest bookRequest = bookRequestService.findRequestById(requestId);
+            if (!bookRequest.getUser().getId().equals(userId)) {
+                return new ResponseEntity<>("You are not allowed to cancel this request", HttpStatus.FORBIDDEN);
+            }
             bookRequestService.cancelRequest(requestId);
             return new ResponseEntity<>("Request cancelled successfully", HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
