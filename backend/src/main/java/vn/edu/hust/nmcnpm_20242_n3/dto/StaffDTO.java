@@ -1,54 +1,36 @@
-package vn.edu.hust.nmcnpm_20242_n3.entity;
-
-import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+package vn.edu.hust.nmcnpm_20242_n3.dto;
 
 import java.util.Date;
 
-@Entity
-@Table(name = "users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+public class StaffDTO {
     private String id;
-
-    @Column(unique = true, nullable = false)
     private String name;
-
-    @Column
     private String userName;
-
-    @Column(unique = true)
     private String email;
-
-    @Column(nullable = false)
     private String password;
-
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at")
     private Date createdAt;
-
-    @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_at")
     private Date updatedAt;
+    private Integer roleId;
+    private String roleName;
+    private RoleDTO role; 
 
-    @ManyToOne
-    private Role role;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = new Date();
-        updatedAt = new Date();
+    // Constructors
+    public StaffDTO() {
     }
 
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = new Date();
+    public StaffDTO(String id, String name, String userName, String email, String password, Date createdAt, Date updatedAt, Integer roleId, String roleName) {
+        this.id = id;
+        this.name = name;
+        this.userName = userName;
+        this.email = email;
+        this.password = password;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.roleId = roleId;
+        this.roleName = roleName;
     }
 
+    // Getters and Setters
     public String getId() {
         return id;
     }
@@ -105,11 +87,27 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    public Role getRole() {
+    public Integer getRoleId() {
+        return role != null && role.getId() != null ? role.getId() : roleId;
+    }
+
+    public void setRoleId(Integer roleId) {
+        this.roleId = roleId;
+    }
+
+    public String getRoleName() {
+        return role != null && role.getName() != null ? role.getName() : roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
+    public RoleDTO getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(RoleDTO role) {
         this.role = role;
     }
 }
