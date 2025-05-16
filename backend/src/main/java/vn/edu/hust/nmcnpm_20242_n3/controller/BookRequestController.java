@@ -53,8 +53,10 @@ public class BookRequestController {
     @PostMapping("/{userId}/new/borrow/rand")
     public ResponseEntity<?> newBorrowingRequest_Random(@PathVariable("userId") String userId,
             @RequestParam("bookId") Integer bookId) {
-        Integer bookCopyId = bookCopyRepository
-                .findFirstByOriginalBook_BookIdAndStatus(bookId, BookCopyStatusEnum.AVAILABLE).get().getId();
+        BookCopy bookCopy = bookCopyRepository
+                .findFirstByOriginalBook_BookIdAndStatus(bookId, BookCopyStatusEnum.AVAILABLE)
+                .orElseThrow(() -> new IllegalArgumentException("No such book copy found!"));
+        Integer bookCopyId = bookCopy.getId();
         try {
             return new ResponseEntity<>(bookRequestService.newBorrowingRequest(userId, bookCopyId), HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {

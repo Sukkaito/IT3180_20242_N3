@@ -53,8 +53,6 @@ public class BookLoan {
     @Temporal(TemporalType.TIMESTAMP)
     Date UpdatedAt;
 
-    @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     Date DueDate;
 
     @PrePersist
