@@ -86,8 +86,15 @@ INSERT INTO users (id, name, user_name, email, password, created_at, updated_at,
 
 -- Insert Book Loans
 INSERT INTO book_loans (id, book_copy_id, user_id, loan_date, return_date, actual_return_date, status, current_book_request_id, loaned_at, updated_at) VALUES
-    ('1', 1, 'b24d5066-6321-4de8-af43-9a852d55a0a6', NOW() - INTERVAL '10 days', NOW() + INTERVAL '20 days', NULL, 'BORROWED', NULL, NOW() - INTERVAL '10 days', NOW() - INTERVAL '10 days'),
-    ('2', 2, 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', NOW() - INTERVAL '5 days', NOW() + INTERVAL '25 days', NULL, 'BORROWED', NULL, NOW() - INTERVAL '5 days', NOW() - INTERVAL '5 days'),
-    ('3', 3, 'b24d5066-6321-4de8-af43-9a852d55a0a6', NOW() - INTERVAL '30 days', NOW(), NOW() - INTERVAL '2 days', 'RETURNED', NULL, NOW() - INTERVAL '30 days', NOW() - INTERVAL '2 days'),
-    ('4', 4, 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', NOW() - INTERVAL '15 days', NOW() + INTERVAL '15 days', NULL, 'REQUEST_RETURNING', NULL, NOW() - INTERVAL '15 days', NOW());
+    ('1', '1', 'b24d5066-6321-4de8-af43-9a852d55a0a6', NOW() - INTERVAL '10 days', NOW() + INTERVAL '20 days', NULL, 'BORROWED', 1, NOW() - INTERVAL '10 days', NOW() - INTERVAL '10 days'),
+    ('2', '2', 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', NOW() - INTERVAL '5 days', NOW() + INTERVAL '25 days', NULL, 'BORROWED', 2, NOW() - INTERVAL '5 days', NOW() - INTERVAL '5 days'),
+    ('3', '3', 'b24d5066-6321-4de8-af43-9a852d55a0a6', NOW() - INTERVAL '30 days', NOW(), NOW() - INTERVAL '2 days', 'RETURNED', 3, NOW() - INTERVAL '30 days', NOW() - INTERVAL '2 days'),
+    ('4', '4', 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', NOW() - INTERVAL '15 days', NOW() + INTERVAL '15 days', NULL, 'REQUEST_RETURNING', 4, NOW() - INTERVAL '15 days', NOW());
 
+-- Insert Book Requests
+INSERT INTO book_requests (id, book_loan_id, status, type, created_at, updated_at) VALUES
+    ('1', NULL, 'PENDING', 'BORROWING', CURRENT_TIMESTAMP - INTERVAL '1 day', CURRENT_TIMESTAMP - INTERVAL '1 day'),
+    ('2', '2', 'ACCEPTED', 'BORROWING', CURRENT_TIMESTAMP - INTERVAL '2 days', CURRENT_TIMESTAMP - INTERVAL '2 days'),
+    ('3', '3', 'PENDING', 'RETURNING', CURRENT_TIMESTAMP - INTERVAL '3 days', CURRENT_TIMESTAMP - INTERVAL '3 days'),
+    ('4', '4', 'DENIED', 'RETURNING', CURRENT_TIMESTAMP - INTERVAL '4 days', CURRENT_TIMESTAMP - INTERVAL '4 days'),
+    ('5', NULL, 'PENDING', 'BORROWING', CURRENT_TIMESTAMP - INTERVAL '5 days', CURRENT_TIMESTAMP - INTERVAL '5 days');

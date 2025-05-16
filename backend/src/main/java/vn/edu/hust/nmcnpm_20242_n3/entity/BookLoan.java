@@ -7,9 +7,8 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
-// Needed for HTTP requests and responses
 @Setter
 @Getter
 
@@ -18,47 +17,46 @@ import java.util.Date;
 public class BookLoan {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+    private String id;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    BookCopy bookCopy;
+    private BookCopy bookCopy;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    User user;
+     private User user;
 
     @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    Date loanDate;
+    @Column(name = "loan_date")
+    private LocalDateTime loanDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    Date returnDate;
+    @Column(name = "return_date")
+    private LocalDateTime returnDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = true)
-    Date actualReturnDate;
+    @Column(name = "actual_return_date", nullable = true)
+    private LocalDateTime actualReturnDate;
 
     @Enumerated(EnumType.STRING)
-    BookLoanStatusEnum status;
+    private BookLoanStatusEnum status;
 
-    @Column(nullable = true)
-    String currentBookRequestId;
+    @Column(name = "current_book_request_id", nullable = true)
+    private String currentBookRequestId;
 
     @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    Date LoanedAt;
+    @Column(name = "loaned_at")
+    private LocalDateTime loanedAt;
+
     @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    Date UpdatedAt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
-        LoanedAt = new Date();
-        UpdatedAt = new Date();
+        loanedAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        UpdatedAt = new Date();
+        updatedAt = LocalDateTime.now();
     }
 }
-

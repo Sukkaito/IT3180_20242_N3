@@ -14,12 +14,12 @@ import vn.edu.hust.nmcnpm_20242_n3.constant.BookCopyStatusEnum;
 public class BookCopy {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+    private String id;
 
     @ManyToOne
-    Book originalBook;
+    private Book originalBook;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    BookCopyStatusEnum status;
+    private BookCopyStatusEnum status;
 }
