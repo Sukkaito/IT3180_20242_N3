@@ -77,7 +77,7 @@ public class BookRequestController {
 
     @PutMapping("/{userId}/cancel")
     public ResponseEntity<?> cancelRequest(@PathVariable("userId") String userId,
-            @RequestParam("requestId") Integer requestId) {
+            @RequestParam("requestId") String requestId) {
 
         try {
             BookRequest bookRequest = bookRequestService.findRequestById(requestId);

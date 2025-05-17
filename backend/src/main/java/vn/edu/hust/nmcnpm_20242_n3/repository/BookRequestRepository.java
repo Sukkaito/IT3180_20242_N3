@@ -11,8 +11,7 @@ import vn.edu.hust.nmcnpm_20242_n3.constant.BookRequestTypeEnum;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookRequest;
 
 @Repository
-public interface BookRequestRepository extends CrudRepository<BookRequest, Integer> {
-
+public interface BookRequestRepository extends CrudRepository<BookRequest, String> {
     @Query("SELECT b FROM BookRequest b WHERE b.bookCopy.id = :bookCopyId and b.user.id = :userId and b.status = PENDING and b.type=:type")
     List<BookRequest> checkForOverlappingRequest(@Param("bookCopyId") Integer bookCopyIdd,
             @Param("userId") String userId, @Param("type") BookRequestTypeEnum type);

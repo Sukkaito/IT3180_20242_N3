@@ -18,8 +18,8 @@ import java.util.Date;
 @Table(name = "book_requests")
 public class BookRequest {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @ManyToOne(cascade = CascadeType.ALL)
     BookLoan bookLoan;

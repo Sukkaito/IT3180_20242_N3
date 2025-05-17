@@ -20,8 +20,8 @@ public class BookLoan {
     public int loan_duration = 30;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @ManyToOne(cascade = CascadeType.ALL)
     BookCopy bookCopy;

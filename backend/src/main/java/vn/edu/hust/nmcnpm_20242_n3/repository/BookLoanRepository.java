@@ -13,7 +13,7 @@ import vn.edu.hust.nmcnpm_20242_n3.constant.BookLoanStatusEnum;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
 
 @Repository
-public interface BookLoanRepository extends CrudRepository<BookLoan, Integer> {
+public interface BookLoanRepository extends CrudRepository<BookLoan, String> {
     @Query("SELECT b FROM BookLoan b WHERE b.status = :status")
     List<BookLoan> findByStatus(@Param("status") BookLoanStatusEnum status);
 

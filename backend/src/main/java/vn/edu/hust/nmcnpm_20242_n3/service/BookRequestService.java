@@ -38,7 +38,7 @@ public class BookRequestService {
         return (List<BookRequest>) bookRequestRepository.findByUserId(userId);
     }
 
-    public BookRequest findRequestById(Integer id) {
+    public BookRequest findRequestById(String id) {
         return bookRequestRepository.findById(id).get();
     }
 
@@ -97,7 +97,7 @@ public class BookRequestService {
     }
 
     @Transactional
-    public BookRequest cancelRequest(Integer requestId) {
+    public BookRequest cancelRequest(String requestId) {
         BookRequest bookRequest = bookRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Request not found"));
         if (!bookRequest.getStatus().equals(BookRequestStatusEnum.PENDING)) {

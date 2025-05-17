@@ -86,8 +86,8 @@ INSERT INTO users (id, name, user_name, email, password, created_at, updated_at,
 
 -- Insert Book Loans
 INSERT INTO book_loans (id, book_copy_id, user_id, loan_date, return_date, actual_return_date, status, current_book_request_id, loaned_at, updated_at,loan_duration) VALUES
-    ('1', 1, 'b24d5066-6321-4de8-af43-9a852d55a0a6', NOW() - INTERVAL '10 days', NOW() + INTERVAL '20 days', NULL, 'BORROWED', NULL, NOW() - INTERVAL '10 days', NOW() - INTERVAL '10 days',30),
-    ('2', 2, 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', NOW() - INTERVAL '5 days', NOW() + INTERVAL '25 days', NULL, 'BORROWED', NULL, NOW() - INTERVAL '5 days', NOW() - INTERVAL '5 days',30),
-    ('3', 3, 'b24d5066-6321-4de8-af43-9a852d55a0a6', NOW() - INTERVAL '30 days', NOW(), NOW() - INTERVAL '2 days', 'RETURNED', NULL, NOW() - INTERVAL '30 days', NOW() - INTERVAL '2 days',30),
-    ('4', 4, 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', NOW() - INTERVAL '15 days', NOW() + INTERVAL '15 days', NULL, 'REQUEST_RETURNING', NULL, NOW() - INTERVAL '15 days', NOW(),30);
+    ('1b6e6cbf-cd10-4a51-b3e7-aaae8364fc22', 1, 'b24d5066-6321-4de8-af43-9a852d55a0a6', NOW() - INTERVAL '10 days', NOW() + INTERVAL '20 days', NULL, 'BORROWED', NULL, NOW() - INTERVAL '10 days', NOW() - INTERVAL '10 days',30),
+    ('cf9592e2-ec63-45d4-bacc-a51f8c4a5a38', 2, 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', NOW() - INTERVAL '5 days', NOW() + INTERVAL '25 days', NULL, 'BORROWED', NULL, NOW() - INTERVAL '5 days', NOW() - INTERVAL '5 days',30),
+    ('86621cd0-4fad-47d8-947e-bf1025afaedf', 3, 'b24d5066-6321-4de8-af43-9a852d55a0a6', NOW() - INTERVAL '30 days', NOW(), NOW() - INTERVAL '2 days', 'RETURNED', NULL, NOW() - INTERVAL '30 days', NOW() - INTERVAL '2 days',30),
+    ('46c9dd3c-7a59-4928-a0e0-830aff62294b', 4, 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', NOW() - INTERVAL '15 days', NOW() + INTERVAL '15 days', NULL, 'REQUEST_RETURNING', NULL, NOW() - INTERVAL '15 days', NOW(),30);
 
