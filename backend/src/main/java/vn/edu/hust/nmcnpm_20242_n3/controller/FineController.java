@@ -1,0 +1,117 @@
+package vn.edu.hust.nmcnpm_20242_n3.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import vn.edu.hust.nmcnpm_20242_n3.entity.Fine;
+import vn.edu.hust.nmcnpm_20242_n3.entity.User;
+import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
+import vn.edu.hust.nmcnpm_20242_n3.repository.UserRepository;
+import vn.edu.hust.nmcnpm_20242_n3.repository.BookLoanRepository;
+import vn.edu.hust.nmcnpm_20242_n3.service.FineService;
+import vn.edu.hust.nmcnpm_20242_n3.dto.FineDTO;
+
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/fines")
+public class FineController {
+
+    private final FineService fineService;
+    private final UserRepository userRepository;
+    private final BookLoanRepository bookLoanRepository;
+
+    @Autowired
+    public FineController(FineService fineService, UserRepository userRepository,
+            BookLoanRepository bookLoanRepository) {
+        this.fineService = fineService;
+        this.userRepository = userRepository;
+        this.bookLoanRepository = bookLoanRepository;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<FineDTO>> getAllFines() {
+        List<FineDTO> dtos = fineService.getAllFines()
+                .stream()
+                .map(FineDTO::fromEntity)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<FineDTO> getFineById(@PathVariable String id) {
+        Fine fine = fineService.getFineById(id);
+        return new ResponseEntity<>(FineDTO.fromEntity(fine), HttpStatus.OK);
+    }
+
+    @PostMapping
+    public ResponseEntity<FineDTO> addFine(@RequestBody FineDTO fineDTO) {
+        if (fineDTO.getUserId() == null) {
+            throw new IllegalArgumentException("User information is missing or invalid.");
+        }
+        if (fineDTO.getBookLoanId() == null) {
+            throw new IllegalArgumentException("Book loan information is missing or invalid.");
+        }
+        if (fineDTO.getAmount() <= 0) {
+            throw new IllegalArgumentException("Fine amount must be greater than zero.");
+        }
+        if (fineDTO.getDescription() == null || fineDTO.getDescription().isEmpty()) {
+            throw new IllegalArgumentException("Description cannot be null or empty.");
+        }
+        User user = userRepository.findById(fineDTO.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        BookLoan bookLoan = bookLoanRepository.findById(fineDTO.getBookLoanId())
+                .orElseThrow(() -> new IllegalArgumentException("BookLoan not found"));
+        Fine fine = new Fine();
+        fine.setAmount(fineDTO.getAmount());
+        fine.setDescription(fineDTO.getDescription());
+        fine.setUser(user);
+        fine.setBookLoan(bookLoan);
+        Fine savedFine = fineService.addFine(fine);
+        return new ResponseEntity<>(FineDTO.fromEntity(savedFine), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<FineDTO> updateFine(@PathVariable String id, @RequestBody FineDTO fineDTO) {
+        User user = userRepository.findById(fineDTO.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        BookLoan bookLoan = bookLoanRepository.findById(fineDTO.getBookLoanId())
+                .orElseThrow(() -> new IllegalArgumentException("BookLoan not found"));
+        Fine fine = new Fine();
+        fine.setId(id);
+        fine.setAmount(fineDTO.getAmount());
+        fine.setDescription(fineDTO.getDescription());
+        fine.setUser(user);
+        fine.setBookLoan(bookLoan);
+        Fine updatedFine = fineService.updateFine(id, fine);
+        return new ResponseEntity<>(FineDTO.fromEntity(updatedFine), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteFine(@PathVariable(name = "id") String id) {
+        fineService.deleteFine(id);
+        return new ResponseEntity<>("Fine deleted successfully", HttpStatus.OK);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<FineDTO>> getFinesByUserId(@PathVariable(name = "userId") String userId) {
+        List<FineDTO> dtos = fineService.getFinesByUserId(userId)
+                .stream()
+                .map(FineDTO::fromEntity)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
+    }
+
+    @GetMapping("/date-range")
+    public ResponseEntity<List<FineDTO>> getFinesByDateRange(@RequestParam Date startDate, @RequestParam Date endDate) {
+        List<FineDTO> dtos = fineService.getFinesByDateRange(startDate, endDate)
+                .stream()
+                .map(FineDTO::fromEntity)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
+    }
+}

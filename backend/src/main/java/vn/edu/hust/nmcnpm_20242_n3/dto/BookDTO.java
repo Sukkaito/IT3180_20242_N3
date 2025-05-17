@@ -2,6 +2,8 @@ package vn.edu.hust.nmcnpm_20242_n3.dto;
 
 import java.util.Set;
 
+import vn.edu.hust.nmcnpm_20242_n3.entity.Fine;
+
 public class BookDTO {
 
     private int id;
@@ -15,12 +17,27 @@ public class BookDTO {
     public BookDTO() {
     }
 
-    public BookDTO(int id, String title, String description, int publisherId, Set<Integer> authorIds, Set<Integer> categoryIds) {
+    public BookDTO(int id, String title, String description, int publisherId, Set<Integer> authorIds,
+            Set<Integer> categoryIds) {
         this.title = title;
         this.description = description;
         this.publisherId = publisherId;
         this.authorIds = authorIds;
         this.categoryIds = categoryIds;
+    }
+
+    public static FineDTO fromEntity(Fine fine) {
+        FineDTO dto = new FineDTO();
+        dto.setId(fine.getId());
+        dto.setAmount(fine.getAmount());
+        dto.setDescription(fine.getDescription());
+        dto.setCreatedAt(fine.getCreatedAt());
+        dto.setUpdatedAt(fine.getUpdatedAt());
+        if (fine.getUser() != null)
+            dto.setUserId(fine.getUser().getId());
+        if (fine.getBookLoan() != null)
+            dto.setBookLoanId(fine.getBookLoan().getId());
+        return dto;
     }
 
     // Getters and Setters
