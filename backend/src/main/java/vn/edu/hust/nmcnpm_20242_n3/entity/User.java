@@ -6,12 +6,13 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import vn.edu.hust.nmcnpm_20242_n3.constant.BookLoanStatusEnum;
+
 import java.util.Date;
 
 // Needed for HTTP requests and responses
 @Setter
 @Getter
-
 
 @Entity
 @Table(name = "users")
@@ -47,4 +48,3 @@ public class User {
         UpdatedAt = new Date();
     }
 }
-

@@ -9,20 +9,22 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 
-// Needed for HTTP requests and responses
 @Setter
 @Getter
 
 @Entity
 @Table(name = "book_loans")
 public class BookLoan {
+    // define default loan duration to be 30 days
+    @Column(name = "loan_duration", nullable = false)
+    public int loan_duration = 30;
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
 
     @ManyToOne(cascade = CascadeType.ALL)
     BookCopy bookCopy;
-
     @ManyToOne(cascade = CascadeType.ALL)
     User user;
 
@@ -46,19 +48,24 @@ public class BookLoan {
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     Date LoanedAt;
+
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     Date UpdatedAt;
+
+    Date DueDate;
 
     @PrePersist
     protected void onCreate() {
         LoanedAt = new Date();
         UpdatedAt = new Date();
+        loan_duration = 30; // Set default loan duration to 30 days
+
     }
 
     @PreUpdate
     protected void onUpdate() {
         UpdatedAt = new Date();
+        DueDate = new Date(LoanedAt.getTime() + (loan_duration * 24 * 60 * 60 * 1000)); // Set due date to loan duration
     }
 }
-

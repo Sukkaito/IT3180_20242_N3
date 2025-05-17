@@ -6,4 +6,5 @@ import vn.edu.hust.nmcnpm_20242_n3.entity.User;
 
 @Repository
 public interface UserRepository extends CrudRepository<User, String> {
+
 }
