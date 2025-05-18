@@ -9,6 +9,8 @@ import vn.edu.hust.nmcnpm_20242_n3.entity.Book;
 import vn.edu.hust.nmcnpm_20242_n3.entity.Category;
 import vn.edu.hust.nmcnpm_20242_n3.entity.Publisher;
 import vn.edu.hust.nmcnpm_20242_n3.repository.BookRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,14 +47,13 @@ public class BookService {
 
         // Get or create authors
         Set<Author> authors = bookDTO.getAuthorIds().stream()
-                .map(authorService::findById)  // Lấy Author bằng Integer ID
+                .map(authorService::findById)
                 .collect(Collectors.toSet());
 
         // Get or create categories
         Set<Category> categories = bookDTO.getCategoryIds().stream()
-                .map(categoryService::findById)  // Lấy Category bằng Integer ID
+                .map(categoryService::findById)
                 .collect(Collectors.toSet());
-
         // Create new book
         Book book = new Book();
         book.setTitle(bookDTO.getTitle());
@@ -64,33 +65,40 @@ public class BookService {
         return bookRepository.save(book);
     }
 
-    public Optional<Book> findByTitle(String title) {
-        return bookRepository.findByTitle(title);
+    public Book searchById(int id) {
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + id));
     }
 
     public List<Book> findAllBooks() {
-        return (List<Book>) bookRepository.findAll();
+        List<Book> books = new ArrayList<>();
+        bookRepository.findAll().forEach(books::add);
+        return books;
     }
 
-    public Book searchById(int id) {
-        return bookRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Book not found"));
-    }
 
     public List<Book> searchByTitle(String title) {
         return bookRepository.searchByTitle(title);
     }
 
-    public List<Book> searchByPublisherId(int publisherId) {
+    public List<Book> searchByPublisherId(Integer publisherId) {
         return bookRepository.searchByPublisherId(publisherId);
     }
 
-    public List<Book> searchByCategoryId(int categoryId) {
+    public List<Book> searchByCategoryId(Integer categoryId) {
         return bookRepository.searchByCategoryId(categoryId);
     }
 
-    public List<Book> searchByAuthorId(int authorId) {
+    public List<Book> searchByAuthorId(Integer authorId) {
         return bookRepository.searchByAuthorId(authorId);
+    }
+
+    public List<Book> findBooksByPage(int page, int size) {
+        if (page < 1) {
+            throw new IllegalArgumentException("Page number must be 1 or greater.");
+        }
+        Page<Book> bookPage = bookRepository.findAll(PageRequest.of(page - 1, size)); // trừ 1 ở đây
+        return bookPage.getContent();
     }
 
     @Transactional
@@ -101,7 +109,7 @@ public class BookService {
         bookRepository.deleteById(id);
     }
 
-    public Book updateByTitle(int id, BookDTO bookDTO){
+    public Book updateByTitle(Integer id, BookDTO bookDTO){
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Book not found"));
         // Get or create publisher
@@ -123,30 +131,23 @@ public class BookService {
 
         return bookRepository.save(book);
     }
-
     public BookDTO convertToDTO(Book book) {
-        BookDTO bookDTO = new BookDTO();
-        bookDTO.setId(book.getBookId());
-        bookDTO.setTitle(book.getTitle());
-        bookDTO.setDescription(book.getDescription());
+        BookDTO dto = new BookDTO();
+        dto.setId(book.getBookId());
+        dto.setTitle(book.getTitle());
+        dto.setDescription(book.getDescription());
+        dto.setPublisherId(book.getPublisher().getId());
 
-        // Set publisher ID if publisher exists
-        if (book.getPublisher() != null) {
-            bookDTO.setPublisherId(book.getPublisher().getId());
-        }
-
-        // Convert Author entities to author IDs
         Set<Integer> authorIds = book.getAuthors().stream()
                 .map(Author::getId)
                 .collect(Collectors.toSet());
-        bookDTO.setAuthorIds(authorIds);
+        dto.setAuthorIds(authorIds);
 
-        // Convert Category entities to category IDs
         Set<Integer> categoryIds = book.getCategories().stream()
                 .map(Category::getId)
                 .collect(Collectors.toSet());
-        bookDTO.setCategoryIds(categoryIds);
+        dto.setCategoryIds(categoryIds);
 
-        return bookDTO;
+        return dto;
     }
 }

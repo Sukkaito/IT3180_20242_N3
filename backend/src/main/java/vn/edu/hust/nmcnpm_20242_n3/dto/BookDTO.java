@@ -1,7 +1,5 @@
 package vn.edu.hust.nmcnpm_20242_n3.dto;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-
 import java.util.Set;
 
 public class BookDTO {
@@ -17,9 +15,7 @@ public class BookDTO {
     public BookDTO() {
     }
 
-    public BookDTO(int id, String title, String description, int publisherId,
-                   Set<Integer> authorIds, Set<Integer> categoryIds) {
-        this.id=id;
+    public BookDTO(int id, String title, String description, int publisherId, Set<Integer> authorIds, Set<Integer> categoryIds) {
         this.title = title;
         this.description = description;
         this.publisherId = publisherId;
@@ -28,6 +24,7 @@ public class BookDTO {
     }
 
     // Getters and Setters
+
     public int getId() {
         return id;
     }
@@ -35,6 +32,7 @@ public class BookDTO {
     public void setId(int id) {
         this.id = id;
     }
+
     public String getTitle() {
         return title;
     }

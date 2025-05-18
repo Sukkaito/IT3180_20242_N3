@@ -10,6 +10,6 @@ import java.util.Optional;
 public interface CategoryRepository extends CrudRepository<Category, Integer> {
     Optional<Category> findByName(String name);
     boolean existsByName(String name);
-    Optional<Category> findById(Long id);
+    Optional<Category> findById(Integer id);
     void deleteById(Integer id);
 }

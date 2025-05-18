@@ -5,6 +5,12 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+.mvn/
+mvnw
+mvnw.cmd
+pom.xml
+pom.xml.*
+
 ### STS ###
 .apt_generated
 .classpath

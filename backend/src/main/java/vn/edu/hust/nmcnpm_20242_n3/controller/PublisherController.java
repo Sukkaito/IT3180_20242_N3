@@ -18,28 +18,28 @@ public class PublisherController {
         this.publisherService = publisherService;
     }
 
-    @GetMapping // Get all
+    @GetMapping // Get All
     public List<Publisher> getAllPublishers() {
         return publisherService.getAllPublishers();
     }
 
-    @GetMapping("/search/{name}") // Get by name
-    public Publisher getPublisherByName(@RequestParam String name) {
+    @GetMapping("/search/{name}") // Get By Name
+    public Publisher getPublisherByName(@PathVariable String name) {
         return publisherService.findByName(name)
                 .orElseThrow(() -> new IllegalArgumentException("Publisher with name " + name + " not found"));
     }
 
-    @PostMapping // Add new
+    @PostMapping // Add New
     public Publisher addPublisher(@RequestBody Publisher publisher) {
         return publisherService.addPublisher(publisher);
     }
 
-    @PutMapping("/update/{id}") // Update by Id
+    @PutMapping("/update/{id}") // Update By Id
     public Publisher updatePublisher(@PathVariable int id, @RequestBody Publisher publisher) {
         return publisherService.updateById(id, publisher);
     }
 
-    @DeleteMapping("/delete/{id}") // Delete by Id
+    @DeleteMapping("/delete/{id}") // Delete By Id
     public void deletePublisher(@PathVariable int id) {
         publisherService.deleteById(id);
     }

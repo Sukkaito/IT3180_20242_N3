@@ -18,28 +18,28 @@ public class AuthorController {
         this.authorService = authorService;
     }
 
-    @GetMapping // Get all
+    @GetMapping // Get All
     public List<Author> getAllAuthors() {
         return authorService.getAllAuthors();
     }
 
-    @GetMapping("/search/{name}") // Get by name
+    @GetMapping("/search/{name}") // Get By Name
     public Author getAuthorByName(@PathVariable String name) {
         return authorService.findByName(name)
                 .orElseThrow(() -> new IllegalArgumentException("Author with name " + name + " not found"));
     }
 
-    @PostMapping // Add new
+    @PostMapping // Add New
     public Author addAuthor(@RequestBody Author author) {
         return authorService.addAuthor(author);
     }
 
-    @PutMapping("/update/{id}") // Update by Id
+    @PutMapping("/update/{id}") // Update By Id
     public Author updateAuthor(@PathVariable int id, @RequestBody Author author) {
         return authorService.updateById(id, author);
     }
 
-    @DeleteMapping("/delete/{id}") // Delete by Id
+    @DeleteMapping("/delete/{id}") // Delete By Id
     public void deleteAuthor(@PathVariable int id) {
         authorService.deleteById(id);
     }

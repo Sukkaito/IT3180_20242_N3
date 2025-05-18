@@ -30,6 +30,7 @@ INSERT INTO books (book_id, title, description, publisher_id) VALUES
 (3, 'Clean Code', 'A handbook of agile software craftsmanship', 3), -- Publisher ID 3
 (4, 'A Brief History of Time', 'A book about modern physics for non-scientists', 4); -- Publisher ID 4
 
+
 -- Insert Book Copies
 INSERT INTO book_copies (id, original_book_book_id, status) VALUES
         ('1', 1, 'AVAILABLE'),

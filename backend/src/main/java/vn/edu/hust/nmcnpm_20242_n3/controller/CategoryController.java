@@ -18,28 +18,28 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping // Get all
+    @GetMapping // Get All
     public List<Category> getAllCategories() {
         return categoryService.getAllCategories();
     }
 
-    @GetMapping("/search/{name}") // Get by name
+    @GetMapping("/search/{name}") // Get By Name
     public Category getCategoryByName(@PathVariable String name) {
         return categoryService.findByName(name)
                 .orElseThrow(() -> new IllegalArgumentException("Category with name " + name + " not found"));
     }
 
-    @PostMapping // Add new
+    @PostMapping // Add New
     public Category addCategory(@RequestBody Category category) {
         return categoryService.addCategory(category);
     }
 
-    @PutMapping("/update/{id}") // Update by Id
+    @PutMapping("/update/{id}") // Update By Id
     public Category updateCategory(@PathVariable int id, @RequestBody Category category) {
         return categoryService.updateById(id, category);
     }
 
-    @DeleteMapping("/delete/{id}") // Delete by Id
+    @DeleteMapping("/delete/{id}") // Delete By Id
     public void deleteCategory(@PathVariable int id) {
         categoryService.deleteById(id);
     }
