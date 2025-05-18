@@ -14,6 +14,7 @@ import UserRequest from './pages/user/UserRequest.tsx'
 import UserFine from './pages/user/UserFine.tsx'
 import AdminDashboard from './pages/admin/AdminDashboard.tsx'
 import NotFound from './pages/404.tsx'
+import AdminStatus from './pages/admin/AdminStatus.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -37,6 +38,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/admin" element={<div><Outlet /></div>} >
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="status" element={<AdminStatus interval={10000}/>} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

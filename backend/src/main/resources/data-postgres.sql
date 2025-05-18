@@ -4,17 +4,21 @@
 
 -- Insert Categories
 INSERT INTO categories (id, name) VALUES
-        (1, 'Fiction'),
-        (2, 'Science'),
-        (3, 'History'),
-        (4, 'Computer Science');
+    (1, 'Fiction'),
+    (2, 'Science'),
+    (3, 'History'),
+    (4, 'Computer Science');
+
+SELECT setval('categories_id_seq', (SELECT MAX(id) FROM categories));
 
 -- Insert Authors
 INSERT INTO authors (id, name) VALUES
-        (1, 'George Orwell'),
-        (2, 'J.K. Rowling'),
-        (3, 'Robert C. Martin'),
-        (4, 'Stephen Hawking');
+    (1, 'George Orwell'),
+    (2, 'J.K. Rowling'),
+    (3, 'Robert C. Martin'),
+    (4, 'Stephen Hawking');
+
+SELECT setval('authors_id_seq', (SELECT MAX(id) FROM authors));
 
 -- Insert Publishers
 INSERT INTO publishers (id, name) VALUES
@@ -23,43 +27,50 @@ INSERT INTO publishers (id, name) VALUES
     (3, 'Prentice Hall'),
     (4, 'Bantam Books');
 
+SELECT setval('publishers_id_seq', (SELECT MAX(id) FROM publishers));
+
 -- Insert Books
 INSERT INTO books (book_id, title, description, publisher_id) VALUES
-(1, '1984', 'A dystopian novel set in a totalitarian regime', 1), -- Publisher ID 1
-(2, 'Harry Potter and the Philosopher''s Stone', 'The first book in the Harry Potter series', 2), -- Publisher ID 2
-(3, 'Clean Code', 'A handbook of agile software craftsmanship', 3), -- Publisher ID 3
-(4, 'A Brief History of Time', 'A book about modern physics for non-scientists', 4); -- Publisher ID 4
+    (1, '1984', 'A dystopian novel set in a totalitarian regime', 1), -- Publisher ID 1
+    (2, 'Harry Potter and the Philosopher''s Stone', 'The first book in the Harry Potter series', 2), -- Publisher ID 2
+    (3, 'Clean Code', 'A handbook of agile software craftsmanship', 3), -- Publisher ID 3
+    (4, 'A Brief History of Time', 'A book about modern physics for non-scientists', 4); -- Publisher ID 4
 
+SELECT setval('books_seq', (SELECT MAX(book_id) FROM books));
 
 -- Insert Book Copies
 INSERT INTO book_copies (id, original_book_book_id, status) VALUES
-        ('1', 1, 'AVAILABLE'),
-        ('2', 2, 'AVAILABLE'),
-        ('3', 3, 'AVAILABLE'),
-        ('4', 4, 'AVAILABLE'),
-        ('5', 1, 'AVAILABLE'),
-        ('6', 2, 'AVAILABLE'),
-        ('7', 3, 'AVAILABLE'),
-        ('8', 4, 'AVAILABLE');
+    ('1', 1, 'AVAILABLE'),
+    ('2', 2, 'AVAILABLE'),
+    ('3', 3, 'AVAILABLE'),
+    ('4', 4, 'AVAILABLE'),
+    ('5', 1, 'AVAILABLE'),
+    ('6', 2, 'AVAILABLE'),
+    ('7', 3, 'AVAILABLE'),
+    ('8', 4, 'AVAILABLE');
+
+SELECT setval('book_copies_seq', (SELECT MAX(id) FROM book_copies));
 
 -- Insert Books-Authors relationships
 INSERT INTO books_authors (book_id, author_id) VALUES
-        (1, 1), -- 1984 by George Orwell
-        (2, 2), -- Harry Potter by J.K. Rowling
-        (3, 3), -- Clean Code by Robert C. Martin
-        (4, 4); -- A Brief History of Time by Stephen Hawking
+    (1, 1), -- 1984 by George Orwell
+    (2, 2), -- Harry Potter by J.K. Rowling
+    (3, 3), -- Clean Code by Robert C. Martin
+    (4, 4); -- A Brief History of Time by Stephen Hawking
 
 -- Insert Books-Categories relationships
 INSERT INTO books_categories (book_id, category_id) VALUES
-        (1, 1), -- 1984 is Fiction
-        (2, 1), -- Harry Potter is Fiction
-        (3, 4), -- Clean Code is Computer Science
-        (4, 2); -- A Brief History of Time is Science
+    (1, 1), -- 1984 is Fiction
+    (2, 1), -- Harry Potter is Fiction
+    (3, 4), -- Clean Code is Computer Science
+    (4, 2); -- A Brief History of Time is Science
 
 -- Insert Roles
 INSERT INTO roles (id, name) VALUES
      (1, 'ADMIN'),
      (2, 'USER');
+
+SELECT setval('roles_id_seq', (SELECT MAX(id) FROM roles));
 
 -- Insert Permissions
 INSERT INTO permissions (id, name) VALUES
@@ -67,6 +78,8 @@ INSERT INTO permissions (id, name) VALUES
      (2, 'WRITE_BOOKS'),
      (3, 'MANAGE_USERS'),
      (4, 'BORROW_BOOKS');
+
+SELECT setval('permissions_id_seq', (SELECT MAX(id) FROM permissions));
 
 -- Insert Role Permissions
 INSERT INTO roles_permissions (role_id, permission_id) VALUES
@@ -91,3 +104,11 @@ INSERT INTO book_loans (id, book_copy_id, user_id, loan_date, return_date, actua
     ('86621cd0-4fad-47d8-947e-bf1025afaedf', 3, 'b24d5066-6321-4de8-af43-9a852d55a0a6', NOW() - INTERVAL '30 days', NOW(), NOW() - INTERVAL '2 days', 'RETURNED', NULL, NOW() - INTERVAL '30 days', NOW() - INTERVAL '2 days',30),
     ('46c9dd3c-7a59-4928-a0e0-830aff62294b', 4, 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', NOW() - INTERVAL '15 days', NOW() + INTERVAL '15 days', NULL, 'REQUEST_RETURNING', NULL, NOW() - INTERVAL '15 days', NOW(),30);
 
+INSERT INTO status_logs (component, message, status, timestamp) VALUES
+    ('database', 'Database connection re-established', 'OK', NOW() - INTERVAL '5 hours 1 minute'),
+    ('server', 'Application started', 'OK', NOW() - INTERVAL '4 hours 2 minutes'),
+    ('server', 'Application shutting down', 'NOT OK', NOW() - INTERVAL '4 hours 1 minute'),
+    ('server', 'Application restarting', 'OK', NOW() - INTERVAL '4 hours'),
+    ('database', 'Database connection lost', 'NOT OK', NOW() - INTERVAL '3 hours'),
+    ('server', 'Application started', 'OK', NOW() - INTERVAL '2 hours'),
+    ('server', 'Application shutting down', 'NOT OK', NOW() - INTERVAL '1 hour');
