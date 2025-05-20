@@ -49,30 +49,36 @@ public class FineController {
     }
 
     @PostMapping
-    public ResponseEntity<FineDTO> addFine(@RequestBody FineDTO fineDTO) {
-        if (fineDTO.getUserId() == null) {
-            throw new IllegalArgumentException("User information is missing or invalid.");
+    public ResponseEntity<?> addFine(@RequestBody FineDTO fineDTO) {
+        try {
+            if (fineDTO.getUserId() == null) {
+                return ResponseEntity.badRequest().body("User information is missing or invalid.");
+            }
+            if (fineDTO.getBookLoanId() == null) {
+                return ResponseEntity.badRequest().body("Book loan information is missing or invalid.");
+            }
+            if (fineDTO.getAmount() <= 0) {
+                return ResponseEntity.badRequest().body("Fine amount must be greater than zero.");
+            }
+            if (fineDTO.getDescription() == null || fineDTO.getDescription().isEmpty()) {
+                return ResponseEntity.badRequest().body("Description cannot be null or empty.");
+            }
+            User user = userRepository.findById(fineDTO.getUserId())
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            BookLoan bookLoan = bookLoanRepository.findById(fineDTO.getBookLoanId())
+                    .orElseThrow(() -> new IllegalArgumentException("BookLoan not found"));
+            Fine fine = new Fine();
+            fine.setAmount(fineDTO.getAmount());
+            fine.setDescription(fineDTO.getDescription());
+            fine.setUser(user);
+            fine.setBookLoan(bookLoan);
+            Fine savedFine = fineService.addFine(fine);
+            return new ResponseEntity<>(FineDTO.fromEntity(savedFine), HttpStatus.CREATED);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
         }
-        if (fineDTO.getBookLoanId() == null) {
-            throw new IllegalArgumentException("Book loan information is missing or invalid.");
-        }
-        if (fineDTO.getAmount() <= 0) {
-            throw new IllegalArgumentException("Fine amount must be greater than zero.");
-        }
-        if (fineDTO.getDescription() == null || fineDTO.getDescription().isEmpty()) {
-            throw new IllegalArgumentException("Description cannot be null or empty.");
-        }
-        User user = userRepository.findById(fineDTO.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        BookLoan bookLoan = bookLoanRepository.findById(fineDTO.getBookLoanId())
-                .orElseThrow(() -> new IllegalArgumentException("BookLoan not found"));
-        Fine fine = new Fine();
-        fine.setAmount(fineDTO.getAmount());
-        fine.setDescription(fineDTO.getDescription());
-        fine.setUser(user);
-        fine.setBookLoan(bookLoan);
-        Fine savedFine = fineService.addFine(fine);
-        return new ResponseEntity<>(FineDTO.fromEntity(savedFine), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

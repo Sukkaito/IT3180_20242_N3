@@ -26,20 +26,6 @@ public class BookDTO {
         this.categoryIds = categoryIds;
     }
 
-    public static FineDTO fromEntity(Fine fine) {
-        FineDTO dto = new FineDTO();
-        dto.setId(fine.getId());
-        dto.setAmount(fine.getAmount());
-        dto.setDescription(fine.getDescription());
-        dto.setCreatedAt(fine.getCreatedAt());
-        dto.setUpdatedAt(fine.getUpdatedAt());
-        if (fine.getUser() != null)
-            dto.setUserId(fine.getUser().getId());
-        if (fine.getBookLoan() != null)
-            dto.setBookLoanId(fine.getBookLoan().getId());
-        return dto;
-    }
-
     // Getters and Setters
 
     public int getId() {
