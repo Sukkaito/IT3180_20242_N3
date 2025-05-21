@@ -59,7 +59,8 @@ INSERT INTO books_categories (book_id, category_id) VALUES
 -- Insert Roles
 INSERT INTO roles (id, name) VALUES
      (1, 'ADMIN'),
-     (2, 'USER');
+     (2, 'USER'),
+     (3, 'STAFF');
 
 -- Insert Permissions
 INSERT INTO permissions (id, name) VALUES
@@ -81,7 +82,9 @@ INSERT INTO users (id, name, user_name, email, password, created_at, updated_at,
      ('e1a9e224-5691-4a78-a219-1ef430ef2b3e', 'Administrator', 'admin', 'admin@library.com', 'password', NOW(), NOW(), 1),
      ('b24d5066-6321-4de8-af43-9a852d55a0a6', 'John Doe', 'john_doe', 'john@example.com', 'password', NOW(), NOW(), 2),
      ('c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', 'Jane Smith', 'jane_smith', 'jane@example.com', 'password', NOW(), NOW(), 2),
-     ('d3b5f975-43c0-42f5-9b5e-ed62a4f935d1', 'Alice Johnson', 'alice_johnson', 'alice@example.com', 'password', NOW(), NOW(), 2);
+     ('d3b5f975-43c0-42f5-9b5e-ed62a4f935d1', 'Alice Johnson', 'alice_johnson', 'alice@example.com', 'password', NOW(), NOW(), 2),
+     ('f8e1c2b3-a4d5-6e7f-8090-abcdef123456', 'Michael Smith', 'michael_smith', 'michael@example.com', 'password', NOW(), NOW(), 3),
+     ('f0e1d2c3-b4a5-6789-0abc-def123456789', 'Bob Brown', 'bob_brown', 'bob@example.com', 'password', NOW(), NOW(), 3);
 
 -- Note: Passwords are stored as plain text for development purposes
 
@@ -92,7 +95,6 @@ INSERT INTO book_loans (id, book_copy_id, user_id, loan_date, return_date, actua
     ('86621cd0-4fad-47d8-947e-bf1025afaedf', 3, 'b24d5066-6321-4de8-af43-9a852d55a0a6', NOW() - INTERVAL '30 days', NOW(), NOW() - INTERVAL '2 days', 'RETURNED', NULL, NOW() - INTERVAL '30 days', NOW() - INTERVAL '2 days',30),
     ('46c9dd3c-7a59-4928-a0e0-830aff62294b', 4, 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', NOW() - INTERVAL '15 days', NOW() + INTERVAL '15 days', NULL, 'REQUEST_RETURNING', NULL, NOW() - INTERVAL '15 days', NOW(),30);
 
-
 -- Insert Book Requests
 INSERT INTO book_requests (id, book_loan_id, book_copy_id, user_id, status, type, created_at, updated_at) VALUES
     ('1', NULL, 1, 'b24d5066-6321-4de8-af43-9a852d55a0a6', 'PENDING', 'BORROWING', CURRENT_TIMESTAMP - INTERVAL '1 day', CURRENT_TIMESTAMP - INTERVAL '1 day'),
@@ -100,3 +102,4 @@ INSERT INTO book_requests (id, book_loan_id, book_copy_id, user_id, status, type
     ('3', '86621cd0-4fad-47d8-947e-bf1025afaedf', 3, 'b24d5066-6321-4de8-af43-9a852d55a0a6', 'PENDING', 'RETURNING', CURRENT_TIMESTAMP - INTERVAL '3 days', CURRENT_TIMESTAMP - INTERVAL '3 days'),
     ('4', '46c9dd3c-7a59-4928-a0e0-830aff62294b', 4, 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', 'DENIED', 'RETURNING', CURRENT_TIMESTAMP - INTERVAL '4 days', CURRENT_TIMESTAMP - INTERVAL '4 days'),
     ('5', NULL, 5, 'e1a9e224-5691-4a78-a219-1ef430ef2b3e', 'PENDING', 'BORROWING', CURRENT_TIMESTAMP - INTERVAL '5 days', CURRENT_TIMESTAMP - INTERVAL '5 days');
+
