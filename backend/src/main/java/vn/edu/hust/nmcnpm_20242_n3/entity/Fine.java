@@ -5,44 +5,47 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import java.util.Date;
 
-// Needed for HTTP requests and responses
-@Setter
 @Getter
-
+@Setter
 @Entity
 @Table(name = "fines")
 public class Fine {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+    private String id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    User user;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    BookLoan bookLoan;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "book_loan_id", nullable = false)
+    private BookLoan bookLoan;
+    @Column(nullable = false)
+    private double amount;
 
-    double amount;
-
-    @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    Date CreatedAt;
-    @UpdateTimestamp
+    @Column(name = "created_at", updatable = false)
+    private Date createdAt;
+
     @Temporal(TemporalType.TIMESTAMP)
-    Date UpdatedAt;
+    @Column(name = "updated_at")
+    private Date updatedAt;
+
+    @Column(length = 255)
+    private String description;
 
     @PrePersist
     protected void onCreate() {
-        CreatedAt = new Date();
-        UpdatedAt = new Date();
+        createdAt = new Date();
+        updatedAt = new Date();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        UpdatedAt = new Date();
+        updatedAt = new Date();
     }
-
 }
