@@ -82,19 +82,25 @@ public class FineController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<FineDTO> updateFine(@PathVariable String id, @RequestBody FineDTO fineDTO) {
-        User user = userRepository.findById(fineDTO.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        BookLoan bookLoan = bookLoanRepository.findById(fineDTO.getBookLoanId())
-                .orElseThrow(() -> new IllegalArgumentException("BookLoan not found"));
-        Fine fine = new Fine();
-        fine.setId(id);
-        fine.setAmount(fineDTO.getAmount());
-        fine.setDescription(fineDTO.getDescription());
-        fine.setUser(user);
-        fine.setBookLoan(bookLoan);
-        Fine updatedFine = fineService.updateFine(id, fine);
-        return new ResponseEntity<>(FineDTO.fromEntity(updatedFine), HttpStatus.OK);
+    public ResponseEntity<?> updateFine(@PathVariable String id, @RequestBody FineDTO fineDTO) {
+        try {
+            User user = userRepository.findById(fineDTO.getUserId())
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            BookLoan bookLoan = bookLoanRepository.findById(fineDTO.getBookLoanId())
+                    .orElseThrow(() -> new IllegalArgumentException("BookLoan not found"));
+            Fine fine = new Fine();
+            fine.setId(id);
+            fine.setAmount(fineDTO.getAmount());
+            fine.setDescription(fineDTO.getDescription());
+            fine.setUser(user);
+            fine.setBookLoan(bookLoan);
+            Fine updatedFine = fineService.updateFine(id, fine);
+            return new ResponseEntity<>(FineDTO.fromEntity(updatedFine), HttpStatus.OK);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+        }
     }
 
     @DeleteMapping("/{id}")
