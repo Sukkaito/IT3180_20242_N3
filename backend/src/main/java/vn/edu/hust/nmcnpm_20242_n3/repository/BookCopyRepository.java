@@ -7,10 +7,14 @@ import vn.edu.hust.nmcnpm_20242_n3.constant.BookCopyStatusEnum;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookCopy;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-
 public interface BookCopyRepository extends CrudRepository<BookCopy, String> {
+    Optional<BookCopy> findFirstByOriginalBook_BookIdAndStatus(Integer bookId, BookCopyStatusEnum status);
+
     List<BookCopy> findByStatus(BookCopyStatusEnum status);
+
+    Optional<BookCopy> findByBookCopyId(String bookCopyId);
 
 }

@@ -23,7 +23,7 @@ public class BookCopyController {
         }
     }
 
-    @PutMapping("/browsiing/{userId}/{bookCopyId}")
+    @PutMapping("/browsing/{userId}/{bookCopyId}")
     public ResponseEntity<?> browsingBookCopy(@RequestParam String bookCopyId ,
                                               @RequestParam String userId) {
         try {
