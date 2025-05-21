@@ -4,6 +4,7 @@ package vn.edu.hust.nmcnpm_20242_n3.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.edu.hust.nmcnpm_20242_n3.constant.BookCopyStatusEnum;
 import vn.edu.hust.nmcnpm_20242_n3.service.BookCopyService;
 
 @RestController
@@ -32,10 +33,19 @@ public class BookCopyController {
                 return ResponseEntity.status(404).body("Book copy not found");
             }
 
+            if ( !bookCopyService.isAvailable(bookCopyId)) {
+                return ResponseEntity.status(400).body("Book copy is not available for browsing");
+            }
+
+            // Update the status of the book copy
+            bookCopyService.setStatus(bookCopyId, BookCopyStatusEnum.UNAVAILABLE);
+
+            return ResponseEntity.ok("Book copy is now being browsed by user " + userId);
+
+
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error processing the request: " + e.getMessage());
         }
-        return null;
     }
 
 //    @PutMapping

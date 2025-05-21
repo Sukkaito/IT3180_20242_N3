@@ -15,6 +15,6 @@ public interface BookCopyRepository extends CrudRepository<BookCopy, String> {
 
     List<BookCopy> findByStatus(BookCopyStatusEnum status);
 
-    Optional<BookCopy> findByBookCopyId(String bookCopyId);
+    BookCopy findByBookCopyId(String bookCopyId);
 
 }
