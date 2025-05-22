@@ -17,9 +17,9 @@ public class BookCopy {
     private int id;
 
     @ManyToOne
-    Book originalBook;
+    private Book originalBook;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    BookCopyStatusEnum status;
+    private BookCopyStatusEnum status;
 }

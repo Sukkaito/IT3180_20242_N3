@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import java.util.Date;
 
 @Setter
@@ -24,48 +23,49 @@ public class BookLoan {
     private String id;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    BookCopy bookCopy;
+    private BookCopy bookCopy;
+
     @ManyToOne(cascade = CascadeType.ALL)
-    User user;
+    private User user;
 
     @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    Date loanDate;
+    @Column(name = "loan_date")
+    private Date loanDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    Date returnDate;
+    @Column(name = "return_date")
+    private Date returnDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = true)
-    Date actualReturnDate;
+    @Column(name = "actual_return_date", nullable = true)
+    private Date actualReturnDate;
 
     @Enumerated(EnumType.STRING)
-    BookLoanStatusEnum status;
+    private BookLoanStatusEnum status;
 
-    @Column(nullable = true)
-    String currentBookRequestId;
+    @Column(name = "current_book_request_id", nullable = true)
+    private String currentBookRequestId;
 
     @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    Date LoanedAt;
+    @Column(name = "loaned_at")
+    private Date LoanedAt;
 
     @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    Date UpdatedAt;
+    @Column(name = "updated_at")
+    private Date UpdatedAt;
 
-    Date DueDate;
+    private Date DueDate;
 
     @PrePersist
     protected void onCreate() {
         LoanedAt = new Date();
         UpdatedAt = new Date();
         loan_duration = 30; // Set default loan duration to 30 days
-
     }
 
     @PreUpdate
     protected void onUpdate() {
         UpdatedAt = new Date();
-        DueDate = new Date(LoanedAt.getTime() + (loan_duration * 24 * 60 * 60 * 1000)); // Set due date to loan duration
+        if (LoanedAt != null) {
+            DueDate = new Date(LoanedAt.getTime() + (loan_duration * 24 * 60 * 60 * 1000)); // Set due date to loan duration
+        }
     }
 }
