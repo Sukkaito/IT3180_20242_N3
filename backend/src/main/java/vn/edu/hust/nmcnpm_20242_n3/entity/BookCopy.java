@@ -13,25 +13,18 @@ import vn.edu.hust.nmcnpm_20242_n3.constant.BookCopyStatusEnum;
 @Table(name = "book_copies")
 public class BookCopy {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
 
     @ManyToOne
-    Book originalBook;
+    private Book originalBook;
 
-    @Getter
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    BookCopyStatusEnum status;
-
-    public Object orElseThrow(Object o) {
-        return o;
-    }
+    private BookCopyStatusEnum status;
 
     @PrePersist
     protected void onCreate() {
         status = BookCopyStatusEnum.AVAILABLE;
     }
-
-
 }

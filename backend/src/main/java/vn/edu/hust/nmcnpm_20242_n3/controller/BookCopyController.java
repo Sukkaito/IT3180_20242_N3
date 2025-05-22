@@ -25,8 +25,8 @@ public class BookCopyController {
     }
 
     @PutMapping("/browsing/{userId}/{bookCopyId}")
-    public ResponseEntity<?> browsingBookCopy(@RequestParam String bookCopyId ,
-                                              @RequestParam String userId) {
+    public ResponseEntity<?> browsingBookCopy(@PathVariable int bookCopyId ,
+                                              @PathVariable String userId) {
         try {
             var bookCopy = bookCopyService.getBookCopyById(bookCopyId);
             if (bookCopy == null) {

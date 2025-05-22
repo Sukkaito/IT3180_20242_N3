@@ -18,7 +18,7 @@ public class BookCopyService {
     @Autowired
     private BookCopyRepository bookCopyRepository;
 
-    public boolean isBookCopyExists(String bookCopyId) {
+    public boolean isBookCopyExists(int  bookCopyId) {
         return bookCopyRepository.existsById(bookCopyId);
     }
 
@@ -26,21 +26,20 @@ public class BookCopyService {
         return bookCopyRepository.findByStatus(BookCopyStatusEnum.valueOf(BookCopyStatusEnum.AVAILABLE.name()));
     }
 
-    public BookCopy getBookCopyById(String bookCopyId) {
-        return bookCopyRepository.findByBookCopyId(bookCopyId);
-
+    public BookCopy getBookCopyById(int bookCopyId) {
+        return bookCopyRepository.findById(bookCopyId)
+                .orElseThrow(() -> new IllegalArgumentException("Book copy not found with id: " + bookCopyId));
     }
 
 
-
-    public void setStatus(String bookCopyId, BookCopyStatusEnum status) {
+    public void setStatus(int bookCopyId, BookCopyStatusEnum status) {
         BookCopy bookCopy = bookCopyRepository.findById(bookCopyId)
                 .orElseThrow(() -> new IllegalArgumentException("Book copy not found with id: " + bookCopyId));
         bookCopy.setStatus(status);
         bookCopyRepository.save(bookCopy);
     }
 
-    public boolean isAvailable (String bookCopyId) {
+    public boolean isAvailable (int bookCopyId) {
         BookCopy bookCopy = bookCopyRepository.findById(bookCopyId)
                 .orElseThrow(() -> new IllegalArgumentException("Book copy not found with id: " + bookCopyId));
         return  bookCopy.getStatus().equals(BookCopyStatusEnum.AVAILABLE);

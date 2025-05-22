@@ -1,40 +1,44 @@
 package vn.edu.hust.nmcnpm_20242_n3.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import vn.edu.hust.nmcnpm_20242_n3.constant.BookLoanStatusEnum;
-import vn.edu.hust.nmcnpm_20242_n3.entity.Book;
-import vn.edu.hust.nmcnpm_20242_n3.entity.BookCopy;
-import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
-import org.springframework.stereotype.Repository;
-import vn.edu.hust.nmcnpm_20242_n3.entity.User;
-
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-public interface BookLoanRepository extends CrudRepository<BookLoan, Long> {
-    boolean existsByUserIdAndBookCopyId(String userId, String bookCopyId) ;
-    BookLoan findByUserId(String userId);
-    void deleteByUserId(String userId);
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
-    
+import org.springframework.stereotype.Repository;
+
+import vn.edu.hust.nmcnpm_20242_n3.constant.BookLoanStatusEnum;
+import vn.edu.hust.nmcnpm_20242_n3.entity.Book;
+import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
+import vn.edu.hust.nmcnpm_20242_n3.entity.User;
+
+@Repository
+public interface BookLoanRepository extends CrudRepository<BookLoan, String> {
+    @Query("SELECT b FROM BookLoan b WHERE b.status = :status")
+    List<BookLoan> findByStatus(@Param("status") BookLoanStatusEnum status);
+
+    @Query("SELECT b FROM BookLoan b WHERE b.bookCopy.id=:bookCopyId")
+    Optional<BookLoan> findByBookCopyId(@Param("bookCopyId") int bookCopyId);
+
+    @Query("SELECT b FROM BookLoan b WHERE b.user.id=:userId")
+    List<BookLoan> findAllByUserId(@Param("userId") String userId);
+
+    @Query("SELECT b FROM BookLoan b WHERE b.user.id=:userId AND b.status = :status AND b.bookCopy.id=:bookCopyId")
+    Optional<BookLoan> findByBookCopyIdAndUserIdAndStatus(@Param("userId") String userId,
+            @Param("bookCopyId") int bookCopyId,
+            @Param("status") BookLoanStatusEnum status);
 
     @Query("SELECT bl.user FROM BookLoan bl WHERE bl.bookCopy.id = ?1")
-    List<User> getUserListByBookCopyId(String bookCopyId);
+    List<User> getUserListByBookCopyId(int bookCopyId);
 
     @Query("SELECT bl.bookCopy.originalBook FROM BookLoan bl WHERE bl.user.id = ?1 AND bl.status = 'BORROWED'")
     List<Book> findBorrowedBooksByUserId(String userId);
 
-    Optional<BookLoan> findByBookCopyIdAndUserIdAndStatus(String userId, String bookCopyId, BookLoanStatusEnum status);
+    boolean existsByUserIdAndBookCopyId(String userId, int bookCopyId) ;
+    BookLoan findByUserId(String userId);
+    void deleteByUserId(String userId);
 
-    Optional<BookLoan> findByBookCopyId(String bookCopyId);
-
-
-    List<BookLoan> findAllByUserId(String userId);
-
-    List<BookLoan> findByStatus(BookLoanStatusEnum bookLoanStatusEnum);
-
+    Optional<BookLoan> findByCurrentBookRequestId(String requestId);
 }
-
