@@ -57,7 +57,7 @@ public class BookRequestController {
 
     @PostMapping("/{userId}/new/borrow")
     public ResponseEntity<?> newBorrowingRequest(@PathVariable("userId") String userId,
-            @RequestParam("bookCopyId") Integer bookCopyId) {
+            @RequestParam("bookCopyId") int bookCopyId) {
         try {
             return new ResponseEntity<>(bookRequestService.newBorrowingRequest(userId, bookCopyId),
                     HttpStatus.CREATED);
@@ -68,12 +68,12 @@ public class BookRequestController {
 
     @PostMapping("/{userId}/new/borrow/rand")
     public ResponseEntity<?> newBorrowingRequest_Random(@PathVariable("userId") String userId,
-            @RequestParam("bookId") Integer bookId) {
+            @RequestParam("bookId") int bookId) {
         try {
             BookCopy bookCopy = bookCopyRepository
                     .findFirstByOriginalBook_BookIdAndStatus(bookId, BookCopyStatusEnum.AVAILABLE)
                     .orElseThrow(() -> new IllegalArgumentException("No such book copy found!"));
-            Integer bookCopyId = bookCopy.getId();
+            int bookCopyId = bookCopy.getId();
 
             return new ResponseEntity<>(bookRequestService.newBorrowingRequest(userId, bookCopyId), HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
@@ -83,7 +83,7 @@ public class BookRequestController {
 
     @PostMapping("/{userId}/new/return")
     public ResponseEntity<?> newReturningRequest(@PathVariable("userId") String userId,
-            @RequestParam("bookCopyId") Integer bookCopyId) {
+            @RequestParam("bookCopyId") int bookCopyId) {
         try {
             return new ResponseEntity<>(bookRequestService.newReturningRequest(userId, bookCopyId), HttpStatus.CREATED);
         } catch (Exception e) {

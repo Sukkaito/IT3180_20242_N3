@@ -130,20 +130,23 @@ public class BookRequestService {
     }
 
     @Transactional
-    public BookRequest newBorrowingRequest(String userId, Integer bookCopyId) {
+    public BookRequest newBorrowingRequest(String userId, int bookCopyId) {
         BookCopy bookCopy = bookCopyRepository.findById(bookCopyId)
                 .orElseThrow(() -> new IllegalArgumentException("Book copy not found"));
         if (!bookCopy.getStatus().equals(BookCopyStatusEnum.AVAILABLE)) {
             throw new IllegalArgumentException("Book copy is not available");
         }
+        // Check if user exists
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        // Check if user has pending requests
         List<BookRequest> pendingRequests = bookRequestRepository.checkForOverlappingRequest(bookCopyId, userId,
                 BookRequestTypeEnum.BORROWING);
         if (pendingRequests.size() > 0) {
             throw new IllegalArgumentException("You already have another pending borrowing request for this book!");
         }
 
+        // Create a new book request
         BookRequest bookRequest = new BookRequest();
         bookRequest.setUser(user);
         bookRequest.setBookCopy(bookCopy);
@@ -153,7 +156,7 @@ public class BookRequestService {
     }
 
     @Transactional
-    public BookRequest newReturningRequest(String userId, Integer bookCopyId) {
+    public BookRequest newReturningRequest(String userId, int bookCopyId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         BookLoan bookLoan = bookLoanService
@@ -169,10 +172,11 @@ public class BookRequestService {
         if (pendingRequests.size() > 0) {
             throw new IllegalArgumentException("You already have another pending returning request for this book!");
         }
+        // Create a new book request
         BookRequest bookRequest = new BookRequest();
         bookRequest.setUser(user);
         bookRequest.setBookCopy(bookCopy);
-        bookRequest.setBookLoan(bookLoan); 
+        bookRequest.setBookLoan(bookLoan);
         bookRequest.setType(BookRequestTypeEnum.RETURNING);
         bookRequest.setStatus(BookRequestStatusEnum.PENDING);
         return bookRequestRepository.save(bookRequest);
@@ -185,6 +189,7 @@ public class BookRequestService {
         if (!bookRequest.getStatus().equals(BookRequestStatusEnum.PENDING)) {
             throw new IllegalArgumentException("Request is not pending");
         }
+        // Update book request status
         bookRequest.setStatus(BookRequestStatusEnum.CANCELED);
         return bookRequestRepository.save(bookRequest);
     }
