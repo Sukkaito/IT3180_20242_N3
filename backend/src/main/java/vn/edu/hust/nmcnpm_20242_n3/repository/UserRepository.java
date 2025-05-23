@@ -1,9 +1,13 @@
 package vn.edu.hust.nmcnpm_20242_n3.repository;
 
-import org.springframework.data.repository.CrudRepository;
-
+import org.springframework.stereotype.Repository;
 import vn.edu.hust.nmcnpm_20242_n3.entity.User;
-
-public interface UserRepository extends CrudRepository<User, String> {
-
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
+@Repository
+public interface UserRepository extends JpaRepository<User, String> {
+    Optional<User> findByEmail(String email);
+    Optional<User> findByUserName(String userName);
+    boolean existsByEmail(String email);
+    boolean existsByUserName(String userName);
 }
