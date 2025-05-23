@@ -8,9 +8,8 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
-// Needed for HTTP requests and responses
 @Setter
 @Getter
 
@@ -19,32 +18,40 @@ import java.util.Date;
 public class BookRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+    private String id;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    BookLoan bookLoan;
+    private BookLoan bookLoan;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private BookCopy bookCopy;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+
+    private User user;
 
     @Enumerated(EnumType.STRING)
-    BookRequestStatusEnum status;
+    private BookRequestStatusEnum status;
 
     @Enumerated(EnumType.STRING)
-    BookRequestTypeEnum type;
+    private BookRequestTypeEnum type;
 
     @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    Date CreatedAt;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
     @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    Date UpdatedAt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
-        CreatedAt = new Date();
-        UpdatedAt = new Date();
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        UpdatedAt = new Date();
+        updatedAt = LocalDateTime.now();
     }
 }
