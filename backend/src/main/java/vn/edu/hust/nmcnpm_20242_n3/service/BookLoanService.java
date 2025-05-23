@@ -115,4 +115,16 @@ public class BookLoanService {
     public void save(BookLoan bookLoan) {
         bookLoanRepository.save(bookLoan);
     }
+
+    public User getUserById(String userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+    }
+
+    public BookCopy getBookCopyById(int bookCopyId) {
+        return bookCopyRepository.findById(bookCopyId)
+                .orElseThrow(() -> new IllegalArgumentException("Book copy not found with ID: " + bookCopyId));
+    }
+
+
 }

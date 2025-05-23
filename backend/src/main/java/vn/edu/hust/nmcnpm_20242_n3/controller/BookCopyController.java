@@ -14,7 +14,7 @@ public class BookCopyController {
     @Autowired
     private BookCopyService bookCopyService;
 
-    @GetMapping
+    @GetMapping("/available")
     public ResponseEntity<?> getAllAvailableBookCopies() {
         try {
             var availableBookCopies = bookCopyService.getAllAvailableBookCopies();
@@ -40,7 +40,7 @@ public class BookCopyController {
             // Update the status of the book copy
             bookCopyService.setStatus(bookCopyId, BookCopyStatusEnum.UNAVAILABLE);
 
-            return ResponseEntity.ok("Book copy is now being browsed by user " + userId);
+            return ResponseEntity.ok("Book copy is now being browsed" );
 
 
         } catch (Exception e) {

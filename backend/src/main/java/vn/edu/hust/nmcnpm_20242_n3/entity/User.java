@@ -37,6 +37,12 @@ public class User {
     @ManyToOne
     Role role;
 
+    public User(String id, String name, String email) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+    }
+
     @PrePersist
     protected void onCreate() {
         CreatedAt = new Date();
