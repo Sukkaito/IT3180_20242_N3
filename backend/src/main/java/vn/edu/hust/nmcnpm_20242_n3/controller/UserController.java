@@ -3,10 +3,10 @@ package vn.edu.hust.nmcnpm_20242_n3.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.edu.hust.nmcnpm_20242_n3.dto.BookLoanDTO;
+import vn.edu.hust.nmcnpm_20242_n3.dto.FineDTO;
 import vn.edu.hust.nmcnpm_20242_n3.dto.UserCreateDTO;
 import vn.edu.hust.nmcnpm_20242_n3.dto.UserDTO;
-import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
-import vn.edu.hust.nmcnpm_20242_n3.entity.Fine;
 import vn.edu.hust.nmcnpm_20242_n3.service.UserService;
 
 import java.util.List;
@@ -73,18 +73,22 @@ public class UserController {
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable String id) {
-        userService.deleteUser(id);
-        return ResponseEntity.ok("User deleted");
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.ok("User deleted");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
     @GetMapping("/{userId}/book-loans")
     public ResponseEntity<?> getBookLoansByUserId(@PathVariable String userId) {
-        List<BookLoan> loans = userService.getBookLoansByUserId(userId);
+        List<BookLoanDTO> loans = userService.getBookLoansByUserId(userId);
         return ResponseEntity.ok(loans);
     }
 
     @GetMapping("/{userId}/fines")
     public ResponseEntity<?> getFinesByUserId(@PathVariable String userId) {
-        List<Fine> fines = userService.getFinesByUserId(userId);
+        List<FineDTO> fines = userService.getFinesByUserId(userId);
         return ResponseEntity.ok(fines);
     }
 

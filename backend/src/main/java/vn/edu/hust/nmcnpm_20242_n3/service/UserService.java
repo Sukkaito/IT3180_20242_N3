@@ -2,6 +2,8 @@ package vn.edu.hust.nmcnpm_20242_n3.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import vn.edu.hust.nmcnpm_20242_n3.dto.FineDTO;
+import vn.edu.hust.nmcnpm_20242_n3.dto.BookLoanDTO;
 import vn.edu.hust.nmcnpm_20242_n3.dto.UserCreateDTO;
 import vn.edu.hust.nmcnpm_20242_n3.dto.UserDTO;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
@@ -48,10 +50,6 @@ public class UserService {
 
         User saved = userRepository.save(user);
         return mapToDTO(saved);
-    }
-    public User getUserEntityById(String id) {
-        return userRepository.findById(id)
-                .orElse(null);
     }
     public Optional<UserDTO> getUserById(String id) {
         return userRepository.findById(id).map(this::mapToDTO);
@@ -104,17 +102,41 @@ public class UserService {
         }
         userRepository.deleteById(id);
     }
+    private BookLoanDTO toBookLoanDTO(BookLoan loan) {
+        BookLoanDTO dto = new BookLoanDTO();
+        dto.setId(loan.getId());
+        dto.setLoanDate(loan.getLoanDate());
+        dto.setReturnDate(loan.getReturnDate());
+        dto.setActualReturnDate(loan.getActualReturnDate());
+        dto.setStatus(loan.getStatus().toString());
+        dto.setCurrentBookRequestId(loan.getCurrentBookRequestId());
+        dto.setBookCopyId(loan.getBookCopy() != null ? loan.getBookCopy().getId() : null);
+        return dto;
+    }
+
+    private FineDTO toFineDTO(Fine fine) {
+        FineDTO dto = new FineDTO();
+        dto.setId(fine.getId());
+        dto.setAmount(fine.getAmount());
+        dto.setCreatedAt(fine.getCreatedAt());
+        dto.setUpdatedAt(fine.getUpdatedAt());
+        dto.setBookLoanId(fine.getBookLoan() != null ? fine.getBookLoan().getId() : null);
+        return dto;
+    }
     @Autowired
     private BookLoanRepository bookLoanRepository;
 
     @Autowired
     private FineRepository fineRepository;
 
-    public List<BookLoan> getBookLoansByUserId(String userId) {
-        return bookLoanRepository.findByUserId(userId);
+    public List<BookLoanDTO> getBookLoansByUserId(String userId) {
+        List<BookLoan> loans = bookLoanRepository.findAllByUserId(userId);
+        return loans.stream().map(this::toBookLoanDTO).collect(Collectors.toList());
     }
 
-    public List<Fine> getFinesByUserId(String userId) {
-        return fineRepository.findByUserId(userId);
+    public List<FineDTO> getFinesByUserId(String userId) {
+        List<Fine> fines = fineRepository.findByUserId(userId);
+        return fines.stream().map(this::toFineDTO).collect(Collectors.toList());
     }
+
 }
