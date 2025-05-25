@@ -41,4 +41,7 @@ public interface BookLoanRepository extends CrudRepository<BookLoan, String> {
     void deleteByUserId(String userId);
 
     Optional<BookLoan> findByCurrentBookRequestId(String requestId);
+
+    @Query("SELECT b FROM BookLoan b WHERE b.bookCopy.id = :bookCopyId")
+    List<BookLoan> findAllByBookCopyId(@Param("bookCopyId") int bookCopyId);
 }

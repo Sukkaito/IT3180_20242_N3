@@ -127,4 +127,20 @@ public class BookLoanService {
     }
 
 
+    public BookLoan getBookLoanById(String bookLoanId) {
+        return bookLoanRepository.findById(bookLoanId)
+                .orElseThrow(() -> new IllegalArgumentException("Book loan not found with ID: " + bookLoanId));
+    }
+
+    public void saveBookCopy(BookCopy bookCopy) {
+        bookCopyRepository.save(bookCopy);
+    }
+
+    public List<BookLoan> getBorrowHistoryByBookCopyId(int bookCopyId) {
+        return bookLoanRepository.findAllByBookCopyId(bookCopyId);
+    }
+
+    public List<BookLoan> getOverdueLoans() {
+        return bookLoanRepository.findByStatus(BookLoanStatusEnum.OVERDUE);
+    }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import vn.edu.hust.nmcnpm_20242_n3.constant.BookCopyStatusEnum;
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookLoanStatusEnum;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookCopy;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
@@ -46,7 +47,7 @@ public class BookLoanController {
         BookCopy bookCopy = bookLoanService.getBookCopyById(bookCopyId);
         User user = bookLoanService.getUserById(userId);
 
-        if (bookCopy == null || user == null) {
+        if (bookCopy == null || user == null || bookCopy.getStatus() != BookCopyStatusEnum.AVAILABLE) {
             throw new IllegalArgumentException("BookCopy and User cannot be null");
         }
 
@@ -56,14 +57,14 @@ public class BookLoanController {
             bookLoan.setLoan_duration(30); // Default loan duration
             bookLoan.setStatus(BookLoanStatusEnum.BORROWED);
             bookLoan.setLoanedAt(new Date());
+        // Set the book copy status to UNAVAILABLE
+            bookCopy.setStatus(BookCopyStatusEnum.UNAVAILABLE);
         try {
             bookLoanService.save(bookLoan);
         } catch (Exception e){
             return false;
         }
         return true;
-
-
     }
 
     @GetMapping("/borrowed-book/{userId}")
@@ -76,16 +77,81 @@ public class BookLoanController {
         }
     }
 
-    @GetMapping("/users/{bookCopyId}")
-    public List<User> getUserListByBookCopyId(@PathVariable int bookCopyId) {
-            return bookLoanService.getUserListByBookCopyId(bookCopyId)
-                    .stream()
-                    .map(user -> new User(user.getId(), user.getName(), user.getEmail()))
-                    .toList();
+    @PutMapping("/return/{bookLoanId}")
+    public ResponseEntity<?> returnBook(@PathVariable String bookLoanId) {
+        try {
+            BookLoan bookLoan = bookLoanService.getBookLoanById(bookLoanId);
+            if (bookLoan == null || bookLoan.getStatus() != BookLoanStatusEnum.BORROWED) {
+                return new ResponseEntity<>("Book loan not found or not in BORROWED state", HttpStatus.NOT_FOUND);
+            }
+            bookLoan.setStatus(BookLoanStatusEnum.RETURNED);
+            bookLoan.setActualReturnDate(new Date());
+            bookLoanService.save(bookLoan);
 
+            // Update the book copy status to AVAILABLE
+            BookCopy bookCopy = bookLoan.getBookCopy();
+            if (bookCopy != null) {
+                bookCopy.setStatus(BookCopyStatusEnum.AVAILABLE);
+                bookLoanService.saveBookCopy(bookCopy);
+            }
 
+            return new ResponseEntity<>("Book returned successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
 
+
+    @PutMapping("/extend/{borrowId}")
+    public ResponseEntity<?> extendBorrowPeriod(@PathVariable String borrowId, @RequestParam Date newReturnDate) {
+        try {
+            BookLoan bookLoan = bookLoanService.getBookLoanById(borrowId);
+            if (bookLoan == null || bookLoan.getStatus() != BookLoanStatusEnum.BORROWED) {
+                return new ResponseEntity<>("Book loan not found or not in BORROWED state", HttpStatus.NOT_FOUND);
+            }
+
+            if (newReturnDate.before(bookLoan.getDueDate())) {
+                return new ResponseEntity<>("New return date must be after the current due date", HttpStatus.BAD_REQUEST);
+            }
+
+            bookLoan.setDueDate(newReturnDate);
+            bookLoanService.save(bookLoan);
+
+            return new ResponseEntity<>("Borrow period extended successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/history/user/{userId}")
+    public ResponseEntity<?> getBorrowingHistory(@PathVariable String userId) {
+        try {
+            List<BookLoan> history = bookLoanService.getAllLoansByUserId(userId);
+            return new ResponseEntity<>(history, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/history/book-copy/{bookCopyId}")
+    public ResponseEntity<?> getBorrowHistoryByBookCopyId(@PathVariable int bookCopyId) {
+        try {
+            List<BookLoan> history = bookLoanService.getBorrowHistoryByBookCopyId(bookCopyId);
+            return new ResponseEntity<>(history, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/overdue")
+    public ResponseEntity<?> getOverdueLoans() {
+        try {
+            List<BookLoan> overdueLoans = bookLoanService.getOverdueLoans();
+            return new ResponseEntity<>(overdueLoans, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 
 
