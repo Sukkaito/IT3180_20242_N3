@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import vn.edu.hust.nmcnpm_20242_n3.entity.Fine;
 import vn.edu.hust.nmcnpm_20242_n3.entity.User;
@@ -43,9 +44,15 @@ public class FineController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FineDTO> getFineById(@PathVariable String id) {
-        Fine fine = fineService.getFineById(id);
-        return new ResponseEntity<>(FineDTO.fromEntity(fine), HttpStatus.OK);
+    public ResponseEntity<?> getFineById(@PathVariable String id) {
+        try {
+            Fine fine = fineService.getFineById(id);
+            return new ResponseEntity<>(FineDTO.fromEntity(fine), HttpStatus.OK);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+        }
     }
 
     @PostMapping
@@ -105,8 +112,14 @@ public class FineController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteFine(@PathVariable(name = "id") String id) {
-        fineService.deleteFine(id);
-        return new ResponseEntity<>("Fine deleted successfully", HttpStatus.OK);
+        try {
+            fineService.deleteFine(id);
+            return new ResponseEntity<>("Fine deleted successfully", HttpStatus.OK);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+        }
     }
 
     @GetMapping("/user/{userId}")
@@ -119,7 +132,9 @@ public class FineController {
     }
 
     @GetMapping("/date-range")
-    public ResponseEntity<List<FineDTO>> getFinesByDateRange(@RequestParam Date startDate, @RequestParam Date endDate) {
+    public ResponseEntity<List<FineDTO>> getFinesByDateRange(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
         List<FineDTO> dtos = fineService.getFinesByDateRange(startDate, endDate)
                 .stream()
                 .map(FineDTO::fromEntity)
