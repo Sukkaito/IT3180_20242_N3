@@ -47,18 +47,23 @@ public class BookLoanController {
         BookCopy bookCopy = bookLoanService.getBookCopyById(bookCopyId);
         User user = bookLoanService.getUserById(userId);
 
-        if (bookCopy == null || user == null || bookCopy.getStatus() != BookCopyStatusEnum.AVAILABLE) {
+        BookLoan bookLoan = new BookLoan();
+        bookLoan.setBookCopy(bookCopy);
+        bookLoan.setUser(user);
+        bookLoan.setLoan_duration(30); // Default loan duration
+        if (bookCopy == null || user == null ) {
             throw new IllegalArgumentException("BookCopy and User cannot be null");
         }
 
-            BookLoan bookLoan = new BookLoan();
-            bookLoan.setBookCopy(bookCopy);
-            bookLoan.setUser(user);
-            bookLoan.setLoan_duration(30); // Default loan duration
+        if(bookCopy.getStatus() == BookCopyStatusEnum.UNAVAILABLE) {
+           bookLoan.setStatus(BookLoanStatusEnum.REQUEST_BORROWING);
+        }
+        else {
             bookLoan.setStatus(BookLoanStatusEnum.BORROWED);
             bookLoan.setLoanedAt(new Date());
         // Set the book copy status to UNAVAILABLE
             bookCopy.setStatus(BookCopyStatusEnum.UNAVAILABLE);
+        }
         try {
             bookLoanService.save(bookLoan);
         } catch (Exception e){
