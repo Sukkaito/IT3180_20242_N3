@@ -16,5 +16,4 @@ public interface BookCopyRepository extends CrudRepository<BookCopy, Integer> {
     Optional<BookCopy> findFirstByOriginalBook_BookIdAndStatus(Integer bookId, BookCopyStatusEnum status);
     Optional<BookCopy> findById(int id);
 
-    List<BookCopy> findByBookIdAndStatus(int bookId, BookCopyStatusEnum bookCopyStatusEnum);
 }

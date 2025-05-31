@@ -22,7 +22,7 @@ export default function UserNavbar({ selected = "home" }: { selected?: string })
         ? "bg-blue-500 text-white"
         : "bg-blue-100 text-blue-700 hover:bg-blue-200"
     }`;
-  return (
+  return (  
     <>
       {/* Spacer to prevent content from being hidden behind the navbar */}
       <div className="h-16" />
