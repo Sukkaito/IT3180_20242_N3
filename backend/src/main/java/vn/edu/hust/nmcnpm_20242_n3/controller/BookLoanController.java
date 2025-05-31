@@ -1,15 +1,14 @@
 package vn.edu.hust.nmcnpm_20242_n3.controller;
 
-import java.util.Date;
 import java.util.List;
 
-import lombok.AllArgsConstructor;
+
 import lombok.NoArgsConstructor;
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookCopyStatusEnum;
-import vn.edu.hust.nmcnpm_20242_n3.constant.BookLoanStatusEnum;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookCopy;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
-import vn.edu.hust.nmcnpm_20242_n3.entity.User;
+import vn.edu.hust.nmcnpm_20242_n3.entity.BookRequest;
+import vn.edu.hust.nmcnpm_20242_n3.repository.BookCopyRepository;
 import vn.edu.hust.nmcnpm_20242_n3.service.BookLoanService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
+import vn.edu.hust.nmcnpm_20242_n3.service.BookRequestService;
 
 @RestController
 @RequestMapping("/api/loaned")
@@ -31,10 +30,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class BookLoanController {
 
     private BookLoanService bookLoanService;
+    private BookRequestService bookRequestService;
+
 
     @Autowired
-    public BookLoanController(BookLoanService bookLoanService) {
+    public BookLoanController(BookLoanService bookLoanService, BookRequestService bookRequestService) {
         this.bookLoanService = bookLoanService;
+        this.bookRequestService = bookRequestService;
     }
 
     @GetMapping("/{userId}")
@@ -42,35 +44,16 @@ public class BookLoanController {
         return bookLoanService.getAllLoansByUserId(userId);
     }
 
-    @PostMapping("/add/user/{bookCopyId}/{userId}")
-    public boolean addUserToBookLoanList(@PathVariable int bookCopyId,@PathVariable String userId) {
-        BookCopy bookCopy = bookLoanService.getBookCopyById(bookCopyId);
-        User user = bookLoanService.getUserById(userId);
-
-        BookLoan bookLoan = new BookLoan();
-        bookLoan.setBookCopy(bookCopy);
-        bookLoan.setUser(user);
-        bookLoan.setLoan_duration(30); // Default loan duration
-        if (bookCopy == null || user == null ) {
-            throw new IllegalArgumentException("BookCopy and User cannot be null");
-        }
-
-        if(bookCopy.getStatus() == BookCopyStatusEnum.UNAVAILABLE) {
-           bookLoan.setStatus(BookLoanStatusEnum.REQUEST_BORROWING);
-        }
-        else {
-            bookLoan.setStatus(BookLoanStatusEnum.BORROWED);
-            bookLoan.setLoanedAt(new Date());
-        // Set the book copy status to UNAVAILABLE
-            bookCopy.setStatus(BookCopyStatusEnum.UNAVAILABLE);
-        }
+@PostMapping("/request-borrow/{bookCopyId}/{userId}")
+    public ResponseEntity<?> createBorrowRequest(@PathVariable int bookCopyId, @PathVariable String userId) {
         try {
-            bookLoanService.save(bookLoan);
-        } catch (Exception e){
-            return false;
+            BookRequest bookRequest = bookRequestService.newBorrowingRequest(userId, bookCopyId);
+            return new ResponseEntity<>(bookRequest, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        return true;
     }
+
 
     @GetMapping("/borrowed-book/{userId}")
     public ResponseEntity<?> getBorrowedBooksByUserId(@PathVariable String userId) {
@@ -82,51 +65,44 @@ public class BookLoanController {
         }
     }
 
-    @PutMapping("/return/{bookLoanId}")
-    public ResponseEntity<?> returnBook(@PathVariable String bookLoanId) {
+    @PutMapping("/{userId}/borrow")
+    public ResponseEntity<?> borrowBookRequest(@PathVariable String userId, @RequestParam int bookCopyId) {
         try {
-            BookLoan bookLoan = bookLoanService.getBookLoanById(bookLoanId);
-            if (bookLoan == null || bookLoan.getStatus() != BookLoanStatusEnum.BORROWED) {
-                return new ResponseEntity<>("Book loan not found or not in BORROWED state", HttpStatus.NOT_FOUND);
-            }
-            bookLoan.setStatus(BookLoanStatusEnum.RETURNED);
-            bookLoan.setActualReturnDate(new Date());
-            bookLoanService.save(bookLoan);
-
-            // Update the book copy status to AVAILABLE
-            BookCopy bookCopy = bookLoan.getBookCopy();
-            if (bookCopy != null) {
-                bookCopy.setStatus(BookCopyStatusEnum.AVAILABLE);
-                bookLoanService.saveBookCopy(bookCopy);
-            }
-
-            return new ResponseEntity<>("Book returned successfully", HttpStatus.OK);
+            // Tạo request mượn sách cố định
+            BookRequest borrowRequest = bookRequestService.newBorrowingRequest(userId, bookCopyId);
+            return new ResponseEntity<>(borrowRequest, HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-
-    @PutMapping("/extend/{borrowId}")
-    public ResponseEntity<?> extendBorrowPeriod(@PathVariable String borrowId, @RequestParam Date newReturnDate) {
+    @PutMapping("/{userId}/borrow/rand")
+    public ResponseEntity<?> borrowRandomBookRequest(@PathVariable String userId, @RequestParam int bookId) {
         try {
-            BookLoan bookLoan = bookLoanService.getBookLoanById(borrowId);
-            if (bookLoan == null || bookLoan.getStatus() != BookLoanStatusEnum.BORROWED) {
-                return new ResponseEntity<>("Book loan not found or not in BORROWED state", HttpStatus.NOT_FOUND);
-            }
+            // Tạo request mượn sách ngẫu nhiên
+            BookCopyRepository bookCopyRepository = null;
+            BookCopy bookCopy = bookCopyRepository
+                    .findFirstByOriginalBook_BookIdAndStatus(bookId, BookCopyStatusEnum.AVAILABLE)
+                    .orElseThrow(() -> new IllegalArgumentException("No such book copy found!"));
+            int bookCopyId = bookCopy.getId();
 
-            if (newReturnDate.before(bookLoan.getDueDate())) {
-                return new ResponseEntity<>("New return date must be after the current due date", HttpStatus.BAD_REQUEST);
-            }
-
-            bookLoan.setDueDate(newReturnDate);
-            bookLoanService.save(bookLoan);
-
-            return new ResponseEntity<>("Borrow period extended successfully", HttpStatus.OK);
+            return new ResponseEntity<>(bookRequestService.newBorrowingRequest(userId, bookCopyId), HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PutMapping("/{userId}/return")
+    public ResponseEntity<?> returnBookRequest(@PathVariable String userId, @RequestParam int bookLoanId) {
+        try {
+            // Tạo request trả sách
+            BookRequest returnRequest = bookRequestService.newReturningRequest(userId, bookLoanId);
+            return new ResponseEntity<>(returnRequest, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
 
     @GetMapping("/history/user/{userId}")
     public ResponseEntity<?> getBorrowingHistory(@PathVariable String userId) {

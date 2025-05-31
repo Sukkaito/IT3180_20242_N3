@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookCopyStatusEnum;
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookLoanStatusEnum;
+import vn.edu.hust.nmcnpm_20242_n3.constant.BookRequestStatusEnum;
+import vn.edu.hust.nmcnpm_20242_n3.constant.BookRequestTypeEnum;
 import vn.edu.hust.nmcnpm_20242_n3.entity.*;
 import vn.edu.hust.nmcnpm_20242_n3.repository.BookCopyRepository;
 import vn.edu.hust.nmcnpm_20242_n3.repository.BookLoanRepository;
@@ -143,4 +145,24 @@ public class BookLoanService {
     public List<BookLoan> getOverdueLoans() {
         return bookLoanRepository.findByStatus(BookLoanStatusEnum.OVERDUE);
     }
+
+    @Transactional
+    public BookRequest createBorrowRequest(int bookCopyId, String userId) {
+        BookCopy bookCopy = bookCopyRepository.findById(bookCopyId)
+                .orElseThrow(() -> new IllegalArgumentException("Book copy not found"));
+        if (!bookCopy.getStatus().equals(BookCopyStatusEnum.AVAILABLE)) {
+            throw new IllegalArgumentException("Book copy is not available");
+        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        BookRequest bookRequest = new BookRequest();
+        bookRequest.setUser(user);
+        bookRequest.setBookCopy(bookCopy);
+        bookRequest.setType(BookRequestTypeEnum.BORROWING);
+        bookRequest.setStatus(BookRequestStatusEnum.PENDING);
+        return bookRequestRepository.save(bookRequest);
+    }
+
+
 }
