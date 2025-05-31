@@ -136,7 +136,7 @@ public class SubscriptionService {
         for (Subscription subscription : subscriptions) {
             String email = subscription.getUser().getEmail();
             System.out.println("Notification sent to: " + email);
-            // emailService.sendEmail(email, "Book Copy Available", "The book copy you subscribed to is now available.");
+            this.sendEmail(email, "Book Copy Available", "The book copy you subscribed to is now available.");
         }
     }
 
