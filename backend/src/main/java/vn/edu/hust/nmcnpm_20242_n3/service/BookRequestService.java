@@ -27,14 +27,16 @@ public class BookRequestService {
     private final BookLoanService bookLoanService;
     private final UserRepository userRepository;
     private final BookRequestRepository bookRequestRepository;
+    private final SubscriptionService subscriptionService;
 
     @Autowired
     public BookRequestService(BookCopyRepository bookCopyRepository, BookLoanService bookLoanService,
-            UserRepository userRepository, BookRequestRepository bookRequestRepository) {
+                              UserRepository userRepository, BookRequestRepository bookRequestRepository, SubscriptionService subscriptionService) {
         this.bookCopyRepository = bookCopyRepository;
         this.userRepository = userRepository;
         this.bookRequestRepository = bookRequestRepository;
         this.bookLoanService = bookLoanService;
+        this.subscriptionService = subscriptionService;
     }
 
     public List<BookRequest> getAllRequests() {
@@ -88,6 +90,7 @@ public class BookRequestService {
                 request.setStatus(BookRequestStatusEnum.ACCEPTED);
                 bookCopy.setStatus(BookCopyStatusEnum.UNAVAILABLE);
                 bookCopyRepository.save(bookCopy);
+                subscriptionService.cancelSubscriptionAfterBorrowing(bookCopy.getId(), request.getUser().getId());
             } else {
                 request.setStatus(BookRequestStatusEnum.DENIED);
             }
@@ -130,7 +133,7 @@ public class BookRequestService {
     }
 
     @Transactional
-    public BookRequest newBorrowingRequest(String userId, int bookCopyId) {
+    public BookRequest newBorrowingRequest(String userId, Integer bookCopyId) {
         BookCopy bookCopy = bookCopyRepository.findById(bookCopyId)
                 .orElseThrow(() -> new IllegalArgumentException("Book copy not found"));
         if (!bookCopy.getStatus().equals(BookCopyStatusEnum.AVAILABLE)) {
@@ -156,7 +159,7 @@ public class BookRequestService {
     }
 
     @Transactional
-    public BookRequest newReturningRequest(String userId, int bookCopyId) {
+    public BookRequest newReturningRequest(String userId, Integer bookCopyId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         BookLoan bookLoan = bookLoanService

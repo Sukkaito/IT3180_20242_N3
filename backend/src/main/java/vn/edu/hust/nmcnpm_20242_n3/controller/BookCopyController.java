@@ -24,31 +24,6 @@ public class BookCopyController {
         }
     }
 
-    @PutMapping("/browsing/{userId}/{bookCopyId}")
-    public ResponseEntity<?> browsingBookCopy(@PathVariable int bookCopyId ,
-                                              @PathVariable String userId) {
-        try {
-            var bookCopy = bookCopyService.getBookCopyById(bookCopyId);
-            if (bookCopy == null) {
-                return ResponseEntity.status(404).body("Book copy not found");
-            }
-
-            if ( !bookCopyService.isAvailable(bookCopyId)) {
-                return ResponseEntity.status(400).body("Book copy is not available for browsing");
-            }
-
-            // Update the status of the book copy
-            bookCopyService.setStatus(bookCopyId, BookCopyStatusEnum.UNAVAILABLE);
-
-            return ResponseEntity.ok("Book copy is now being browsed" );
-
-
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error processing the request: " + e.getMessage());
-        }
-    }
-
-//    @PutMapping
 
     
 }

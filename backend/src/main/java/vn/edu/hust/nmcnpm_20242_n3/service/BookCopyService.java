@@ -18,10 +18,6 @@ public class BookCopyService {
     @Autowired
     private BookCopyRepository bookCopyRepository;
 
-    public boolean isBookCopyExists(int  bookCopyId) {
-        return bookCopyRepository.existsById(bookCopyId);
-    }
-
     public List<BookCopy> getAllAvailableBookCopies() {
         return bookCopyRepository.findByStatus(BookCopyStatusEnum.valueOf(BookCopyStatusEnum.AVAILABLE.name()));
     }
@@ -30,7 +26,6 @@ public class BookCopyService {
         return bookCopyRepository.findById(bookCopyId)
                 .orElseThrow(() -> new IllegalArgumentException("Book copy not found with id: " + bookCopyId));
     }
-
 
     public void setStatus(int bookCopyId, BookCopyStatusEnum status) {
         BookCopy bookCopy = bookCopyRepository.findById(bookCopyId)

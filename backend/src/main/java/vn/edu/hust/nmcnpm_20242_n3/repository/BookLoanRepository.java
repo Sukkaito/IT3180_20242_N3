@@ -20,28 +20,28 @@ public interface BookLoanRepository extends CrudRepository<BookLoan, String> {
     List<BookLoan> findByStatus(@Param("status") BookLoanStatusEnum status);
 
     @Query("SELECT b FROM BookLoan b WHERE b.bookCopy.id=:bookCopyId")
-    Optional<BookLoan> findByBookCopyId(@Param("bookCopyId") int bookCopyId);
+    Optional<BookLoan> findByBookCopyId(@Param("bookCopyId") Integer bookCopyId);
 
     @Query("SELECT b FROM BookLoan b WHERE b.user.id=:userId")
     List<BookLoan> findAllByUserId(@Param("userId") String userId);
 
     @Query("SELECT b FROM BookLoan b WHERE b.user.id=:userId AND b.status = :status AND b.bookCopy.id=:bookCopyId")
     Optional<BookLoan> findByBookCopyIdAndUserIdAndStatus(@Param("userId") String userId,
-            @Param("bookCopyId") int bookCopyId,
+            @Param("bookCopyId") Integer bookCopyId,
             @Param("status") BookLoanStatusEnum status);
 
     @Query("SELECT bl.user FROM BookLoan bl WHERE bl.bookCopy.id = ?1")
-    List<User> getUserListByBookCopyId(int bookCopyId);
+    List<User> getUserListByBookCopyId(Integer bookCopyId);
 
     @Query("SELECT bl.bookCopy.originalBook FROM BookLoan bl WHERE bl.user.id = ?1 AND bl.status = 'BORROWED'")
     List<Book> findBorrowedBooksByUserId(String userId);
 
-    boolean existsByUserIdAndBookCopyId(String userId, int bookCopyId) ;
+    boolean existsByUserIdAndBookCopyId(String userId, Integer bookCopyId) ;
     BookLoan findByUserId(String userId);
     void deleteByUserId(String userId);
 
     Optional<BookLoan> findByCurrentBookRequestId(String requestId);
 
     @Query("SELECT b FROM BookLoan b WHERE b.bookCopy.id = :bookCopyId")
-    List<BookLoan> findAllByBookCopyId(@Param("bookCopyId") int bookCopyId);
+    List<BookLoan> findAllByBookCopyId(@Param("bookCopyId") Integer bookCopyId);
 }

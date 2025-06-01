@@ -65,44 +65,6 @@ public class BookLoanController {
         }
     }
 
-    @PutMapping("/{userId}/borrow")
-    public ResponseEntity<?> borrowBookRequest(@PathVariable String userId, @RequestParam int bookCopyId) {
-        try {
-            // Tạo request mượn sách cố định
-            BookRequest borrowRequest = bookRequestService.newBorrowingRequest(userId, bookCopyId);
-            return new ResponseEntity<>(borrowRequest, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @PutMapping("/{userId}/borrow/rand")
-    public ResponseEntity<?> borrowRandomBookRequest(@PathVariable String userId, @RequestParam int bookId) {
-        try {
-            // Tạo request mượn sách ngẫu nhiên
-            BookCopyRepository bookCopyRepository = null;
-            BookCopy bookCopy = bookCopyRepository
-                    .findFirstByOriginalBook_BookIdAndStatus(bookId, BookCopyStatusEnum.AVAILABLE)
-                    .orElseThrow(() -> new IllegalArgumentException("No such book copy found!"));
-            int bookCopyId = bookCopy.getId();
-
-            return new ResponseEntity<>(bookRequestService.newBorrowingRequest(userId, bookCopyId), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @PutMapping("/{userId}/return")
-    public ResponseEntity<?> returnBookRequest(@PathVariable String userId, @RequestParam int bookLoanId) {
-        try {
-            // Tạo request trả sách
-            BookRequest returnRequest = bookRequestService.newReturningRequest(userId, bookLoanId);
-            return new ResponseEntity<>(returnRequest, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
 
     @GetMapping("/history/user/{userId}")
     public ResponseEntity<?> getBorrowingHistory(@PathVariable String userId) {

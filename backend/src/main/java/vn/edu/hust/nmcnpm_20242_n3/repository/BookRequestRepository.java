@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface BookRequestRepository extends CrudRepository<BookRequest, String> {
     @Query("SELECT b FROM BookRequest b WHERE b.bookCopy.id = :bookCopyId and b.user.id = :userId and b.status = PENDING and b.type=:type")
-    List<BookRequest> checkForOverlappingRequest(@Param("bookCopyId") int bookCopyIdd,
+    List<BookRequest> checkForOverlappingRequest(@Param("bookCopyId") Integer bookCopyIdd,
             @Param("userId") String userId, @Param("type") BookRequestTypeEnum type);
 
     @Query("SELECT b FROM BookRequest b WHERE b.user.id = :userId")

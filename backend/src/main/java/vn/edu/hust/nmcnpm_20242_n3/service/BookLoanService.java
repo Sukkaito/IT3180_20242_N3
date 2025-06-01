@@ -26,20 +26,14 @@ public class BookLoanService {
     private final BookCopyRepository bookCopyRepository;
     private final BookLoanRepository bookLoanRepository;
     private final UserRepository userRepository;
-    private final BookRequestRepository bookRequestRepository;
 
     @Autowired
     public BookLoanService(BookCopyRepository bookCopyRepository, BookLoanRepository bookLoanRepository,
-            UserRepository userRepository, BookRequestRepository bookRequestRepository) {
+            UserRepository userRepository) {
         this.bookCopyRepository = bookCopyRepository;
         this.bookLoanRepository = bookLoanRepository;
 
         this.userRepository = userRepository;
-        this.bookRequestRepository = bookRequestRepository;
-    }
-
-    public Optional<BookLoan> findBookLoanByBookCopyId(Integer bookCopyId) {
-        return bookLoanRepository.findByBookCopyId(bookCopyId);
     }
 
     public List<BookLoan> getAllLoansByUserId(String userId) {
@@ -93,50 +87,11 @@ public class BookLoanService {
         return bookLoanRepository.findBorrowedBooksByUserId(userId);
     }
 
-    public List<User> getUserListByBookCopyId(int bookCopyId) {
-        return bookLoanRepository.getUserListByBookCopyId(bookCopyId);
-    }
-
-
-    public void removeUserFromBookLoanList(String userId) {
-        bookLoanRepository.deleteByUserId(userId);
-    }
-
-    public boolean addUserToBookLoanList(BookCopy bookCopy,User user) {
-        BookLoan bookLoan = new BookLoan(bookCopy ,user);
-        return bookLoanRepository.save(bookLoan) != null;
-    }
-
-
-    public BookLoan findByRequestId(String requestId) {
-        BookRequest request = bookRequestRepository.findById(requestId)
-                .orElseThrow(() -> new IllegalArgumentException("Book request not found with ID: " + requestId));
-        return request.getBookLoan();
-    }
 
     public void save(BookLoan bookLoan) {
         bookLoanRepository.save(bookLoan);
     }
 
-    public User getUserById(String userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
-    }
-
-    public BookCopy getBookCopyById(int bookCopyId) {
-        return bookCopyRepository.findById(bookCopyId)
-                .orElseThrow(() -> new IllegalArgumentException("Book copy not found with ID: " + bookCopyId));
-    }
-
-
-    public BookLoan getBookLoanById(String bookLoanId) {
-        return bookLoanRepository.findById(bookLoanId)
-                .orElseThrow(() -> new IllegalArgumentException("Book loan not found with ID: " + bookLoanId));
-    }
-
-    public void saveBookCopy(BookCopy bookCopy) {
-        bookCopyRepository.save(bookCopy);
-    }
 
     public List<BookLoan> getBorrowHistoryByBookCopyId(int bookCopyId) {
         return bookLoanRepository.findAllByBookCopyId(bookCopyId);
@@ -146,23 +101,6 @@ public class BookLoanService {
         return bookLoanRepository.findByStatus(BookLoanStatusEnum.OVERDUE);
     }
 
-    @Transactional
-    public BookRequest createBorrowRequest(int bookCopyId, String userId) {
-        BookCopy bookCopy = bookCopyRepository.findById(bookCopyId)
-                .orElseThrow(() -> new IllegalArgumentException("Book copy not found"));
-        if (!bookCopy.getStatus().equals(BookCopyStatusEnum.AVAILABLE)) {
-            throw new IllegalArgumentException("Book copy is not available");
-        }
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        BookRequest bookRequest = new BookRequest();
-        bookRequest.setUser(user);
-        bookRequest.setBookCopy(bookCopy);
-        bookRequest.setType(BookRequestTypeEnum.BORROWING);
-        bookRequest.setStatus(BookRequestStatusEnum.PENDING);
-        return bookRequestRepository.save(bookRequest);
-    }
 
 
 }
