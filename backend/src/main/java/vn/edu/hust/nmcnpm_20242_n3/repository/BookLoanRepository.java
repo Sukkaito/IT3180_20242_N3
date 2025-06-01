@@ -19,8 +19,6 @@ public interface BookLoanRepository extends CrudRepository<BookLoan, String> {
     @Query("SELECT b FROM BookLoan b WHERE b.status = :status")
     List<BookLoan> findByStatus(@Param("status") BookLoanStatusEnum status);
 
-    @Query("SELECT b FROM BookLoan b WHERE b.bookCopy.id=:bookCopyId")
-    Optional<BookLoan> findByBookCopyId(@Param("bookCopyId") Integer bookCopyId);
 
     @Query("SELECT b FROM BookLoan b WHERE b.user.id=:userId")
     List<BookLoan> findAllByUserId(@Param("userId") String userId);
@@ -30,15 +28,9 @@ public interface BookLoanRepository extends CrudRepository<BookLoan, String> {
             @Param("bookCopyId") Integer bookCopyId,
             @Param("status") BookLoanStatusEnum status);
 
-    @Query("SELECT bl.user FROM BookLoan bl WHERE bl.bookCopy.id = ?1")
-    List<User> getUserListByBookCopyId(Integer bookCopyId);
 
     @Query("SELECT bl.bookCopy.originalBook FROM BookLoan bl WHERE bl.user.id = ?1 AND bl.status = 'BORROWED'")
     List<Book> findBorrowedBooksByUserId(String userId);
-
-    boolean existsByUserIdAndBookCopyId(String userId, Integer bookCopyId) ;
-    BookLoan findByUserId(String userId);
-    void deleteByUserId(String userId);
 
     Optional<BookLoan> findByCurrentBookRequestId(String requestId);
 

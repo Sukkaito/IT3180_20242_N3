@@ -27,6 +27,7 @@ public class BookLoanService {
     private final BookLoanRepository bookLoanRepository;
     private final UserRepository userRepository;
 
+
     @Autowired
     public BookLoanService(BookCopyRepository bookCopyRepository, BookLoanRepository bookLoanRepository,
             UserRepository userRepository) {
@@ -34,6 +35,7 @@ public class BookLoanService {
         this.bookLoanRepository = bookLoanRepository;
 
         this.userRepository = userRepository;
+
     }
 
     public List<BookLoan> getAllLoansByUserId(String userId) {
@@ -83,15 +85,10 @@ public class BookLoanService {
         return bookLoanRepository.findByBookCopyIdAndUserIdAndStatus(userId, bookCopyId, status);
     }
 
-    public List<Book> getBorrowedBooksByUserId(String userId) {
-        return bookLoanRepository.findBorrowedBooksByUserId(userId);
-    }
-
 
     public void save(BookLoan bookLoan) {
         bookLoanRepository.save(bookLoan);
     }
-
 
     public List<BookLoan> getBorrowHistoryByBookCopyId(int bookCopyId) {
         return bookLoanRepository.findAllByBookCopyId(bookCopyId);
@@ -100,7 +97,5 @@ public class BookLoanService {
     public List<BookLoan> getOverdueLoans() {
         return bookLoanRepository.findByStatus(BookLoanStatusEnum.OVERDUE);
     }
-
-
 
 }

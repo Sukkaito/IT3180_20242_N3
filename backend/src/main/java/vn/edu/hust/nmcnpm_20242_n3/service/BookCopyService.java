@@ -22,24 +22,12 @@ public class BookCopyService {
         return bookCopyRepository.findByStatus(BookCopyStatusEnum.valueOf(BookCopyStatusEnum.AVAILABLE.name()));
     }
 
-    public BookCopy getBookCopyById(int bookCopyId) {
-        return bookCopyRepository.findById(bookCopyId)
-                .orElseThrow(() -> new IllegalArgumentException("Book copy not found with id: " + bookCopyId));
+
+    public Object getBookCopiesByBookId(Integer bookId) {
+        List<BookCopy> bookCopies = bookCopyRepository.findByOriginalBook_BookId(bookId);
+        if (bookCopies.isEmpty()) {
+            return "No available book copies found for the given book ID.";
+        }
+        return bookCopies;
     }
-
-    public void setStatus(int bookCopyId, BookCopyStatusEnum status) {
-        BookCopy bookCopy = bookCopyRepository.findById(bookCopyId)
-                .orElseThrow(() -> new IllegalArgumentException("Book copy not found with id: " + bookCopyId));
-        bookCopy.setStatus(status);
-        bookCopyRepository.save(bookCopy);
-    }
-
-    public boolean isAvailable (int bookCopyId) {
-        BookCopy bookCopy = bookCopyRepository.findById(bookCopyId)
-                .orElseThrow(() -> new IllegalArgumentException("Book copy not found with id: " + bookCopyId));
-        return  bookCopy.getStatus().equals(BookCopyStatusEnum.AVAILABLE);
-    }
-
-
-
 }

@@ -24,6 +24,15 @@ public class BookCopyController {
         }
     }
 
+    @GetMapping("/book-copy/{bookId}")
+    public ResponseEntity<?> getBookCopiesByBookId(@PathVariable Integer bookId) {
+        try {
+            var bookCopies = bookCopyService.getBookCopiesByBookId(bookId);
+            return ResponseEntity.ok(bookCopies);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error retrieving available book copies: " + e.getMessage());
+        }
+    }
 
     
 }

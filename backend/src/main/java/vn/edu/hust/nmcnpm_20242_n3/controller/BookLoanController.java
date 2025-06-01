@@ -30,13 +30,11 @@ import vn.edu.hust.nmcnpm_20242_n3.service.BookRequestService;
 public class BookLoanController {
 
     private BookLoanService bookLoanService;
-    private BookRequestService bookRequestService;
 
 
     @Autowired
     public BookLoanController(BookLoanService bookLoanService, BookRequestService bookRequestService) {
         this.bookLoanService = bookLoanService;
-        this.bookRequestService = bookRequestService;
     }
 
     @GetMapping("/{userId}")
@@ -44,26 +42,6 @@ public class BookLoanController {
         return bookLoanService.getAllLoansByUserId(userId);
     }
 
-@PostMapping("/request-borrow/{bookCopyId}/{userId}")
-    public ResponseEntity<?> createBorrowRequest(@PathVariable int bookCopyId, @PathVariable String userId) {
-        try {
-            BookRequest bookRequest = bookRequestService.newBorrowingRequest(userId, bookCopyId);
-            return new ResponseEntity<>(bookRequest, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-
-    @GetMapping("/borrowed-book/{userId}")
-    public ResponseEntity<?> getBorrowedBooksByUserId(@PathVariable String userId) {
-        try {
-            var borrowedBooks = bookLoanService.getBorrowedBooksByUserId(userId);
-            return new ResponseEntity<>(borrowedBooks, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
 
     @GetMapping("/history/user/{userId}")
