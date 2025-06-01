@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface SubscriptionRepository extends CrudRepository<Subscription, Long> {
+public interface SubscriptionRepository extends CrudRepository<Subscription, Integer> {
 
     Optional<Subscription> findByBookCopyIdAndUserId(Integer bookCopyId, String userId);
     List<Subscription> findAllByBookCopyIdAndActive(Integer bookCopyId, boolean active);
     List<Subscription> findAllByActive(boolean b);
     List<Subscription> findAllByUserId(String userId);
-    List<Subscription> findAllByBookCopyId(Integer bookCopyId);
+    Optional<Subscription> findById(Integer id);
 }

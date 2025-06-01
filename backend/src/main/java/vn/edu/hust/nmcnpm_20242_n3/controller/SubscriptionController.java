@@ -34,10 +34,10 @@ public class SubscriptionController {
     }
 
     // API để hủy đăng ký nhận thông báo
-    @PutMapping("/unsubscribe/{userId}/{bookCopyId}")
-    public ResponseEntity<?> unsubscribeFromBookCopy(@PathVariable Integer bookCopyId, @PathVariable String userId) {
+    @PutMapping("/unsubscribe/{subscriptionId}")
+    public ResponseEntity<?> unsubscribeFromBookCopy(@PathVariable Integer subscriptionId ) {
         try {
-            subscriptionService.unsubscribeFromBookCopy(bookCopyId, userId);
+            subscriptionService.unsubscribeFromBookCopy(subscriptionId);
             return ResponseEntity.ok("Unsubscription successful");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error unsubscribing: " + e.getMessage());

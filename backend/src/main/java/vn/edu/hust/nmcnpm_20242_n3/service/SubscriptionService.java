@@ -47,9 +47,9 @@ public class SubscriptionService {
         subscriptionRepository.save(subscription);
     }
 
-    public void unsubscribeFromBookCopy(int bookCopyId, String userId) {
+    public void unsubscribeFromBookCopy(Integer subscriptionId) {
         // Find the subscription
-        Subscription subscription = subscriptionRepository.findByBookCopyIdAndUserId(bookCopyId, userId)
+        Subscription subscription = subscriptionRepository.findById(subscriptionId)
                 .orElseThrow(() -> new IllegalArgumentException("Subscription not found"));
 
         // Mark the subscription as inactive
