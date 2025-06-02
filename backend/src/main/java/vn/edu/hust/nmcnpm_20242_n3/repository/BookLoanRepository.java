@@ -2,13 +2,10 @@ package vn.edu.hust.nmcnpm_20242_n3.repository;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
-
 import org.springframework.stereotype.Repository;
-
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookLoanStatusEnum;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
 
@@ -27,4 +24,6 @@ public interface BookLoanRepository extends CrudRepository<BookLoan, String> {
     Optional<BookLoan> findByBookCopyIdAndUserIdAndStatus(@Param("userId") String userId,
             @Param("bookCopyId") Integer bookCopyId,
             @Param("status") BookLoanStatusEnum status);
+
+    Optional<BookLoan> findByCurrentBookRequestId(String requestId);
 }

@@ -1,9 +1,9 @@
 // GET /api/books
 
 export interface Book {
-    id: number, 
-    title: string, 
-    description: string, 
+    id: number,
+    title: string,
+    description: string,
     publisherId: number,
     authorIds: number[],
     categoryIds: number[]
