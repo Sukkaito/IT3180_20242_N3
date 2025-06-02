@@ -57,9 +57,10 @@ public class UserService {
     }
 
     public List<UserDTO> getAllUsers() {
-        return userRepository.findAll()
-                .stream().map(this::mapToDTO)
-                .collect(Collectors.toList());
+//        return userRepository.findAll()
+//                .stream().map(this::mapToDTO)
+//                .collect(Collectors.toList());
+        return null;
     }
 
     private UserDTO mapToDTO(User user) {
