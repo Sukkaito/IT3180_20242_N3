@@ -3,14 +3,10 @@ package vn.edu.hust.nmcnpm_20242_n3.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import vn.edu.hust.nmcnpm_20242_n3.dto.BookLoanDTO;
-import vn.edu.hust.nmcnpm_20242_n3.dto.FineDTO;
-import vn.edu.hust.nmcnpm_20242_n3.dto.UserCreateDTO;
 import vn.edu.hust.nmcnpm_20242_n3.dto.UserDTO;
 import vn.edu.hust.nmcnpm_20242_n3.service.UserService;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -21,7 +17,7 @@ public class UserController {
 
 
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody UserCreateDTO dto) {
+    public ResponseEntity<?> createUser(@RequestBody UserDTO dto) {
         try {
             UserDTO created = userService.createUser(dto);
             return ResponseEntity.ok(created);
@@ -43,23 +39,16 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
     @GetMapping("/search")
-    public ResponseEntity<?> searchUser(
+    public ResponseEntity<List<UserDTO>> searchUsers(
             @RequestParam(required = false) String id,
             @RequestParam(required = false) String email,
-            @RequestParam(required = false) String username
-    ) {
-        Optional<UserDTO> result = Optional.empty();
+            @RequestParam(required = false) String username) {
 
-        if (id != null) {
-            result = userService.getUserById(id);
-        } else if (email != null) {
-            result = userService.getUserByEmail(email);
-        } else if (username != null) {
-            result = userService.getUserByUsername(username);
+        List<UserDTO> results = userService.searchUsers(id, email, username);
+        if (results.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
-
-        return result.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(results);
     }
 
     @PutMapping("/{id}")
@@ -80,16 +69,4 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    @GetMapping("/{userId}/book-loans")
-    public ResponseEntity<?> getBookLoansByUserId(@PathVariable String userId) {
-        List<BookLoanDTO> loans = userService.getBookLoansByUserId(userId);
-        return ResponseEntity.ok(loans);
-    }
-
-    @GetMapping("/{userId}/fines")
-    public ResponseEntity<?> getFinesByUserId(@PathVariable String userId) {
-        List<FineDTO> fines = userService.getFinesByUserId(userId);
-        return ResponseEntity.ok(fines);
-    }
-
 }

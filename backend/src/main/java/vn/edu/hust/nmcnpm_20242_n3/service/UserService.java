@@ -2,17 +2,10 @@ package vn.edu.hust.nmcnpm_20242_n3.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import vn.edu.hust.nmcnpm_20242_n3.dto.FineDTO;
-import vn.edu.hust.nmcnpm_20242_n3.dto.BookLoanDTO;
-import vn.edu.hust.nmcnpm_20242_n3.dto.UserCreateDTO;
 import vn.edu.hust.nmcnpm_20242_n3.dto.UserDTO;
-import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
-import vn.edu.hust.nmcnpm_20242_n3.entity.Fine;
 import vn.edu.hust.nmcnpm_20242_n3.entity.Role;
 import vn.edu.hust.nmcnpm_20242_n3.entity.User;
 import vn.edu.hust.nmcnpm_20242_n3.constant.RoleEnum;
-import vn.edu.hust.nmcnpm_20242_n3.repository.BookLoanRepository;
-import vn.edu.hust.nmcnpm_20242_n3.repository.FineRepository;
 import vn.edu.hust.nmcnpm_20242_n3.repository.RoleRepository;
 import vn.edu.hust.nmcnpm_20242_n3.repository.UserRepository;
 
@@ -29,7 +22,7 @@ public class UserService {
     @Autowired
     private RoleRepository roleRepository;
 
-    public UserDTO createUser(UserCreateDTO dto) throws IllegalArgumentException {
+    public UserDTO createUser(UserDTO dto) throws IllegalArgumentException {
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
         }
@@ -75,6 +68,7 @@ public class UserService {
         dto.setName(user.getName());
         dto.setUserName(user.getUserName());
         dto.setEmail(user.getEmail());
+        dto.setPassword(null);
         dto.setRoleName(user.getRole().getName().name());
         dto.setCreatedAt(user.getCreatedAt());
         dto.setUpdatedAt(user.getUpdatedAt());
@@ -83,7 +77,12 @@ public class UserService {
     public UserDTO updateUser(String id, UserDTO dto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
+        if (!user.getEmail().equals(dto.getEmail()) && userRepository.existsByEmail(dto.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+        if (!user.getUserName().equals(dto.getUserName()) && userRepository.existsByUserName(dto.getUserName())) {
+            throw new IllegalArgumentException("Username already exists");
+        }
         user.setName(dto.getName());
         user.setUserName(dto.getUserName());
         user.setEmail(dto.getEmail());
@@ -102,41 +101,10 @@ public class UserService {
         }
         userRepository.deleteById(id);
     }
-    private BookLoanDTO toBookLoanDTO(BookLoan loan) {
-        BookLoanDTO dto = new BookLoanDTO();
-        dto.setId(loan.getId());
-        dto.setLoanDate(loan.getLoanDate());
-        dto.setReturnDate(loan.getReturnDate());
-        dto.setActualReturnDate(loan.getActualReturnDate());
-        dto.setStatus(loan.getStatus().toString());
-        dto.setCurrentBookRequestId(loan.getCurrentBookRequestId());
-        dto.setBookCopyId(loan.getBookCopy() != null ? loan.getBookCopy().getId() : null);
-        return dto;
+    public List<UserDTO> searchUsers(String id, String email, String username) {
+        List<User> users = userRepository.searchUsers(id, email, username);
+        return users.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
-
-    private FineDTO toFineDTO(Fine fine) {
-        FineDTO dto = new FineDTO();
-        dto.setId(fine.getId());
-        dto.setAmount(fine.getAmount());
-        dto.setCreatedAt(fine.getCreatedAt());
-        dto.setUpdatedAt(fine.getUpdatedAt());
-        dto.setBookLoanId(fine.getBookLoan() != null ? fine.getBookLoan().getId() : null);
-        return dto;
-    }
-    @Autowired
-    private BookLoanRepository bookLoanRepository;
-
-    @Autowired
-    private FineRepository fineRepository;
-
-    public List<BookLoanDTO> getBookLoansByUserId(String userId) {
-        List<BookLoan> loans = bookLoanRepository.findAllByUserId(userId);
-        return loans.stream().map(this::toBookLoanDTO).collect(Collectors.toList());
-    }
-
-    public List<FineDTO> getFinesByUserId(String userId) {
-        List<Fine> fines = fineRepository.findByUserId(userId);
-        return fines.stream().map(this::toFineDTO).collect(Collectors.toList());
-    }
-
 }
