@@ -1,10 +1,10 @@
 package vn.edu.hust.nmcnpm_20242_n3.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import lombok.Getter;
+import lombok.Setter;
 
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookLoanStatusEnum;
 
@@ -19,33 +19,42 @@ import java.util.Date;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+    private String id;
+
     @Column(unique = true, nullable = false)
-    String name;
+    private String name;
+
     @Column
-    String userName;
+    private String userName;
+
     @Column(unique = true)
-    String email;
+    private String email;
+
     @Column(nullable = false)
-    String password;
+    private String password;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    Date CreatedAt;
+    @Column(name = "created_at")
+    private Date createdAt;
+
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    Date UpdatedAt;
+    @Column(name = "updated_at")
+    private Date updatedAt;
+
     @ManyToOne
-    Role role;
+    private Role role;
 
     @PrePersist
     protected void onCreate() {
-        CreatedAt = new Date();
-        UpdatedAt = new Date();
+        createdAt = new Date();
+        updatedAt = new Date();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        UpdatedAt = new Date();
+        updatedAt = new Date();
     }
 }
 
