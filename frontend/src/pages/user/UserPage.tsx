@@ -1,38 +1,78 @@
-import UserNavbar from "../../components/UserNavbar.tsx";
-import books from "../../data/books.ts";
-import Book from "../../components/Book.tsx";
+import { useState } from "react";
+import UserNavbar from "../../components/UserNavbar";
 
+interface SummaryData {
+  currentLoans: number;
+  unpaidFines: number;
+  pendingRequests: number;
+}
 
 export default function UserPage() {
+  // Comment useState và useEffect liên quan fetch đi
+  // const [summary, setSummary] = useState<SummaryData | null>(null);
+  // const [loading, setLoading] = useState(true);
+  // const [error, setError] = useState(false);
+
+  // Comment useEffect đi
+  /*
+  useEffect(() => {
+    const fetchSummary = async () => {
+      try {
+        const response = await fetch("/api/user/summary");
+
+        const contentType = response.headers.get("content-type");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        if (!contentType || !contentType.includes("application/json")) {
+          const text = await response.text();
+          console.error("Expected JSON, received:", text);
+          throw new Error("Invalid response format");
+        }
+
+        const data = await response.json();
+        setSummary(data);
+      } catch (error) {
+        console.error("Error fetching summary:", error);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSummary();
+  }, []);
+  */
+
   return (
     <>
-      <title>Home</title>
-      <UserNavbar selected="home"/>
-      
-      <div className="min-h-screen bg-blue-50">
+      <title>User Dashboard</title>
+      <UserNavbar selected="home" />
+      <div className="p-6 bg-gray-100 min-h-screen">
+        <h1 className="text-3xl font-bold mb-6 text-blue-700">
+          Welcome to Your Dashboard
+        </h1>
 
-        <div className="p-4">
-          <h2 className="text-2xl font-semibold text-blue-700 mb-4">Welcome back!</h2>
-          <p className="text-gray-700">
-            Browse available books, manage your loans, requests, and fines. Use the filter to find exactly what you need.
-          </p>
+        {/* Tạm thời bỏ phần hiển thị dữ liệu */}
+        <p>Summary data loading is disabled temporarily.</p>
 
-          {/* Book list */}
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {books.map((book) => (<Book key={book.id} book={book} />))}
+        {/* Nếu muốn, bạn có thể hiển thị một dữ liệu mặc định */}
+        {/* 
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white p-6 rounded shadow text-center">
+            <p className="text-4xl font-bold text-indigo-600">0</p>
+            <p className="mt-2 text-lg font-medium">Books Borrowed</p>
           </div>
-
-          {/* For scrolling testing purpose */}
-          <p className="text-gray-700 mt-4 mb-4 text-justify leading-100">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Maxime, dicta iste, sapiente corporis vero fugit odit totam omnis tempore aut, quia quis. Totam aut nihil soluta sint, magni velit unde.
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Deleniti in quidem earum dolorum molestiae, eligendi recusandae tempora eos eius provident dolore aperiam nihil aut modi esse similique, pariatur quia vel.
-              Lorem ipsum dolor sit amet consectetur adipisicing elit adipisicing elit. Quasi, cumque. Quod, voluptatibus!
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi, cumque.
-              Quod, voluptatibus! Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi, cumque. Quod, voluptatibus!
-
-          </p>
+          <div className="bg-white p-6 rounded shadow text-center">
+            <p className="text-4xl font-bold text-red-600">0đ</p>
+            <p className="mt-2 text-lg font-medium">Unpaid Fines</p>
+          </div>
+          <div className="bg-white p-6 rounded shadow text-center">
+            <p className="text-4xl font-bold text-yellow-600">0</p>
+            <p className="mt-2 text-lg font-medium">Pending Requests</p>
+          </div>
         </div>
+        */}
       </div>
     </>
   );
