@@ -27,14 +27,16 @@ public class BookRequestService {
     private final BookLoanService bookLoanService;
     private final UserRepository userRepository;
     private final BookRequestRepository bookRequestRepository;
+    private final SubscriptionService subscriptionService;
 
     @Autowired
     public BookRequestService(BookCopyRepository bookCopyRepository, BookLoanService bookLoanService,
-            UserRepository userRepository, BookRequestRepository bookRequestRepository) {
+                              UserRepository userRepository, BookRequestRepository bookRequestRepository, SubscriptionService subscriptionService) {
         this.bookCopyRepository = bookCopyRepository;
         this.userRepository = userRepository;
         this.bookRequestRepository = bookRequestRepository;
         this.bookLoanService = bookLoanService;
+        this.subscriptionService = subscriptionService;
     }
 
     public List<BookRequest> getAllRequests() {
@@ -88,6 +90,7 @@ public class BookRequestService {
                 request.setStatus(BookRequestStatusEnum.ACCEPTED);
                 bookCopy.setStatus(BookCopyStatusEnum.UNAVAILABLE);
                 bookCopyRepository.save(bookCopy);
+                subscriptionService.cancelSubscriptionAfterBorrowing(bookCopy.getId(), request.getUser().getId());
             } else {
                 request.setStatus(BookRequestStatusEnum.DENIED);
             }
@@ -136,14 +139,17 @@ public class BookRequestService {
         if (!bookCopy.getStatus().equals(BookCopyStatusEnum.AVAILABLE)) {
             throw new IllegalArgumentException("Book copy is not available");
         }
+        // Check if user exists
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        // Check if user has pending requests
         List<BookRequest> pendingRequests = bookRequestRepository.checkForOverlappingRequest(bookCopyId, userId,
                 BookRequestTypeEnum.BORROWING);
         if (pendingRequests.size() > 0) {
             throw new IllegalArgumentException("You already have another pending borrowing request for this book!");
         }
 
+        // Create a new book request
         BookRequest bookRequest = new BookRequest();
         bookRequest.setUser(user);
         bookRequest.setBookCopy(bookCopy);
@@ -169,10 +175,11 @@ public class BookRequestService {
         if (pendingRequests.size() > 0) {
             throw new IllegalArgumentException("You already have another pending returning request for this book!");
         }
+        // Create a new book request
         BookRequest bookRequest = new BookRequest();
         bookRequest.setUser(user);
         bookRequest.setBookCopy(bookCopy);
-        bookRequest.setBookLoan(bookLoan); 
+        bookRequest.setBookLoan(bookLoan);
         bookRequest.setType(BookRequestTypeEnum.RETURNING);
         bookRequest.setStatus(BookRequestStatusEnum.PENDING);
         return bookRequestRepository.save(bookRequest);
@@ -185,6 +192,7 @@ public class BookRequestService {
         if (!bookRequest.getStatus().equals(BookRequestStatusEnum.PENDING)) {
             throw new IllegalArgumentException("Request is not pending");
         }
+        // Update book request status
         bookRequest.setStatus(BookRequestStatusEnum.CANCELED);
         return bookRequestRepository.save(bookRequest);
     }

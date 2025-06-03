@@ -1,6 +1,8 @@
 package vn.edu.hust.nmcnpm_20242_n3.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.hust.nmcnpm_20242_n3.entity.Publisher;
 import vn.edu.hust.nmcnpm_20242_n3.service.PublisherService;
@@ -43,4 +45,6 @@ public class PublisherController {
     public void deletePublisher(@PathVariable int id) {
         publisherService.deleteById(id);
     }
+
+
 }

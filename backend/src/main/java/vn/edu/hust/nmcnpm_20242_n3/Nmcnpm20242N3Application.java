@@ -7,9 +7,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import vn.edu.hust.nmcnpm_20242_n3.service.ApplicationService;
 
 @SpringBootApplication
+@EnableScheduling
 public class Nmcnpm20242N3Application {
 	private static ConfigurableApplicationContext context;
 

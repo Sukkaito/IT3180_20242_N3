@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import java.util.Date;
 
 @Setter
@@ -59,6 +60,7 @@ public class BookLoan {
         LoanedAt = new Date();
         UpdatedAt = new Date();
         loan_duration = 30; // Set default loan duration to 30 days
+
     }
 
     @PreUpdate
@@ -68,4 +70,20 @@ public class BookLoan {
             DueDate = new Date(LoanedAt.getTime() + (loan_duration * 24 * 60 * 60 * 1000)); // Set due date to loan duration
         }
     }
+
+    public BookLoan() {
+    }
+    public BookLoan(BookCopy bookcopy, User user) {
+        this.bookCopy = bookcopy;
+        this.user = user;
+        this.status = BookLoanStatusEnum.REQUEST_BORROWING;
+    }
+
+    public BookLoan(BookCopy bookcopy, User user, BookLoanStatusEnum status) {
+        this.bookCopy = bookcopy;
+        this.user = user;
+        this.status = status;
+    }
+
+
 }
