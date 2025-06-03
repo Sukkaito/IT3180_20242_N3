@@ -24,6 +24,7 @@ import LoansManage from './pages/admin/LoanManage.tsx'
 import FinesManage from './pages/admin/FineManage.tsx'
 import BookDetail from './pages/admin/BookDetail.tsx'
 import NotFound from './pages/404.tsx'
+import AdminStatus from './pages/admin/AdminStatus.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -56,6 +57,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="loans" element={<LoansManage />} />
           <Route path="fines" element={<FinesManage />} />
           <Route path="manage/books/:bookId" element={<BookDetail />} />
+          <Route path="status" element={<AdminStatus interval={10000}/>} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
