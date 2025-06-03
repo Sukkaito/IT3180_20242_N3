@@ -1,78 +1,120 @@
 import { useState } from "react";
 import UserNavbar from "../../components/UserNavbar";
 
-interface SummaryData {
-  currentLoans: number;
-  unpaidFines: number;
-  pendingRequests: number;
+interface Book {
+  id: number;
+  title: string;
+  author: string;
+  availableCopies: number;
+  totalCopies: number;
 }
 
-export default function UserPage() {
-  // Comment useState và useEffect liên quan fetch đi
-  // const [summary, setSummary] = useState<SummaryData | null>(null);
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState(false);
+// Mảng tĩnh giả lập dữ liệu sách
+const bookList: Book[] = [
+  {
+    id: 1,
+    title: "Clean Code",
+    author: "Robert C. Martin",
+    availableCopies: 2,
+    totalCopies: 5,
+  },
+  {
+    id: 2,
+    title: "The Pragmatic Programmer",
+    author: "Andrew Hunt",
+    availableCopies: 0,
+    totalCopies: 3,
+  },
+  {
+    id: 3,
+    title: "Introduction to Algorithms",
+    author: "Thomas H. Cormen",
+    availableCopies: 1,
+    totalCopies: 4,
+  },
+];
 
-  // Comment useEffect đi
-  /*
-  useEffect(() => {
-    const fetchSummary = async () => {
-      try {
-        const response = await fetch("/api/user/summary");
+export default function BookListPage() {
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [notification, setNotification] = useState<string | null>(null);
 
-        const contentType = response.headers.get("content-type");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        if (!contentType || !contentType.includes("application/json")) {
-          const text = await response.text();
-          console.error("Expected JSON, received:", text);
-          throw new Error("Invalid response format");
-        }
+  const handleBorrow = (book: Book) => {
+    if (book.availableCopies === 0) return;
+    setSelectedBook(book);
+  };
 
-        const data = await response.json();
-        setSummary(data);
-      } catch (error) {
-        console.error("Error fetching summary:", error);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const confirmBorrow = () => {
+    setNotification(`Successfully requested to borrow "${selectedBook?.title}"`);
+    setSelectedBook(null);
+  };
 
-    fetchSummary();
-  }, []);
-  */
+  const closePopup = () => {
+    setSelectedBook(null);
+  };
 
   return (
     <>
-      <title>User Dashboard</title>
+      <title>Book List</title>
       <UserNavbar selected="home" />
       <div className="p-6 bg-gray-100 min-h-screen">
-        <h1 className="text-3xl font-bold mb-6 text-blue-700">
-          Welcome to Your Dashboard
-        </h1>
+        <h1 className="text-2xl font-bold mb-4 text-blue-700">Available Books</h1>
 
-        {/* Tạm thời bỏ phần hiển thị dữ liệu */}
-        <p>Summary data loading is disabled temporarily.</p>
+        {notification && (
+          <div className="mb-4 p-4 bg-green-100 text-green-700 rounded">
+            {notification}
+          </div>
+        )}
 
-        {/* Nếu muốn, bạn có thể hiển thị một dữ liệu mặc định */}
-        {/* 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded shadow text-center">
-            <p className="text-4xl font-bold text-indigo-600">0</p>
-            <p className="mt-2 text-lg font-medium">Books Borrowed</p>
-          </div>
-          <div className="bg-white p-6 rounded shadow text-center">
-            <p className="text-4xl font-bold text-red-600">0đ</p>
-            <p className="mt-2 text-lg font-medium">Unpaid Fines</p>
-          </div>
-          <div className="bg-white p-6 rounded shadow text-center">
-            <p className="text-4xl font-bold text-yellow-600">0</p>
-            <p className="mt-2 text-lg font-medium">Pending Requests</p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {bookList.map((book) => (
+            <div key={book.id} className="bg-white p-4 rounded shadow">
+              <h2 className="text-xl font-semibold">{book.title}</h2>
+              <p className="text-gray-600">Author: {book.author}</p>
+              <p className="text-gray-700">
+                {book.availableCopies > 0
+                  ? `${book.availableCopies} copy(ies) available`
+                  : "No copies available"}
+              </p>
+
+              <button
+                className={`mt-3 px-4 py-2 rounded ${
+                  book.availableCopies > 0
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    : "bg-gray-400 text-white cursor-not-allowed"
+                }`}
+                disabled={book.availableCopies === 0}
+                onClick={() => handleBorrow(book)}
+              >
+                Borrow
+              </button>
+            </div>
+          ))}
         </div>
-        */}
+
+        {/* Popup Borrow Form */}
+        {selectedBook && (
+          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+              <h2 className="text-xl font-bold mb-4 text-blue-700">Borrow Book</h2>
+              <p className="mb-2">Title: {selectedBook.title}</p>
+              <p className="mb-4">Author: {selectedBook.author}</p>
+
+              {/* Form có thể mở rộng thêm nếu cần nhập thông tin */}
+              <button
+                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mr-2"
+                onClick={confirmBorrow}
+              >
+                Confirm Borrow
+              </button>
+              <button
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+                onClick={closePopup}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
