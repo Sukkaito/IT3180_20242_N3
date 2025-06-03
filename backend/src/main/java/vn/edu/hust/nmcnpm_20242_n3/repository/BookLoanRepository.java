@@ -36,4 +36,6 @@ public interface BookLoanRepository extends CrudRepository<BookLoan, String> {
 
     @Query("SELECT b FROM BookLoan b WHERE b.bookCopy.id = :bookCopyId")
     List<BookLoan> findAllByBookCopyId(@Param("bookCopyId") Integer bookCopyId);
+
+    List<BookLoan> findByUserId(String userId);
 }

@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import vn.edu.hust.nmcnpm_20242_n3.entity.Publisher;
+import vn.edu.hust.nmcnpm_20242_n3.dto.PublisherDTO;
 import vn.edu.hust.nmcnpm_20242_n3.service.PublisherService;
 
 import java.util.List;
@@ -21,24 +21,24 @@ public class PublisherController {
     }
 
     @GetMapping // Get All
-    public List<Publisher> getAllPublishers() {
+    public List<PublisherDTO> getAllPublishers() {
         return publisherService.getAllPublishers();
     }
 
     @GetMapping("/search/{name}") // Get By Name
-    public Publisher getPublisherByName(@PathVariable String name) {
+    public PublisherDTO getPublisherByName(@PathVariable String name) {
         return publisherService.findByName(name)
                 .orElseThrow(() -> new IllegalArgumentException("Publisher with name " + name + " not found"));
     }
 
     @PostMapping // Add New
-    public Publisher addPublisher(@RequestBody Publisher publisher) {
-        return publisherService.addPublisher(publisher);
+    public PublisherDTO addPublisher(@RequestBody PublisherDTO dto) {
+        return publisherService.addPublisher(dto);
     }
 
     @PutMapping("/update/{id}") // Update By Id
-    public Publisher updatePublisher(@PathVariable int id, @RequestBody Publisher publisher) {
-        return publisherService.updateById(id, publisher);
+    public PublisherDTO updatePublisher(@PathVariable int id, @RequestBody PublisherDTO dto) {
+        return publisherService.updateById(id, dto);
     }
 
     @DeleteMapping("/delete/{id}") // Delete By Id

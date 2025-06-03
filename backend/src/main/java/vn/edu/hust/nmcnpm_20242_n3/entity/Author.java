@@ -2,6 +2,8 @@ package vn.edu.hust.nmcnpm_20242_n3.entity;
 
 import jakarta.persistence.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "authors")
 public class Author {
@@ -12,6 +14,17 @@ public class Author {
 
     @Column(unique = true, nullable = false)
     private String name;
+
+    public Set<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(Set<Book> books) {
+        this.books = books;
+    }
+
+    @ManyToMany(mappedBy = "authors")
+    private Set<Book> books;
 
     // Constructors
     public Author() {

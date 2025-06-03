@@ -1,10 +1,12 @@
 // Trang quản lý Loans 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminNavbar from "../../components/AdminNavbar";
-import bookLoans, { LoanStatus } from "../../data/bookLoans";
-import users from "../../data/users";
-import bookCopies from "../../data/bookCopies";
-import books from "../../data/books";
+import { BookLoan, LoanStatus } from "../../data/bookLoans";
+import { STORAGE_KEY_PREFIX } from "../../services/baseService";
+import { BookLoanService } from "../../services/bookLoanService";
+
+// Local storage key
+const BOOK_LOANS_STORAGE_KEY = `${STORAGE_KEY_PREFIX}loans`;
 
 export default function LoansManage() {
     // State để lưu giá trị tìm kiếm
@@ -12,35 +14,38 @@ export default function LoansManage() {
     // State để lưu trạng thái lọc (filter status)
     const [filterStatus, setFilterStatus] = useState<string>("");
     // State để lưu ID của khoản vay (loan) đang chỉnh sửa tiền phạt
-    const [editingFineLoanId, setEditingFineLoanId] = useState<number | null>(null);
+    const [editingFineLoanId, setEditingFineLoanId] = useState<string | null>(null);
     // State để lưu số tiền phạt đang nhập
     const [fineAmount, setFineAmount] = useState<string>("");
+    // State to store loans
+    const [loans, setLoans] = useState<BookLoan[]>([]);
+    // Loading state
+    const [loading, setLoading] = useState(true);
 
-    // Tạo mảng enrichedLoans để kết hợp dữ liệu từ nhiều nguồn (loan, user, bookCopy, book)
-    const enrichedLoans = bookLoans.map((loan) => {
-        // Tìm user theo user_id trong loan
-        const user = users.find((u) => u.id === loan.user_id);
-        // Tìm bản sao sách (book copy) theo book_copy_id trong loan
-        const copy = bookCopies.find((c) => c.id === loan.book_copy_id);
-        // Tìm sách gốc theo original_book_book_id từ bản sao sách
-        const book = books.find((b) => b.id === copy?.original_book_book_id);
-
-        // Trả về đối tượng mới bao gồm thông tin từ loan và các dữ liệu bổ sung
-        return {
-            ...loan,
-            username: user?.userName || "Unknown",      // Tên người dùng hoặc "Unknown" nếu không tìm thấy
-            bookTitle: book?.title || "Unknown",       // Tên sách hoặc "Unknown"
-            bookCopyId: copy?.id || "Unknown",         // ID bản sao sách hoặc "Unknown"
+    // Load loans on component mount
+    useEffect(() => {
+        const loadLoans = async () => {
+            try {
+                setLoading(true);
+                const loanData = await BookLoanService.getAll();
+                setLoans(loanData);
+            } catch (error) {
+                console.error("Error loading loans:", error);
+            } finally {
+                setLoading(false);
+            }
         };
-    });
+        
+        loadLoans();
+    }, []);
 
-    // Lọc danh sách enrichedLoans dựa trên giá trị tìm kiếm và trạng thái lọc
-    const filteredLoans = enrichedLoans.filter((loan) => {
+    // Lọc danh sách loans dựa trên giá trị tìm kiếm và trạng thái lọc
+    const filteredLoans = loans.filter((loan) => {
         const lowerSearch = search.toLowerCase(); // chuyển về chữ thường để so sánh
         // Kiểm tra có khớp tìm kiếm username, bookTitle hoặc bookCopyId không
         const matchesSearch =
-            loan.username.toLowerCase().includes(lowerSearch) ||
-            loan.bookTitle.toLowerCase().includes(lowerSearch) ||
+            loan.userUserName.toLowerCase().includes(lowerSearch) ||
+            loan.bookCopyOriginalBookTitle.toLowerCase().includes(lowerSearch) ||
             String(loan.bookCopyId).includes(lowerSearch);
         // Kiểm tra trạng thái có khớp với filterStatus (nếu filterStatus không rỗng)
         const matchesStatus = filterStatus ? loan.status === filterStatus : true;
@@ -67,12 +72,31 @@ export default function LoansManage() {
         }
     };
 
-    // Xử lý lưu tiền phạt (demo hiện tại chỉ log ra console)
-    const handleSaveFine = (loanId: number) => {
-        console.log(`Save fine for loan ${loanId}:`, fineAmount);
-        // TODO: gọi API hoặc cập nhật trạng thái thật ở đây
-        setEditingFineLoanId(null); // đóng form chỉnh sửa tiền phạt
-        setFineAmount("");          // reset số tiền phạt nhập
+    // Xử lý lưu tiền phạt
+    const handleSaveFine = async (loan: BookLoan) => {
+        try {
+            const fineAmountNum = parseFloat(fineAmount);
+            if (isNaN(fineAmountNum) || fineAmountNum < 0) {
+                alert("Please enter a valid fine amount");
+                return;
+            }
+            
+            await BookLoanService.addFine({bookLoanId: loan.id,
+                amount: fineAmountNum, 
+                username: loan.userUserName,
+                description: `Fine for loan ${loan.id}`});
+            
+            // Refresh loans list
+            const updatedLoans = await BookLoanService.getAll();
+            setLoans(updatedLoans);
+            
+            // Close the fine editing form
+            setEditingFineLoanId(null);
+            setFineAmount("");
+        } catch (error) {
+            console.error("Error adding fine:", error);
+            alert("Failed to add fine. Please try again.");
+        }
     };
 
     // Hủy chỉnh sửa tiền phạt, reset các state liên quan
@@ -80,6 +104,20 @@ export default function LoansManage() {
         setEditingFineLoanId(null);
         setFineAmount("");
     };
+
+    // Show loading indicator while data is being fetched
+    if (loading) {
+        return (
+            <>
+                <AdminNavbar selected="loans" />
+                <div className="min-h-screen bg-purple-50 p-6">
+                    <div className="text-center py-10">
+                        <p className="text-purple-600">Loading loans data...</p>
+                    </div>
+                </div>
+            </>
+        );
+    }
 
     return (
         <>
@@ -119,12 +157,7 @@ export default function LoansManage() {
                         >
                             <option value="">All Statuses</option>
                             {[
-                                "REJECTED",
-                                "REQUEST_BORROWING",
-                                "BORROWED",
-                                "REQUEST_RETURNING",
-                                "RETURNED",
-                                "NONRETURNABLE",
+                                "REJECTED", "REQUEST_BORROWING", "BORROWED", "REQUEST_RETURNING", "RETURNED","NONRETURNABLE"
                             ].map((status) => (
                                 <option key={status} value={status}>
                                     {status}
@@ -142,8 +175,8 @@ export default function LoansManage() {
                                 <tr>
                                     {/* Tiêu đề cột */}
                                     {[
-                                        "Username", "Book Title", "Book Copy ID", "Loan Date", "Return Date",
-                                        "Loaned At", "Actual Return Date", "Updated At", "Status", "Action"
+                                        "Username", "Book Title", "Book Copy ID", "Loan Date", "Due Date",
+                                        "Actual Return Date", "Loaned At", "Updated At", "Status", "Action"
                                     ].map((heading) => (
                                         <th key={heading} className="py-2 px-3 text-sm font-semibold">
                                             {heading}
@@ -171,50 +204,35 @@ export default function LoansManage() {
                                                     } border-b hover:bg-purple-100 transition`}
                                             >
                                                 {/* Dữ liệu các cột */}
-                                                <td className="py-2 px-3">{loan.username}</td>
-                                                <td className="py-2 px-3">{loan.bookTitle}</td>
+                                                <td className="py-2 px-3">{loan.userUserName}</td>
+                                                <td className="py-2 px-3">{loan.bookCopyOriginalBookTitle}</td>
                                                 <td className="py-2 px-3">{loan.bookCopyId}</td>
                                                 <td className="py-2 px-3 text-sm text-gray-600">
-                                                    {new Date(loan.loan_date).toLocaleDateString()}
+                                                    {new Date(loan.loanDate).toLocaleDateString()}
                                                 </td>
                                                 <td className="py-2 px-3 text-sm text-gray-600">
-                                                    {new Date(loan.return_date).toLocaleDateString()}
+                                                    {new Date(loan.dueDate).toLocaleDateString()}
                                                 </td>
                                                 <td className="py-2 px-3 text-sm text-gray-600">
-                                                    {new Date(loan.loaned_at).toLocaleString()}
-                                                </td>
-                                                <td className="py-2 px-3 text-sm text-gray-600">
-                                                    {loan.actual_return_date
-                                                        ? new Date(loan.actual_return_date).toLocaleDateString()
+                                                    {loan.actualReturnDate
+                                                        ? new Date(loan.actualReturnDate).toLocaleDateString()
                                                         : "—"}
                                                 </td>
                                                 <td className="py-2 px-3 text-sm text-gray-600">
-                                                    {new Date(loan.updated_at).toLocaleString()}
+                                                    {new Date(loan.loanedAt).toLocaleString()}
+                                                </td>
+                                                <td className="py-2 px-3 text-sm text-gray-600">
+                                                    {new Date(loan.updatedAt).toLocaleString()}
                                                 </td>
                                                 <td className="py-2 px-3">
                                                     {/* Hiển thị trạng thái với màu nền theo status */}
                                                     <span
-                                                        className={`px-2 py-1 rounded-full text-xs font-semibold ${loan.status === "BORROWED"
-                                                            ? "bg-green-100 text-green-700"
-                                                            : loan.status === "RETURNED"
-                                                                ? "bg-gray-200 text-gray-700"
-                                                                : loan.status === "REQUEST_BORROWING"
-                                                                    ? "bg-blue-100 text-blue-700"
-                                                                    : loan.status === "REQUEST_RETURNING"
-                                                                        ? "bg-yellow-100 text-yellow-700"
-                                                                        : loan.status === "REJECTED"
-                                                                            ? "bg-red-100 text-red-700"
-                                                                            : "bg-purple-100 text-purple-700"
-                                                            }`}
+                                                        className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(loan.status as LoanStatus)}`}
                                                     >
                                                         {loan.status}
                                                     </span>
                                                 </td>
                                                 <td className="py-2 px-3 space-x-1">
-                                                    {/* Nút chỉnh sửa (chưa có handler) */}
-                                                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 text-sm rounded shadow">
-                                                        ✏️
-                                                    </button>
                                                     {/* Nút chỉnh sửa tiền phạt */}
                                                     <button
                                                         className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 text-sm rounded shadow"
@@ -250,7 +268,7 @@ export default function LoansManage() {
                                                             {/* Nút lưu tiền phạt */}
                                                             <button
                                                                 className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                                                                onClick={() => handleSaveFine(loan.id)}
+                                                                onClick={() => handleSaveFine(loan)}
                                                             >
                                                                 Save
                                                             </button>

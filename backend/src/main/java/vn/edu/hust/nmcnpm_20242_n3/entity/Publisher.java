@@ -2,6 +2,8 @@ package vn.edu.hust.nmcnpm_20242_n3.entity;
 
 import jakarta.persistence.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "publishers")
 public class Publisher {
@@ -12,6 +14,17 @@ public class Publisher {
 
     @Column(unique = true, nullable = false)
     private String name;
+
+    @OneToMany(mappedBy = "publisher")
+    private Set<Book> books;
+
+    public Set<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(Set<Book> books) {
+        this.books = books;
+    }
 
     // Constructors
     public Publisher() {

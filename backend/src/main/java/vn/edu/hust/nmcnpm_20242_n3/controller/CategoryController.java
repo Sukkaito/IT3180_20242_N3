@@ -2,7 +2,7 @@ package vn.edu.hust.nmcnpm_20242_n3.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import vn.edu.hust.nmcnpm_20242_n3.entity.Category;
+import vn.edu.hust.nmcnpm_20242_n3.dto.CategoryDTO;
 import vn.edu.hust.nmcnpm_20242_n3.service.CategoryService;
 
 import java.util.List;
@@ -19,24 +19,24 @@ public class CategoryController {
     }
 
     @GetMapping // Get All
-    public List<Category> getAllCategories() {
+    public List<CategoryDTO> getAllCategories() {
         return categoryService.getAllCategories();
     }
 
     @GetMapping("/search/{name}") // Get By Name
-    public Category getCategoryByName(@PathVariable String name) {
+    public CategoryDTO getCategoryByName(@PathVariable String name) {
         return categoryService.findByName(name)
                 .orElseThrow(() -> new IllegalArgumentException("Category with name " + name + " not found"));
     }
 
     @PostMapping // Add New
-    public Category addCategory(@RequestBody Category category) {
-        return categoryService.addCategory(category);
+    public CategoryDTO addCategory(@RequestBody CategoryDTO dto) {
+        return categoryService.addCategory(dto);
     }
 
     @PutMapping("/update/{id}") // Update By Id
-    public Category updateCategory(@PathVariable int id, @RequestBody Category category) {
-        return categoryService.updateById(id, category);
+    public CategoryDTO updateCategory(@PathVariable int id, @RequestBody CategoryDTO dto) {
+        return categoryService.updateById(id, dto);
     }
 
     @DeleteMapping("/delete/{id}") // Delete By Id

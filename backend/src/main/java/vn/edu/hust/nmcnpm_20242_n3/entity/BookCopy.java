@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookCopyStatusEnum;
 
+import java.util.HashSet;
+import java.util.Set;
+
 // Needed for HTTP requests and responses
 @Setter
 @Getter
@@ -22,6 +25,12 @@ public class BookCopy {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private BookCopyStatusEnum status;
+
+    @OneToMany(mappedBy = "bookCopy", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<BookLoan> bookLoans = new HashSet<>();
+
+    @OneToMany(mappedBy = "bookCopy", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<BookRequest> bookRequests = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {

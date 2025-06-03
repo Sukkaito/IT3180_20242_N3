@@ -25,6 +25,7 @@ import FinesManage from './pages/admin/FineManage.tsx'
 import BookDetail from './pages/admin/BookDetail.tsx'
 import NotFound from './pages/404.tsx'
 import AdminStatus from './pages/admin/AdminStatus.tsx'
+import UserRouteTracker from './components/UserRouteTracker.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -34,7 +35,12 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        <Route path="/user" element={<div><Outlet /></div>} >
+        <Route path="/user" element={
+          <div>
+            <UserRouteTracker />
+            <Outlet />
+          </div>
+        }>
           <Route index element={<Navigate to="home" replace />} />
           <Route path="home" element={<UserPage />} />
           <Route path="search" element={<UserBookSearch />} />

@@ -9,6 +9,7 @@ import lombok.Setter;
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookLoanStatusEnum;
 
 import java.util.Date;
+import java.util.Set;
 
 // Needed for HTTP requests and responses
 @Setter
@@ -42,6 +43,9 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     private Date updatedAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<BookLoan> bookLoans;
 
     @ManyToOne
     private Role role;

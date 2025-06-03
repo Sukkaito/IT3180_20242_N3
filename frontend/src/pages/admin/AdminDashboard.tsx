@@ -1,9 +1,69 @@
 // Dashboard cho Admin 
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AdminNavbar from "../../components/AdminNavbar";
 import VisitChart from "../../components/VisitChart";
+import { DashboardService, MetricsData } from "../../services/dashboardService";
 
 export default function AdminDashboard() {
+  // State for metrics data
+  const [metrics, setMetrics] = useState<MetricsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch metrics on component mount
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      try {
+        setLoading(true);
+        const data = await DashboardService.getMetrics();
+        setMetrics(data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching dashboard metrics:', err);
+        setError('Failed to load dashboard metrics');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMetrics();
+  }, []);
+
+  // Show loading indicator
+  if (loading) {
+    return (
+      <>
+        <AdminNavbar selected="dashboard" />
+        <div className="min-h-screen bg-purple-50 p-6">
+          <div className="text-center py-10">
+            <p className="text-purple-600">Loading dashboard data...</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Show error message if there was a problem
+  if (error) {
+    return (
+      <>
+        <AdminNavbar selected="dashboard" />
+        <div className="min-h-screen bg-purple-50 p-6">
+          <div className="text-center py-10">
+            <p className="text-red-600">{error}</p>
+            <button 
+              className="mt-4 bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700"
+              onClick={() => window.location.reload()}
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       {/* Đặt title cho trang admin dashboard */}
@@ -28,26 +88,34 @@ export default function AdminDashboard() {
             {/* Link đến trang quản lý sách */}
             <Link to="/admin/manage/books" className="bg-white shadow-md rounded-lg p-6">
               <h3 className="text-lg font-semibold text-purple-600 mb-2">Books</h3>
-              {/* Số lượng sách (hiện đang để tĩnh) */}
-              <p className="text-3xl font-bold text-purple-800">1,240</p>
+              {/* Số lượng sách từ API */}
+              <p className="text-3xl font-bold text-purple-800">
+                {metrics?.books.toLocaleString() || "0"}
+              </p>
             </Link>
 
             {/* Link đến trang quản lý danh mục */}
             <Link to="/admin/manage/categories" className="bg-white shadow-md rounded-lg p-6">
               <h3 className="text-lg font-semibold text-purple-600 mb-2">Categories</h3>
-              <p className="text-3xl font-bold text-purple-800">3,570</p>
+              <p className="text-3xl font-bold text-purple-800">
+                {metrics?.categories.toLocaleString() || "0"}
+              </p>
             </Link>
 
             {/* Link đến trang quản lý tác giả */}
             <Link to="/admin/manage/authors" className="bg-white shadow-md rounded-lg p-6">
               <h3 className="text-lg font-semibold text-purple-600 mb-2">Authors</h3>
-              <p className="text-3xl font-bold text-purple-800">28</p>
+              <p className="text-3xl font-bold text-purple-800">
+                {metrics?.authors.toLocaleString() || "0"}
+              </p>
             </Link>
 
             {/* Link đến trang quản lý nhà xuất bản */}
             <Link to="/admin/manage/publishers" className="bg-white shadow-md rounded-lg p-6">
               <h3 className="text-lg font-semibold text-purple-600 mb-2">Publishers</h3>
-              <p className="text-3xl font-bold text-purple-800">28</p>
+              <p className="text-3xl font-bold text-purple-800">
+                {metrics?.publishers.toLocaleString() || "0"}
+              </p>
             </Link>
           </div>
 
@@ -62,19 +130,25 @@ export default function AdminDashboard() {
             {/* Link đến trang quản lý người dùng */}
             <Link to="/admin/users" className="bg-white shadow-md rounded-lg p-6">
               <h3 className="text-lg font-semibold text-purple-600 mb-2">Users</h3>
-              <p className="text-3xl font-bold text-purple-800">1,240</p>
+              <p className="text-3xl font-bold text-purple-800">
+                {metrics?.users.toLocaleString() || "0"}
+              </p>
             </Link>
 
             {/* Link đến trang quản lý các phiếu mượn */}
             <Link to="/admin/loans" className="bg-white shadow-md rounded-lg p-6">
               <h3 className="text-lg font-semibold text-purple-600 mb-2">Loans</h3>
-              <p className="text-3xl font-bold text-purple-800">3,570</p>
+              <p className="text-3xl font-bold text-purple-800">
+                {metrics?.loans.toLocaleString() || "0"}
+              </p>
             </Link>
 
             {/* Link đến trang quản lý các yêu cầu */}
             <Link to="/admin/requests" className="bg-white shadow-md rounded-lg p-6">
               <h3 className="text-lg font-semibold text-purple-600 mb-2">Requests</h3>
-              <p className="text-3xl font-bold text-purple-800">28</p>
+              <p className="text-3xl font-bold text-purple-800">
+                {metrics?.requests.toLocaleString() || "0"}
+              </p>
             </Link>
           </div>
 

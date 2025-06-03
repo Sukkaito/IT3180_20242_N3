@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -11,13 +13,13 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookCopyStatusEnum;
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookLoanStatusEnum;
-import vn.edu.hust.nmcnpm_20242_n3.constant.BookRequestStatusEnum;
-import vn.edu.hust.nmcnpm_20242_n3.constant.BookRequestTypeEnum;
-import vn.edu.hust.nmcnpm_20242_n3.entity.*;
+import vn.edu.hust.nmcnpm_20242_n3.dto.BookLoanDTO;
+import vn.edu.hust.nmcnpm_20242_n3.entity.BookCopy;
+import vn.edu.hust.nmcnpm_20242_n3.entity.User;
+import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
 import vn.edu.hust.nmcnpm_20242_n3.repository.BookCopyRepository;
 import vn.edu.hust.nmcnpm_20242_n3.repository.BookLoanRepository;
 import vn.edu.hust.nmcnpm_20242_n3.repository.UserRepository;
-import vn.edu.hust.nmcnpm_20242_n3.repository.BookRequestRepository;
 
 @EnableScheduling
 @Service
@@ -38,8 +40,11 @@ public class BookLoanService {
 
     }
 
-    public List<BookLoan> getAllLoansByUserId(String userId) {
-        return (List<BookLoan>) bookLoanRepository.findAllByUserId(userId);
+    public List<BookLoanDTO> getAllLoansByUserId(String userId) {
+        List<BookLoan> bookLoans = bookLoanRepository.findByUserId(userId);
+        return bookLoans.stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
     }
 
     @Transactional
@@ -53,7 +58,6 @@ public class BookLoanService {
             throw new IllegalArgumentException("Book copy is not available");
         }
 
-        // Create a new book loan
         BookLoan bookLoan = new BookLoan();
         bookLoan.setUser(user);
         bookLoan.setBookCopy(bookCopy);
@@ -90,12 +94,37 @@ public class BookLoanService {
         bookLoanRepository.save(bookLoan);
     }
 
-    public List<BookLoan> getBorrowHistoryByBookCopyId(int bookCopyId) {
-        return bookLoanRepository.findAllByBookCopyId(bookCopyId);
+    public List<BookLoanDTO> getBorrowHistoryByBookCopyId(int bookCopyId) {
+        return bookLoanRepository.findAllByBookCopyId(bookCopyId).stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
     }
 
-    public List<BookLoan> getOverdueLoans() {
-        return bookLoanRepository.findByStatus(BookLoanStatusEnum.OVERDUE);
+    public List<BookLoanDTO> getOverdueLoans() {
+        return bookLoanRepository.findByStatus(BookLoanStatusEnum.OVERDUE).stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
     }
 
+    public List<BookLoanDTO> getAllBookLoans() {
+        List<BookLoan> bookLoans = (List<BookLoan>) bookLoanRepository.findAll();
+        return bookLoans.stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+    }
+
+    public BookLoanDTO convertToDTO(BookLoan bookLoan) {
+        return new BookLoanDTO(
+            bookLoan.getId(),
+            bookLoan.getBookCopy() != null ? bookLoan.getBookCopy().getId() : -1,
+            bookLoan.getBookCopy() != null ? bookLoan.getBookCopy().getOriginalBook().getTitle() : null,
+            bookLoan.getUser().getUserName(),
+            bookLoan.getLoanedAt(),
+            bookLoan.getDueDate(),
+            bookLoan.getActualReturnDate(),
+            bookLoan.getStatus().toString(),
+            bookLoan.getLoanedAt(),
+            bookLoan.getUpdatedAt()
+        );
+    }
 }

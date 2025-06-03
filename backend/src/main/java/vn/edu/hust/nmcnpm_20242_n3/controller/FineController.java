@@ -58,7 +58,7 @@ public class FineController {
     @PostMapping
     public ResponseEntity<?> addFine(@RequestBody FineDTO fineDTO) {
         try {
-            if (fineDTO.getUserId() == null) {
+            if (fineDTO.getUsername() == null) {
                 return ResponseEntity.badRequest().body("User information is missing or invalid.");
             }
             if (fineDTO.getBookLoanId() == null) {
@@ -70,7 +70,7 @@ public class FineController {
             if (fineDTO.getDescription() == null || fineDTO.getDescription().isEmpty()) {
                 return ResponseEntity.badRequest().body("Description cannot be null or empty.");
             }
-            User user = userRepository.findById(fineDTO.getUserId())
+            User user = userRepository.findByUserName(fineDTO.getUsername())
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
             BookLoan bookLoan = bookLoanRepository.findById(fineDTO.getBookLoanId())
                     .orElseThrow(() -> new IllegalArgumentException("BookLoan not found"));
@@ -88,29 +88,20 @@ public class FineController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<?> updateFine(@PathVariable String id, @RequestBody FineDTO fineDTO) {
         try {
-            User user = userRepository.findById(fineDTO.getUserId())
-                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
-            BookLoan bookLoan = bookLoanRepository.findById(fineDTO.getBookLoanId())
-                    .orElseThrow(() -> new IllegalArgumentException("BookLoan not found"));
-            Fine fine = new Fine();
-            fine.setId(id);
-            fine.setAmount(fineDTO.getAmount());
-            fine.setDescription(fineDTO.getDescription());
-            fine.setUser(user);
-            fine.setBookLoan(bookLoan);
-            Fine updatedFine = fineService.updateFine(id, fine);
+
+            Fine updatedFine = fineService.updateFine(id, fineDTO);
             return new ResponseEntity<>(FineDTO.fromEntity(updatedFine), HttpStatus.OK);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteFine(@PathVariable(name = "id") String id) {
         try {
             fineService.deleteFine(id);

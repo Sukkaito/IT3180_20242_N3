@@ -6,67 +6,69 @@ export type LoanStatus =
     | "RETURNED"
     | "NONRETURNABLE";
 
+// Updated to match backend DTO
 export interface BookLoan {
-    id: number;
-    book_copy_id: number;
-    user_id: string;
-    loan_date: string;           // ISO string format
-    return_date: string;         // ISO string format
-    actual_return_date: string | null;
+    id: string;
+    bookCopyId: number;
+    bookCopyOriginalBookTitle: string;
+    userUserName: string;
+    loanDate: string;           // ISO string format
+    dueDate: string;            // ISO string format
+    actualReturnDate: string | null;
     status: LoanStatus;
-    current_book_request_id: number | null;
-    loaned_at: string;           // ISO string format
-    updated_at: string;          // ISO string format
+    loanedAt: string;           // ISO string format
+    updatedAt: string;          // ISO string format
 }
 
+// Update the default data to match the new interface
 const bookLoans: BookLoan[] = [
     {
-        id: 1,
-        book_copy_id: 1,
-        user_id: "b24d5066-6321-4de8-af43-9a852d55a0a6",
-        loan_date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-        return_date: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000).toISOString(),
-        actual_return_date: null,
+        id: "1",
+        bookCopyId: 1,
+        bookCopyOriginalBookTitle: "To Kill a Mockingbird",
+        userUserName: "johndoe",
+        loanDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+        dueDate: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000).toISOString(),
+        actualReturnDate: null,
         status: "BORROWED",
-        current_book_request_id: null,
-        loaned_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-        updated_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+        loanedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+        updatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
     },
     {
-        id: 2,
-        book_copy_id: 2,
-        user_id: "c9b5f975-43c0-42f5-9b5e-ed62a4f935d1",
-        loan_date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-        return_date: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000).toISOString(),
-        actual_return_date: null,
+        id: "2",
+        bookCopyId: 2,
+        bookCopyOriginalBookTitle: "1984",
+        userUserName: "janedoe",
+        loanDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        dueDate: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000).toISOString(),
+        actualReturnDate: null,
         status: "BORROWED",
-        current_book_request_id: null,
-        loaned_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-        updated_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        loanedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     },
     {
-        id: 3,
-        book_copy_id: 3,
-        user_id: "b24d5066-6321-4de8-af43-9a852d55a0a6",
-        loan_date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-        return_date: new Date().toISOString(),
-        actual_return_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        id: "3",
+        bookCopyId: 3,
+        bookCopyOriginalBookTitle: "The Great Gatsby",
+        userUserName: "johndoe",
+        loanDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        dueDate: new Date().toISOString(),
+        actualReturnDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
         status: "RETURNED",
-        current_book_request_id: null,
-        loaned_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-        updated_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        loanedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     },
     {
-        id: 4,
-        book_copy_id: 4,
-        user_id: "c9b5f975-43c0-42f5-9b5e-ed62a4f935d1",
-        loan_date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-        return_date: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
-        actual_return_date: null,
+        id: "4",
+        bookCopyId: 4,
+        bookCopyOriginalBookTitle: "Pride and Prejudice",
+        userUserName: "janedoe",
+        loanDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+        dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
+        actualReturnDate: null,
         status: "REQUEST_RETURNING",
-        current_book_request_id: null,
-        loaned_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-        updated_at: new Date().toISOString(),
+        loanedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+        updatedAt: new Date().toISOString(),
     },
 ];
 

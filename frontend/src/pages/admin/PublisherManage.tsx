@@ -1,13 +1,64 @@
 // Trang quản lý nhà xuất bản (Publishers)
 // Tương tự như trang quản lý tác giả
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminNavbar from "../../components/AdminNavbar.tsx";
 import AdminPublisher from "../../components/AdminPublisher.tsx";
-import publishers from "../../data/publishers.ts";
+import { Publisher } from "../../data/publishers.ts";
+import { publisherService } from "../../services/publisherService.ts";
+
+// Local storage key
+const PUBLISHERS_STORAGE_KEY = "library_publishers";
 
 export default function PublisherManage() {
     const [search, setSearch] = useState("");
     const [newPublisherName, setNewPublisherName] = useState("");
+    const [publishers, setPublishers] = useState<Publisher[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    // Load publishers from API or local storage
+    useEffect(() => {
+        const fetchPublishers = async () => {
+            try {
+                setLoading(true);
+                // Try to load from local storage first
+                const storedPublishers = localStorage.getItem(PUBLISHERS_STORAGE_KEY);
+                
+                if (storedPublishers) {
+                    // If we have data in local storage, use it first (for instant loading)
+                    setPublishers(JSON.parse(storedPublishers));
+                    setLoading(false);
+                }
+                
+                // Then try to fetch from API (for up-to-date data)
+                try {
+                    const data = await publisherService.getAll();
+                    setPublishers(data);
+                    // Save to local storage
+                    localStorage.setItem(PUBLISHERS_STORAGE_KEY, JSON.stringify(data));
+                } catch (error) {
+                    console.error("Error fetching publishers from API:", error);
+                    // If we already loaded from localStorage, we can continue with that data
+                    if (!storedPublishers) {
+                        throw error; // Re-throw if we don't have any data
+                    }
+                }
+            } catch (error) {
+                console.error("Error loading publishers:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPublishers();
+
+        // Set up the interval for refreshing - optional, can be removed if not needed
+        const intervalId = setInterval(() => {
+            fetchPublishers();
+        }, 60000); // Refresh every minute
+
+        // Clean up the interval on component unmount
+        return () => clearInterval(intervalId);
+    }, []);
 
     const filteredPublishers = publishers.filter((publisher) => {
         const lowerSearch = search.toLowerCase();
@@ -16,11 +67,99 @@ export default function PublisherManage() {
         return idMatch || nameMatch;
     });
 
-    const handleAddPublisher = (name: string) => {
+    const handleAddPublisher = async (name: string) => {
         if (!name.trim()) return;
-        // TODO: Gọi API backend thêm publisher mới
-        console.log("Add publisher:", name);
-        setNewPublisherName("");
+        
+        try {
+            setLoading(true);
+            // Create a new publisher object with temporary ID
+            const tempId = Date.now(); // Use timestamp as temporary ID
+            const newPublisher: Publisher = {
+                id: tempId,
+                name: name.trim()
+            };
+            
+            // Optimistically update UI
+            const updatedPublishers = [...publishers, newPublisher];
+            setPublishers(updatedPublishers);
+            localStorage.setItem(PUBLISHERS_STORAGE_KEY, JSON.stringify(updatedPublishers));
+            
+            // Reset input field
+            setNewPublisherName("");
+            
+            // Make API call
+            try {
+                await publisherService.create({ name: name.trim() });
+                console.log("Add publisher:", name);
+                
+                // Fetch the updated list with proper IDs from server
+                const freshData = await publisherService.getAll();
+                setPublishers(freshData);
+                localStorage.setItem(PUBLISHERS_STORAGE_KEY, JSON.stringify(freshData));
+            } catch (error) {
+                console.error("Error adding publisher:", error);
+                // Revert optimistic update on error
+                const revertedPublishers = publishers.filter(p => p.id !== tempId);
+                setPublishers(revertedPublishers);
+                localStorage.setItem(PUBLISHERS_STORAGE_KEY, JSON.stringify(revertedPublishers));
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUpdatePublisher = async (id: number, newName: string) => {
+        if (!newName.trim()) return;
+        
+        try {
+            setLoading(true);
+            // Optimistically update UI
+            const updatedPublishers = publishers.map(pub => 
+                pub.id === id ? { ...pub, name: newName.trim() } : pub
+            );
+            setPublishers(updatedPublishers);
+            localStorage.setItem(PUBLISHERS_STORAGE_KEY, JSON.stringify(updatedPublishers));
+            
+            // Make API call
+            try {
+                await publisherService.update(id.toString(), { name: newName.trim() });
+                console.log("Update publisher ID:", id, "with new name:", newName);
+            } catch (error) {
+                console.error("Error updating publisher:", error);
+                // On error, revert the optimistic update
+                const revertedPublishers = await publisherService.getAll();
+                setPublishers(revertedPublishers);
+                localStorage.setItem(PUBLISHERS_STORAGE_KEY, JSON.stringify(revertedPublishers));
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDeletePublisher = async (id: number) => {
+        try {
+            setLoading(true);
+            // Store the original publisher list in case we need to revert
+            const originalPublishers = [...publishers];
+            
+            // Optimistically update UI
+            const updatedPublishers = publishers.filter(pub => pub.id !== id);
+            setPublishers(updatedPublishers);
+            localStorage.setItem(PUBLISHERS_STORAGE_KEY, JSON.stringify(updatedPublishers));
+            
+            // Make API call
+            try {
+                await publisherService.delete(id.toString());
+                console.log("Delete publisher ID:", id);
+            } catch (error) {
+                console.error("Error deleting publisher:", error);
+                // Revert on error
+                setPublishers(originalPublishers);
+                localStorage.setItem(PUBLISHERS_STORAGE_KEY, JSON.stringify(originalPublishers));
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -68,10 +207,28 @@ export default function PublisherManage() {
                     </div>
                 </div>
 
+                {/* Loading state */}
+                {loading && (
+                    <div className="text-center py-4">
+                        <p className="text-purple-600">Loading publishers...</p>
+                    </div>
+                )}
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-4 pb-10">
                     {filteredPublishers.map((publisher) => (
-                        <AdminPublisher key={publisher.id} publisher={publisher} />
+                        <AdminPublisher 
+                            key={publisher.id} 
+                            publisher={publisher} 
+                            onUpdate={handleUpdatePublisher}
+                            onDelete={handleDeletePublisher}
+                        />
                     ))}
+                    
+                    {!loading && filteredPublishers.length === 0 && (
+                        <div className="col-span-full text-center py-4">
+                            <p className="text-gray-500">No publishers found</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

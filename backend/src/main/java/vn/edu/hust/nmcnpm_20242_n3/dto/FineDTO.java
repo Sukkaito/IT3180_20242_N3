@@ -8,7 +8,7 @@ public class FineDTO {
     private String id;
     private double amount;
     private String description;
-    private String userId;
+    private String username;
     private String bookLoanId;
     private Date createdAt;
     private Date updatedAt;
@@ -17,12 +17,12 @@ public class FineDTO {
     public FineDTO() {
     }
 
-    public FineDTO(String id, double amount, String description, String userId, String bookLoanId, Date createdAt,
+    public FineDTO(String id, double amount, String description, String userName, String bookLoanId, Date createdAt,
             Date updatedAt) {
         this.id = id;
         this.amount = amount;
         this.description = description;
-        this.userId = userId;
+        this.username = userName;
         this.bookLoanId = bookLoanId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -36,7 +36,7 @@ public class FineDTO {
         dto.setCreatedAt(fine.getCreatedAt());
         dto.setUpdatedAt(fine.getUpdatedAt());
         if (fine.getUser() != null)
-            dto.setUserId(fine.getUser().getId());
+            dto.setUsername(fine.getUser().getUserName());
         if (fine.getBookLoan() != null)
             dto.setBookLoanId(fine.getBookLoan().getId());
         return dto;
@@ -67,12 +67,12 @@ public class FineDTO {
         this.description = description;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getBookLoanId() {

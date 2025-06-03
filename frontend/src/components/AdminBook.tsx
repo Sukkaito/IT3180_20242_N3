@@ -1,11 +1,18 @@
 // Component nay dùng để hiển thị thông tin của một cuốn sách trong trang quản lý
+import { useState, useEffect } from "react";
 import { Book as BookType } from "../data/books";
 import { Author as AuthorType } from "../data/authors";
 import { Category as CategoryType } from "../data/categories";
 import { Publisher as PublisherType } from "../data/publishers";
-import authors from "../data/authors";
-import categories from "../data/categories";
-import publishers from "../data/publishers";
+import { STORAGE_KEY_PREFIX } from "../services/baseService";
+import defaultAuthors from "../data/authors";
+import defaultCategories from "../data/categories";
+import defaultPublishers from "../data/publishers";
+
+// LocalStorage keys
+const AUTHORS_STORAGE_KEY = `${STORAGE_KEY_PREFIX}authors`;
+const CATEGORIES_STORAGE_KEY = `${STORAGE_KEY_PREFIX}categories`;
+const PUBLISHERS_STORAGE_KEY = `${STORAGE_KEY_PREFIX}publishers`;
 
 // Props nhận từ component cha
 interface AdminBookProps {
@@ -16,19 +23,54 @@ interface AdminBookProps {
 }
 
 export default function AdminBook({ book, onView, onEdit, onDelete }: AdminBookProps) {
+    // State for storing data from localStorage
+    const [authors, setAuthors] = useState<AuthorType[]>([]);
+    const [categories, setCategories] = useState<CategoryType[]>([]);
+    const [publishers, setPublishers] = useState<PublisherType[]>([]);
+    
+    // Load data from localStorage on component mount
+    useEffect(() => {
+        // Load authors
+        const storedAuthors = localStorage.getItem(AUTHORS_STORAGE_KEY);
+        if (storedAuthors) {
+            setAuthors(JSON.parse(storedAuthors));
+        } else {
+            // Fallback to default data if localStorage is empty
+            setAuthors(defaultAuthors);
+        }
+        
+        // Load categories
+        const storedCategories = localStorage.getItem(CATEGORIES_STORAGE_KEY);
+        if (storedCategories) {
+            setCategories(JSON.parse(storedCategories));
+        } else {
+            // Fallback to default data if localStorage is empty
+            setCategories(defaultCategories);
+        }
+        
+        // Load publishers
+        const storedPublishers = localStorage.getItem(PUBLISHERS_STORAGE_KEY);
+        if (storedPublishers) {
+            setPublishers(JSON.parse(storedPublishers));
+        } else {
+            // Fallback to default data if localStorage is empty
+            setPublishers(defaultPublishers);
+        }
+    }, []);
+    
     // Tìm tên tác giả từ danh sách id
     const authorNames = book.authorIds
-        .map((id) => authors.find((a: AuthorType) => a.id === id)?.name || "Unknown")
+        .map((id) => authors.find((a) => a.id === id)?.name || "Unknown")
         .join(", ");
 
     // Tìm tên thể loại từ danh sách id
     const categoryNames = book.categoryIds
-        .map((id) => categories.find((c: CategoryType) => c.id === id)?.name || "Unknown")
+        .map((id) => categories.find((c) => c.id === id)?.name || "Unknown")
         .join(", ");
 
     // Tìm tên nhà xuất bản từ id
     const publisherName =
-        publishers.find((p: PublisherType) => p.id === book.publisherId)?.name || "Unknown";
+        publishers.find((p) => p.id === book.publisherId)?.name || "Unknown";
 
     return (
         <div className="bg-white shadow-md rounded-lg p-4 flex flex-col justify-between h-full">

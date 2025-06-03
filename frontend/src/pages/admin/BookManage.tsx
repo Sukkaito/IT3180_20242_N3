@@ -1,13 +1,20 @@
 // Import các hook và component cần thiết
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";  // để chuyển trang khi xem chi tiết
 import AdminNavbar from "../../components/AdminNavbar.tsx";
 import AdminBook from "../../components/AdminBook.tsx";
 import BookFormModal from "../../components/BookFormModal.tsx";
-import booksData from "../../data/books.ts";       // dữ liệu sách mẫu
-import authors from "../../data/authors.ts";
-import categories from "../../data/categories.ts";
-import publishers from "../../data/publishers.ts";
+import { Book } from "../../data/books.ts";
+import { Author } from "../../data/authors.ts";
+import { Category } from "../../data/categories.ts";
+import { Publisher } from "../../data/publishers.ts";
+import { STORAGE_KEY_PREFIX } from "../../services/baseService.ts";
+import bookService from "../../services/bookService.ts";
+
+// Local storage keys
+const AUTHORS_STORAGE_KEY = `${STORAGE_KEY_PREFIX}authors`;
+const CATEGORIES_STORAGE_KEY = `${STORAGE_KEY_PREFIX}categories`;
+const PUBLISHERS_STORAGE_KEY = `${STORAGE_KEY_PREFIX}publishers`;
 
 export default function BookManage() {
     // State lưu chuỗi tìm kiếm
@@ -15,12 +22,55 @@ export default function BookManage() {
     // State quản lý trạng thái mở/đóng modal form thêm/sửa sách
     const [isModalOpen, setIsModalOpen] = useState(false);
     // State lưu sách đang được chỉnh sửa (null nếu thêm mới)
-    const [editingBook, setEditingBook] = useState(null);
-    // State danh sách sách, khởi tạo từ dữ liệu mẫu
-    const [books, setBooks] = useState(booksData);
+    const [editingBook, setEditingBook] = useState<Book | null>(null);
+    // State danh sách sách
+    const [books, setBooks] = useState<Book[]>([]);
+    // State for authors, categories, publishers
+    const [authors, setAuthors] = useState<Author[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [publishers, setPublishers] = useState<Publisher[]>([]);
+    // Loading state
+    const [loading, setLoading] = useState(true);
 
     // Hook dùng để chuyển trang
     const navigate = useNavigate();
+
+    // Load data on component mount
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                setLoading(true);
+                
+                // Load books using the service
+                const booksData = await bookService.getAll();
+                setBooks(booksData);
+                
+                // Load authors from localStorage
+                const storedAuthors = localStorage.getItem(AUTHORS_STORAGE_KEY);
+                if (storedAuthors) {
+                    setAuthors(JSON.parse(storedAuthors));
+                }
+                
+                // Load categories from localStorage
+                const storedCategories = localStorage.getItem(CATEGORIES_STORAGE_KEY);
+                if (storedCategories) {
+                    setCategories(JSON.parse(storedCategories));
+                }
+                
+                // Load publishers from localStorage
+                const storedPublishers = localStorage.getItem(PUBLISHERS_STORAGE_KEY);
+                if (storedPublishers) {
+                    setPublishers(JSON.parse(storedPublishers));
+                }
+            } catch (error) {
+                console.error("Error loading data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        
+        loadData();
+    }, []);
 
     // Lọc danh sách sách dựa trên từ khóa tìm kiếm (title, author, category, publisher)
     const filteredBooks = books.filter((book) => {
@@ -51,7 +101,7 @@ export default function BookManage() {
     };
 
     // Mở modal form chỉnh sửa sách
-    const handleEdit = (book) => {
+    const handleEdit = (book: Book) => {
         setEditingBook(book);    // gán sách cần sửa
         setIsModalOpen(true);    // mở modal
     };
@@ -63,17 +113,58 @@ export default function BookManage() {
     };
 
     // Chuyển sang trang xem chi tiết sách
-    // Lưu ý URL đúng với đường dẫn có "manage"
-    const handleView = (bookId) => {
+    const handleView = (bookId: number) => {
         navigate(`/admin/manage/books/${bookId}`);
     };
 
     // Xóa sách theo ID, hỏi xác nhận trước
-    const handleDelete = (bookId) => {
+    const handleDelete = async (bookId: number) => {
         if (window.confirm("Are you sure you want to delete this book?")) {
-            setBooks(prev => prev.filter(book => book.id !== bookId));
+            try {
+                await bookService.delete(bookId);
+                // Update the local state after successful deletion
+                setBooks(prev => prev.filter(book => book.id !== bookId));
+            } catch (error) {
+                console.error("Error deleting book:", error);
+                alert("Failed to delete the book. Please try again.");
+            }
         }
     };
+
+    // Handle form submission
+    const handleSubmit = async (bookData: Partial<Book>) => {
+        try {
+            if (editingBook) {
+                // Update existing book
+                const updatedBook = await bookService.update(editingBook.id, bookData);
+                setBooks(prev => prev.map(book => 
+                    book.id === editingBook.id ? updatedBook : book
+                ));
+            } else {
+                // Create new book
+                const newBook = await bookService.create(bookData as Omit<Book, 'id'>);
+                setBooks(prev => [...prev, newBook]);
+            }
+            handleCloseModal();
+        } catch (error) {
+            console.error("Error saving book:", error);
+            alert("Failed to save the book. Please try again.");
+        }
+    };
+
+    // Show loading indicator while data is being fetched
+    if (loading) {
+        return (
+            <>
+                <AdminNavbar selected="books" />
+                <div className="min-h-screen bg-purple-50 p-6">
+                    <div className="text-center py-10">
+                        <p className="text-purple-600">Loading books data...</p>
+                    </div>
+                </div>
+            </>
+        );
+    }
 
     return (
         <>
@@ -105,23 +196,32 @@ export default function BookManage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-4 pb-10">
-                    {filteredBooks.map((book) => (
-                        <AdminBook
-                            key={book.id}
-                            book={book}
-                            onView={() => handleView(book.id)}
-                            onEdit={() => handleEdit(book)}
-                            onDelete={() => handleDelete(book.id)}
-                        />
-                    ))}
+                    {filteredBooks.length > 0 ? (
+                        filteredBooks.map((book) => (
+                            <AdminBook
+                                key={book.id}
+                                book={book}
+                                onView={() => handleView(book.id)}
+                                onEdit={() => handleEdit(book)}
+                                onDelete={() => handleDelete(book.id)}
+                            />
+                        ))
+                    ) : (
+                        <div className="col-span-3 text-center py-8 text-gray-500">
+                            No books found matching your search criteria.
+                        </div>
+                    )}
                 </div>
             </div>
 
             <BookFormModal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
-                onSubmit={() => handleCloseModal()}
+                onSubmit={handleSubmit}
                 initialData={editingBook}
+                authors={authors}
+                categories={categories}
+                publishers={publishers}
             />
         </>
     );

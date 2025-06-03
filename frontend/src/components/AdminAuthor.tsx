@@ -6,9 +6,10 @@ import { Author as AuthorType } from "../data/authors";
 interface AdminAuthorProps {
     author: AuthorType;                                // Dữ liệu tác giả (id, name)
     onUpdate: (id: number, newName: string) => void;   // Hàm callback để cập nhật tên tác giả
+    onDelete?: (id: number) => void; // Hàm callback để xóa tác giả (tùy chọn)
 }
 
-export default function AdminAuthor({ author, onUpdate }: AdminAuthorProps) {
+export default function AdminAuthor({ author, onUpdate, onDelete }: AdminAuthorProps) {
     // Trạng thái hiển thị form sửa tên
     const [isEditing, setIsEditing] = useState(false);
 
@@ -30,6 +31,13 @@ export default function AdminAuthor({ author, onUpdate }: AdminAuthorProps) {
         setEditName(author.name);
         setIsEditing(false);
     };
+
+    const handleDelete = () => {
+        // Hiển thị hộp thoại xác nhận trước khi xóa
+        if (window.confirm(`Are you sure you want to delete author ${author.name}?`)) {
+            onDelete?.(author.id); // Gọi hàm xóa nếu có
+        }
+    }
 
     return (
         // Container chính của thẻ tác giả
@@ -95,7 +103,9 @@ export default function AdminAuthor({ author, onUpdate }: AdminAuthorProps) {
                 )}
 
                 {/* Nút Delete (hiện chưa có sự kiện xử lý) */}
-                <button className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600">Delete</button>
+                <button className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600"
+                onClick={handleDelete}
+                >Delete</button>
             </div>
         </div>
     );

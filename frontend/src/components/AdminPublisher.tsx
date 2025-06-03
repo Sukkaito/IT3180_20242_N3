@@ -5,9 +5,10 @@ import { Publisher as PublisherType } from "../data/publishers";
 interface AdminPublisherProps {
     publisher: PublisherType;
     onUpdate: (id: number, newName: string) => void;
+    onDelete?: (id: number) => void; // Added onDelete callback
 }
 
-export default function AdminPublisher({ publisher, onUpdate }: AdminPublisherProps) {
+export default function AdminPublisher({ publisher, onUpdate, onDelete }: AdminPublisherProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [editName, setEditName] = useState(publisher.name);
 
@@ -22,6 +23,13 @@ export default function AdminPublisher({ publisher, onUpdate }: AdminPublisherPr
         setEditName(publisher.name);
         setIsEditing(false);
     };
+
+    const handleDelete = () => {
+        // Hiển thị hộp thoại xác nhận trước khi xóa
+        if (window.confirm(`Are you sure you want to delete publisher ${publisher.name}?`)) {
+            onDelete?.(publisher.id); // Gọi hàm xóa nếu có
+        }
+    }
 
     return (
         <div className="bg-white shadow-md rounded-lg p-4 flex flex-col justify-between h-full">
@@ -78,7 +86,12 @@ export default function AdminPublisher({ publisher, onUpdate }: AdminPublisherPr
                     </button>
                 )}
 
-                <button className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600">Delete</button>
+                <button 
+                    className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600"
+                    onClick={handleDelete}
+                >
+                    Delete
+                </button>
             </div>
         </div>
     );

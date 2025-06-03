@@ -1,12 +1,12 @@
 // Trang quản lý Requests 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminNavbar from "../../components/AdminNavbar";
-import bookRequests, {
+import {
+    BookRequest,
     BookRequestStatusEnum,
     BookRequestTypeEnum,
 } from "../../data/bookRequests";
-import bookLoans from "../../data/bookLoans";
-import users from "../../data/users";
+import { BookRequestService } from "../../services/bookRequestService";
 
 export default function RequestManage() {
     // State để lưu giá trị tìm kiếm theo username hoặc Book Loan ID
@@ -15,24 +15,44 @@ export default function RequestManage() {
     const [filterStatus, setFilterStatus] = useState<string>("");
     // State để lưu giá trị lọc theo loại yêu cầu (Borrowing hoặc Returning)
     const [filterType, setFilterType] = useState<string>("");
+    // State to store requests
+    const [requests, setRequests] = useState<BookRequest[]>([]);
+    // Loading state
+    const [loading, setLoading] = useState(true);
 
-    // Tạo mảng enrichedRequests bằng cách kết hợp dữ liệu yêu cầu mượn/trả
-    // với thông tin user và bookLoan liên quan
-    const enrichedRequests = bookRequests.map((req) => {
-        // Tìm thông tin bookLoan tương ứng với yêu cầu
-        const loan = bookLoans.find((loan) => loan.id === req.bookLoanId);
-        // Tìm thông tin user dựa trên user_id trong bookLoan tìm được
-        const user = users.find((u) => u.id === loan?.user_id);
-        // Trả về object enriched gồm thông tin yêu cầu cùng username và bookLoanId rõ ràng
-        return {
-            ...req,
-            username: user?.userName || "Unknown",
-            bookLoanId: loan?.id || "Unknown",
+    // Load requests on component mount
+    useEffect(() => {
+        const loadRequests = async () => {
+            try {
+                setLoading(true);
+                const data = await BookRequestService.getAll();
+                
+                // Process the data to replace null values with "Unknown"
+                const processedData = data.map(request => ({
+                    ...request,
+                    username: request.username || "Unknown",
+                    bookLoanId: request.bookLoanId || "Unknown",
+                    status: request.status || "Unknown",
+                    type: request.type || "Unknown",
+                    createdAt: request.createdAt || new Date().toISOString(),
+                    updatedAt: request.updatedAt || new Date().toISOString()
+                }));
+                
+                setRequests(processedData);
+            } catch (error) {
+                console.error("Error loading requests:", error);
+            } finally {
+                setLoading(false);
+            }
         };
-    });
+        
+        loadRequests();
+    }, []);
 
-    // Lọc enrichedRequests dựa trên giá trị tìm kiếm, trạng thái và loại yêu cầu
-    const filteredRequests = enrichedRequests.filter((req) => {
+
+
+    // Lọc requests dựa trên giá trị tìm kiếm, trạng thái và loại yêu cầu
+    const filteredRequests = requests.filter((req) => {
         // Chuyển search thành chữ thường để so sánh không phân biệt hoa thường
         const lowerSearch = search.toLowerCase();
         // Kiểm tra xem username hoặc bookLoanId có chứa chuỗi tìm kiếm không
@@ -72,6 +92,34 @@ export default function RequestManage() {
                 return ""; // Không style cho loại không xác định
         }
     };
+
+    // Handle request processing (approve or reject)
+    const handleProcessRequest = async (requestId: string, approve: boolean) => {
+        try {
+            await BookRequestService.processRequest(requestId, approve);
+            
+            // Refresh the requests list
+            const updatedRequests = await BookRequestService.getAll();
+            setRequests(updatedRequests);
+        } catch (error) {
+            console.error("Error processing request:", error);
+            alert("Failed to process the request. Please try again.");
+        }
+    };
+
+    // Show loading indicator while data is being fetched
+    if (loading) {
+        return (
+            <>
+                <AdminNavbar selected="requests" />
+                <div className="min-h-screen bg-purple-50 p-6">
+                    <div className="text-center py-10">
+                        <p className="text-purple-600">Loading requests data...</p>
+                    </div>
+                </div>
+            </>
+        );
+    }
 
     return (
         <>
@@ -186,10 +234,16 @@ export default function RequestManage() {
                                             {/* Nếu trạng thái là PENDING, hiển thị nút Accept và Deny */}
                                             {req.status === "PENDING" ? (
                                                 <>
-                                                    <button className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                                                    <button 
+                                                        className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                                                        onClick={() => handleProcessRequest(req.id, true)}
+                                                    >
                                                         Accept
                                                     </button>
-                                                    <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                                                    <button 
+                                                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                                                        onClick={() => handleProcessRequest(req.id, false)}
+                                                    >
                                                         Deny
                                                     </button>
                                                 </>

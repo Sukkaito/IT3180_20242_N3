@@ -73,7 +73,7 @@ export default function AdminNavbar({ selected = "dashboard" }: { selected?: str
                         <Link to="/admin/expense" className={getNavLinkClass("expense")}>
                             Expenses
                         </Link>
-                        <Link to="/admin/infrastructure" className={getNavLinkClass("infrastructure")}>
+                        <Link to="/admin/status" className={getNavLinkClass("status")}>
                             Infrastructure
                         </Link>
                         <Link to="/admin/profile" className={getNavLinkClass("profile")}>

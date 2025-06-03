@@ -5,9 +5,10 @@ import { Category as CategoryType } from "../data/categories";
 interface AdminCategoryProps {
     category: CategoryType;
     onUpdate: (id: number, newName: string) => void; // callback khi lưu tên mới
+    onDelete?: (id: number) => void; // callback khi xóa category
 }
 
-export default function AdminCategory({ category, onUpdate }: AdminCategoryProps) {
+export default function AdminCategory({ category, onUpdate, onDelete }: AdminCategoryProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [editName, setEditName] = useState(category.name);
 
@@ -22,6 +23,13 @@ export default function AdminCategory({ category, onUpdate }: AdminCategoryProps
         setEditName(category.name);
         setIsEditing(false);
     };
+
+    const handleDelete = () => {
+        // Hiển thị hộp thoại xác nhận trước khi xóa
+        if (window.confirm(`Are you sure you want to delete category ${category.name}?`)) {
+            onDelete?.(category.id); // Gọi hàm xóa nếu có
+        }
+    }
 
     return (
         <div className="bg-white shadow-md rounded-lg p-4 flex flex-col justify-between h-full">
@@ -78,7 +86,12 @@ export default function AdminCategory({ category, onUpdate }: AdminCategoryProps
                     </button>
                 )}
 
-                <button className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600">Delete</button>
+                <button 
+                    className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600"
+                    onClick={handleDelete}
+                >
+                    Delete
+                </button>
             </div>
         </div>
     );

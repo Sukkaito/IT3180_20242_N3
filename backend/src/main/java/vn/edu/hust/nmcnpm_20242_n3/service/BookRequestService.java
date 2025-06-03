@@ -11,6 +11,7 @@ import vn.edu.hust.nmcnpm_20242_n3.constant.BookCopyStatusEnum;
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookLoanStatusEnum;
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookRequestStatusEnum;
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookRequestTypeEnum;
+import vn.edu.hust.nmcnpm_20242_n3.dto.BookRequestDTO;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookCopy;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookRequest;
@@ -18,7 +19,6 @@ import vn.edu.hust.nmcnpm_20242_n3.entity.User;
 import vn.edu.hust.nmcnpm_20242_n3.repository.BookCopyRepository;
 import vn.edu.hust.nmcnpm_20242_n3.repository.BookRequestRepository;
 import vn.edu.hust.nmcnpm_20242_n3.repository.UserRepository;
-import vn.edu.hust.nmcnpm_20242_n3.service.BookLoanService;
 
 @Service
 public class BookRequestService {
@@ -39,8 +39,8 @@ public class BookRequestService {
         this.subscriptionService = subscriptionService;
     }
 
-    public List<BookRequest> getAllRequests() {
-        List<BookRequest> requests = (List<BookRequest>) bookRequestRepository.findAll();
+    public List<BookRequestDTO> getAllRequests() {
+        List<BookRequest> requests = bookRequestRepository.findAll();
         for (BookRequest request : requests) {
             if (request.getBookLoan() != null) {
                 if (request.getBookCopy() == null) {
@@ -54,11 +54,12 @@ public class BookRequestService {
         return requests.stream()
                 .sorted(Comparator.comparing((BookRequest br) -> br.getStatus() == BookRequestStatusEnum.PENDING ? 0 : 1)
                         .thenComparing(BookRequest::getCreatedAt))
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public BookRequest processRequest(String requestId, boolean approve) {
+    public BookRequestDTO processRequest(String requestId, boolean approve) {
         BookRequest request = bookRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Request not found with ID: " + requestId));
 
@@ -121,19 +122,21 @@ public class BookRequestService {
             }
         }
 
-        return bookRequestRepository.save(request);
+        return convertToDTO(bookRequestRepository.save(request));
     }
 
-    public List<BookRequest> listAllRequestsFromUser(String userId) {
-        return (List<BookRequest>) bookRequestRepository.findByUserId(userId);
+    public List<BookRequestDTO> listAllRequestsFromUser(String userId) {
+        return bookRequestRepository.findByUserId(userId).stream()
+                .map(this::convertToDTO)
+                .toList();
     }
 
-    public BookRequest findRequestById(String id) {
-        return bookRequestRepository.findById(id).get();
+    public BookRequestDTO findRequestById(String id) {
+        return convertToDTO(bookRequestRepository.findById(id).get());
     }
 
     @Transactional
-    public BookRequest newBorrowingRequest(String userId, Integer bookCopyId) {
+    public BookRequestDTO newBorrowingRequest(String userId, Integer bookCopyId) {
         BookCopy bookCopy = bookCopyRepository.findById(bookCopyId)
                 .orElseThrow(() -> new IllegalArgumentException("Book copy not found"));
         if (!bookCopy.getStatus().equals(BookCopyStatusEnum.AVAILABLE)) {
@@ -155,11 +158,11 @@ public class BookRequestService {
         bookRequest.setBookCopy(bookCopy);
         bookRequest.setType(BookRequestTypeEnum.BORROWING);
         bookRequest.setStatus(BookRequestStatusEnum.PENDING);
-        return bookRequestRepository.save(bookRequest);
+        return convertToDTO(bookRequestRepository.save(bookRequest));
     }
 
     @Transactional
-    public BookRequest newReturningRequest(String userId, Integer bookCopyId) {
+    public BookRequestDTO newReturningRequest(String userId, Integer bookCopyId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         BookLoan bookLoan = bookLoanService
@@ -182,11 +185,11 @@ public class BookRequestService {
         bookRequest.setBookLoan(bookLoan);
         bookRequest.setType(BookRequestTypeEnum.RETURNING);
         bookRequest.setStatus(BookRequestStatusEnum.PENDING);
-        return bookRequestRepository.save(bookRequest);
+        return convertToDTO(bookRequestRepository.save(bookRequest));
     }
 
     @Transactional
-    public BookRequest cancelRequest(String requestId) {
+    public void cancelRequest(String requestId) {
         BookRequest bookRequest = bookRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Request not found"));
         if (!bookRequest.getStatus().equals(BookRequestStatusEnum.PENDING)) {
@@ -194,6 +197,18 @@ public class BookRequestService {
         }
         // Update book request status
         bookRequest.setStatus(BookRequestStatusEnum.CANCELED);
-        return bookRequestRepository.save(bookRequest);
+        convertToDTO(bookRequestRepository.save(bookRequest));
+    }
+
+    private BookRequestDTO convertToDTO(BookRequest bookRequest) {
+        return new BookRequestDTO(
+                bookRequest.getId(),
+                bookRequest.getBookLoan() != null ? bookRequest.getBookLoan().getId() : null,
+                bookRequest.getUser() != null ? bookRequest.getUser().getUserName() : null,
+                bookRequest.getStatus(),
+                bookRequest.getType(),
+                bookRequest.getCreatedAt(),
+                bookRequest.getUpdatedAt()
+        );
     }
 }

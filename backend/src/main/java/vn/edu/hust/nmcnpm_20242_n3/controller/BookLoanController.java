@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.NoArgsConstructor;
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookCopyStatusEnum;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookCopy;
+import vn.edu.hust.nmcnpm_20242_n3.dto.BookLoanDTO;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookRequest;
 import vn.edu.hust.nmcnpm_20242_n3.repository.BookCopyRepository;
@@ -38,26 +39,19 @@ public class BookLoanController {
     }
 
     @GetMapping("/{userId}")
-    public List<BookLoan> getAllLoans(@PathVariable("userId") String userId) {
+    public List<BookLoanDTO> getAllLoans(@PathVariable("userId") String userId) {
         return bookLoanService.getAllLoansByUserId(userId);
     }
 
-
-
-    @GetMapping("/history/user/{userId}")
-    public ResponseEntity<?> getBorrowingHistory(@PathVariable String userId) {
-        try {
-            List<BookLoan> history = bookLoanService.getAllLoansByUserId(userId);
-            return new ResponseEntity<>(history, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @GetMapping
+    public List<BookLoanDTO> getAllLoans() {
+        return bookLoanService.getAllBookLoans();
     }
 
     @GetMapping("/history/book-copy/{bookCopyId}")
     public ResponseEntity<?> getBorrowHistoryByBookCopyId(@PathVariable int bookCopyId) {
         try {
-            List<BookLoan> history = bookLoanService.getBorrowHistoryByBookCopyId(bookCopyId);
+            List<BookLoanDTO> history = bookLoanService.getBorrowHistoryByBookCopyId(bookCopyId);
             return new ResponseEntity<>(history, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -67,7 +61,7 @@ public class BookLoanController {
     @GetMapping("/overdue")
     public ResponseEntity<?> getOverdueLoans() {
         try {
-            List<BookLoan> overdueLoans = bookLoanService.getOverdueLoans();
+            List<BookLoanDTO> overdueLoans = bookLoanService.getOverdueLoans();
             return new ResponseEntity<>(overdueLoans, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

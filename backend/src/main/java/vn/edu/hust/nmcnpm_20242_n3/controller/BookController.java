@@ -59,10 +59,10 @@ public class BookController {
     }
 
 
-    @GetMapping("/search/id/{id}") // Get By Id
+    @GetMapping("/{id}") // Get By Id
     public ResponseEntity<?> getBookById(@PathVariable int id) {
         try {
-            Book book = bookService.searchById(id);
+            Book book = bookService.getById(id);
             return new ResponseEntity<>(bookService.convertToDTO(book), HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);

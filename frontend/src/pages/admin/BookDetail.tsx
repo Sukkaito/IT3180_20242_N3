@@ -2,18 +2,106 @@
 import { useParams } from "react-router-dom"; // Hook lấy params từ URL
 import AdminNavbar from "../../components/AdminNavbar"; // Navbar cho trang admin
 import books from "../../data/books"; // Data sách mẫu
-import authors from "../../data/authors"; // Data tác giả mẫu
-import categories from "../../data/categories"; // Data danh mục sách mẫu
-import publishers from "../../data/publishers"; // Data nhà xuất bản mẫu
-import bookCopies from "../../data/bookCopies"; // Data bản sao sách mẫu
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Author } from "../../data/authors";
+import { Category } from "../../data/categories";
+import { Publisher } from "../../data/publishers";
+import { BookCopy } from "../../data/bookCopies";
+import { BookCopyService } from "../../services/bookCopyService";
+import { Book } from "../../data/books";
+import bookService from "../../services/bookService";
+import { STORAGE_KEY_PREFIX } from "../../services/baseService";
+
+// Local storage keys
+const AUTHORS_STORAGE_KEY = `${STORAGE_KEY_PREFIX}authors`;
+const CATEGORIES_STORAGE_KEY = `${STORAGE_KEY_PREFIX}categories`;
+const PUBLISHERS_STORAGE_KEY = `${STORAGE_KEY_PREFIX}publishers`;
 
 export default function BookDetail() {
-    // Lấy tham số bookId từ URL (vd: /books/123 thì bookId = "123")
-    const { bookId } = useParams();
+    // State for data
+    const [book, setBook] = useState<Book>();
+    const [bookCopies, setBookCopies] = useState<BookCopy[]>([]);
+    const [authors, setAuthors] = useState<Author[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [publishers, setPublishers] = useState<Publisher[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    // Chuyển bookId sang số để dễ xử lý
+    // Lấy tham số bookId từ URL
+    const { bookId } = useParams();
     const bookIdNumber = bookId ? parseInt(bookId) : NaN;
+
+    // Load data on component mount
+    useEffect(() => {
+        const loadData = async () => {
+            if (isNaN(bookIdNumber)) {
+                return;
+            }
+
+            try {
+                setLoading(true);
+                
+                // Load book data
+                const bookData = await bookService.getById(bookIdNumber);
+                if (bookData) {
+                    setBook(bookData);
+                }
+                
+                // Load book copies
+                const copies = await BookCopyService.getByBookId(bookIdNumber);
+                setBookCopies(copies);
+                
+                // Load authors from local storage
+                const storedAuthors = localStorage.getItem(AUTHORS_STORAGE_KEY);
+                if (storedAuthors) {
+                    setAuthors(JSON.parse(storedAuthors));
+                }
+                
+                // Load categories from local storage
+                const storedCategories = localStorage.getItem(CATEGORIES_STORAGE_KEY);
+                if (storedCategories) {
+                    setCategories(JSON.parse(storedCategories));
+                }
+                
+                // Load publishers from local storage
+                const storedPublishers = localStorage.getItem(PUBLISHERS_STORAGE_KEY);
+                if (storedPublishers) {
+                    setPublishers(JSON.parse(storedPublishers));
+                }
+            } catch (error) {
+                console.error("Error loading data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        
+        loadData();
+    }, [bookIdNumber]);
+
+    // Handle adding a new book copy
+    const handleAddCopy = async () => {
+        if (!book) return;
+        
+        try {
+            const newCopy = await BookCopyService.create(book.id);
+            setBookCopies(prev => [...prev, newCopy]);
+        } catch (error) {
+            console.error("Error creating book copy:", error);
+            alert("Failed to create a new copy. Please try again.");
+        }
+    };
+
+    // Handle deleting a book copy
+    const handleDeleteCopy = async (copyId: number) => {
+        if (window.confirm("Are you sure you want to delete this copy?")) {
+            try {
+                await BookCopyService.delete(copyId);
+                setBookCopies(prev => prev.filter(copy => copy.id !== copyId));
+            } catch (error) {
+                console.error("Error deleting book copy:", error);
+                alert("Failed to delete the copy. " + error.message);
+            }
+        }
+    };
 
     // Nếu bookId không hợp lệ (không phải số), hiển thị lỗi
     if (isNaN(bookIdNumber)) {
@@ -21,37 +109,45 @@ export default function BookDetail() {
     }
 
     // Tìm sách trong data theo id lấy được
-    const book = books.find((b) => b.id === bookIdNumber);
+    const foundBook = books.find((b) => b.id === bookIdNumber);
 
     // Nếu không tìm thấy sách nào với id đó, hiển thị lỗi
-    if (!book) {
+    if (!foundBook) {
         return <div className="p-4 text-red-500">Book not found!</div>;
     }
 
     // Lấy tên tác giả dựa trên mảng authorIds của sách, nối thành chuỗi
-    const authorNames = book.authorIds
+    const authorNames = foundBook.authorIds
         .map((id) => authors.find((a) => a.id === id)?.name || "Unknown")
         .join(", ");
 
     // Lấy tên danh mục dựa trên mảng categoryIds của sách, nối thành chuỗi
-    const categoryNames = book.categoryIds
+    const categoryNames = foundBook.categoryIds
         .map((id) => categories.find((c) => c.id === id)?.name || "Unknown")
         .join(", ");
 
     // Lấy tên nhà xuất bản dựa trên publisherId của sách
     const publisherName =
-        publishers.find((p) => p.id === book.publisherId)?.name || "Unknown";
+        publishers.find((p) => p.id === foundBook.publisherId)?.name || "Unknown";
 
-    // Lọc lấy các bản copy của cuốn sách này từ bookCopies (dựa theo original_book_book_id)
+    // Lọc lấy các bản copy của cuốn sách này từ bookCopies
     const filteredCopies = bookCopies.filter(
-        (copy) => copy.original_book_book_id === bookIdNumber
+        (copy) => copy.originalBookBookId === bookIdNumber
     );
 
-    // Xử lý sự kiện khi nhấn nút "Add New Copy"
-    const handleAddCopy = () => {
-        alert("Add New Copy button clicked");
-        // TODO: cài đặt thêm chức năng tạo bản copy mới ở đây
-    };
+    // If still loading data, show a loading indicator
+    if (loading) {
+        return (
+            <>
+                <AdminNavbar selected="books" />
+                <div className="min-h-screen bg-purple-50 p-6">
+                    <div className="text-center py-10">
+                        <p className="text-purple-600">Loading book details...</p>
+                    </div>
+                </div>
+            </>
+        );
+    }
 
     return (
         <>
@@ -67,7 +163,7 @@ export default function BookDetail() {
 
                 {/* Thông tin chi tiết sách */}
                 <div className="bg-white rounded shadow-md p-4 mb-4">
-                    <h3 className="text-xl font-semibold text-purple-800 mb-2">{book.title}</h3>
+                    <h3 className="text-xl font-semibold text-purple-800 mb-2">{foundBook.title}</h3>
                     <p>
                         <strong>Authors:</strong> {authorNames}
                     </p>
@@ -78,7 +174,7 @@ export default function BookDetail() {
                         <strong>Publisher:</strong> {publisherName}
                     </p>
                     <p>
-                        <strong>Description:</strong> {book.description}
+                        <strong>Description:</strong> {foundBook.description}
                     </p>
                 </div>
 
@@ -120,8 +216,11 @@ export default function BookDetail() {
                                             {copy.status}
                                         </td>
                                         <td className="py-3 px-4 space-x-2">
-                                            {/* Nút xoá (hiện chưa có xử lý) */}
-                                            <button className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 text-sm">
+                                            {/* Nút xoá */}
+                                            <button 
+                                                className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 text-sm"
+                                                onClick={() => handleDeleteCopy(copy.id)}
+                                            >
                                                 Delete
                                             </button>
                                         </td>

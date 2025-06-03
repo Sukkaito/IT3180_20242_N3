@@ -3,14 +3,18 @@ package vn.edu.hust.nmcnpm_20242_n3.service;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import vn.edu.hust.nmcnpm_20242_n3.dto.AuthorDTO;
 import vn.edu.hust.nmcnpm_20242_n3.dto.BookDTO;
+import vn.edu.hust.nmcnpm_20242_n3.dto.CategoryDTO;
 import vn.edu.hust.nmcnpm_20242_n3.entity.Author;
 import vn.edu.hust.nmcnpm_20242_n3.entity.Book;
 import vn.edu.hust.nmcnpm_20242_n3.entity.Category;
 import vn.edu.hust.nmcnpm_20242_n3.entity.Publisher;
+import vn.edu.hust.nmcnpm_20242_n3.repository.AuthorRepository;
 import vn.edu.hust.nmcnpm_20242_n3.repository.BookRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import vn.edu.hust.nmcnpm_20242_n3.repository.CategoryRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,18 +26,22 @@ public class BookService {
     private final AuthorService authorService;
     private final PublisherService publisherService;
     private final CategoryService categoryService;
+    private final AuthorRepository authorRepository;
+    private final CategoryRepository categoryRepository;
 
     @Autowired
     public BookService(
             BookRepository bookRepository,
             AuthorService authorService,
             PublisherService publisherService,
-            CategoryService categoryService
-    ) {
+            CategoryService categoryService,
+            AuthorRepository authorRepository, CategoryRepository categoryRepository) {
         this.bookRepository = bookRepository;
         this.authorService = authorService;
         this.publisherService = publisherService;
         this.categoryService = categoryService;
+        this.authorRepository = authorRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Transactional
@@ -46,12 +54,12 @@ public class BookService {
         Publisher publisher = publisherService.findById(bookDTO.getPublisherId());
 
         // Get or create authors
-        Set<Author> authors = bookDTO.getAuthorIds().stream()
+        Set<AuthorDTO> authors = bookDTO.getAuthorIds().stream()
                 .map(authorService::findById)
                 .collect(Collectors.toSet());
 
         // Get or create categories
-        Set<Category> categories = bookDTO.getCategoryIds().stream()
+        Set<CategoryDTO> categories = bookDTO.getCategoryIds().stream()
                 .map(categoryService::findById)
                 .collect(Collectors.toSet());
         // Create new book
@@ -59,13 +67,17 @@ public class BookService {
         book.setTitle(bookDTO.getTitle());
         book.setDescription(bookDTO.getDescription());
         book.setPublisher(publisher);
-        book.setAuthors(authors);
-        book.setCategories(categories);
+        book.setAuthors(authors.stream()
+                .map(authorDTO -> authorRepository.findById(authorDTO.getId()).orElse(null))
+                .collect(Collectors.toSet()));
+        book.setCategories(categories.stream()
+                .map(categoryDTO -> categoryRepository.findById(categoryDTO.getId()).orElse(null))
+                .collect(Collectors.toSet()));
 
         return bookRepository.save(book);
     }
 
-    public Book searchById(int id) {
+    public Book getById(int id) {
         return bookRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + id));
     }
@@ -115,19 +127,23 @@ public class BookService {
         // Get or create publisher
         Publisher publisher = publisherService.findById(bookDTO.getPublisherId());
 
-        Set<Author> authors = bookDTO.getAuthorIds().stream()
+        Set<AuthorDTO> authors = bookDTO.getAuthorIds().stream()
                 .map(authorService::findById)
                 .collect(Collectors.toSet());
 
-        Set<Category> categories = bookDTO.getCategoryIds().stream()
+        Set<CategoryDTO> categories = bookDTO.getCategoryIds().stream()
                 .map(categoryService::findById)
                 .collect(Collectors.toSet());
 
         book.setTitle(bookDTO.getTitle());
         book.setDescription(bookDTO.getDescription());
         book.setPublisher(publisher);
-        book.setAuthors(authors);
-        book.setCategories(categories);
+        book.setAuthors(authors.stream()
+                .map(authorDTO -> authorRepository.findById(authorDTO.getId()).orElse(null))
+                .collect(Collectors.toSet()));
+        book.setCategories(categories.stream()
+                .map(categoryDTO -> categoryRepository.findById(categoryDTO.getId()).orElse(null))
+                .collect(Collectors.toSet()));
 
         return bookRepository.save(book);
     }

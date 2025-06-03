@@ -1,17 +1,11 @@
 import { useEffect, useState } from "react"
 import { usePollingData } from "../../hooks/use-fetch";
+import { StatusLog } from "../../data/statusLogs";
+import AdminNavbar from "../../components/AdminNavbar";
 
 export interface AdminStatus {
   "server": string;
   "database": string;
-}
-
-interface StatusLog {
-  id: number;
-  component: "server" | "database";
-  status: string;
-  timestamp: string;
-  message: string;
 }
 
 export default function AdminStatus({ interval = 10000 }: { interval?: number }) {
@@ -96,40 +90,44 @@ export default function AdminStatus({ interval = 10000 }: { interval?: number })
   }, [logs]);
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">System Status (Last 30 days)</h1>
-      {error && <p className="text-red-500">{error}</p>}
-      
-      {status ? (
-        <div className="space-y-6">
-          <ul className="space-y-2">
-            {/* Uptime Percentage Bars */}
-            <UptimePercentageBar 
-              key = "server-status"
-              componentTitle = "Server Status"
-              status = { status.server }
-              uptimePercentage = { serverUptimePercentage } />
+    <>
+      <title>Admin - System Status</title>
+      <AdminNavbar selected="status"/>
+      <div className="p-4">
+        <h1 className="text-xl font-bold mb-4 text-purple-700">System Status (Last 30 days)</h1>
+        {error && <p className="text-red-500">{error}</p>}
+        
+        {status ? (
+          <div className="space-y-6">
+            <ul className="space-y-2">
+              {/* Uptime Percentage Bars */}
+              <UptimePercentageBar 
+                key = "server-status"
+                componentTitle = "Server Status"
+                status = { status.server }
+                uptimePercentage = { serverUptimePercentage } />
 
-            <UptimePercentageBar
-              key = "database-status"
-              componentTitle = "Database Status"
-              status = { status.database }
-              uptimePercentage = { databaseUptimePercentage } />
-          </ul>
+              <UptimePercentageBar
+                key = "database-status"
+                componentTitle = "Database Status"
+                status = { status.database }
+                uptimePercentage = { databaseUptimePercentage } />
+            </ul>
 
-          {/* Downtime Logs */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Server Downtime Events</h2>
-            < StatusLogContainer key = "server-downtime-logs" downtimeLogs={ serverDowntimeLogs }/>
+            {/* Downtime Logs */}
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-purple-700">Server Downtime Events</h2>
+              < StatusLogContainer key = "server-downtime-logs" downtimeLogs={ serverDowntimeLogs }/>
 
-            <h2 className="text-lg font-semibold">Database Downtime Events</h2>
-            < StatusLogContainer key = "database-downtime-logs" downtimeLogs={ databaseDowntimeLogs }/>
+              <h2 className="text-lg font-semibold text-purple-700">Database Downtime Events</h2>
+              < StatusLogContainer key = "database-downtime-logs" downtimeLogs={ databaseDowntimeLogs }/>
+            </div>
           </div>
-        </div>
-      ) : (
-        !error && <p>Loading status...</p>
-      )}
-    </div>
+        ) : (
+          !error && <p>Loading status...</p>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -141,9 +139,9 @@ function StatusLogContainer( {downtimeLogs} : {
       <table className="min-w-full">
         <thead>
           <tr className="bg-gray-100">
-            <th className="py-2 px-3 text-left">Time</th>
-            <th className="py-2 px-3 text-left">Status</th>
-            <th className="py-2 px-3 text-left">Message</th>
+            <th className="py-2 px-3 text-left text-purple-700">Time</th>
+            <th className="py-2 px-3 text-left text-purple-700">Status</th>
+            <th className="py-2 px-3 text-left text-purple-700">Message</th>
           </tr>
         </thead>
         <tbody>
@@ -171,7 +169,7 @@ function UptimePercentageBar({ componentTitle, status, uptimePercentage}: {
   
   return (
     <li className="flex items-center">
-      <strong className="w-36">{`${componentTitle}:`}</strong>
+      <strong className="w-36 text-purple-700">{`${componentTitle}:`}</strong>
       <span className={status === "OK" ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
         {status}
       </span>

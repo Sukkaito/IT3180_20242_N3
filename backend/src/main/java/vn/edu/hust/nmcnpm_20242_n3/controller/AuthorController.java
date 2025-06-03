@@ -2,6 +2,7 @@ package vn.edu.hust.nmcnpm_20242_n3.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import vn.edu.hust.nmcnpm_20242_n3.dto.AuthorDTO;
 import vn.edu.hust.nmcnpm_20242_n3.entity.Author;
 import vn.edu.hust.nmcnpm_20242_n3.service.AuthorService;
 
@@ -19,24 +20,24 @@ public class AuthorController {
     }
 
     @GetMapping // Get All
-    public List<Author> getAllAuthors() {
+    public List<AuthorDTO> getAllAuthors() {
         return authorService.getAllAuthors();
     }
 
     @GetMapping("/search/{name}") // Get By Name
-    public Author getAuthorByName(@PathVariable String name) {
+    public AuthorDTO getAuthorByName(@PathVariable String name) {
         return authorService.findByName(name)
                 .orElseThrow(() -> new IllegalArgumentException("Author with name " + name + " not found"));
     }
 
     @PostMapping // Add New
-    public Author addAuthor(@RequestBody Author author) {
-        return authorService.addAuthor(author);
+    public AuthorDTO addAuthor(@RequestBody AuthorDTO dto) {
+        return authorService.addAuthor(dto);
     }
 
     @PutMapping("/update/{id}") // Update By Id
-    public Author updateAuthor(@PathVariable int id, @RequestBody Author author) {
-        return authorService.updateById(id, author);
+    public AuthorDTO updateAuthor(@PathVariable int id, @RequestBody AuthorDTO dto) {
+        return authorService.updateById(id, dto);
     }
 
     @DeleteMapping("/delete/{id}") // Delete By Id
