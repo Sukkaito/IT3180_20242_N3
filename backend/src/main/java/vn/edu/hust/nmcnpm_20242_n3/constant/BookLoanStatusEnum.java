@@ -6,5 +6,6 @@ public enum BookLoanStatusEnum {
     BORROWED,
     REQUEST_RETURNING,
     RETURNED,
-    NONRETURNABLE
+    NONRETURNABLE,
+    OVERDUE
 }

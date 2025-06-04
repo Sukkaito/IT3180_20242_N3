@@ -10,6 +10,6 @@ import java.util.Optional;
 public interface AuthorRepository extends CrudRepository<Author, Integer> {
     Optional<Author> findByName(String name);
     boolean existsByName(String name);
-    Optional<Author> findById(Long id);
+    Optional<Author> findById(Integer id);
     void deleteById(Integer id);
 }

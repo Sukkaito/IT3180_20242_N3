@@ -32,13 +32,10 @@ public class PublisherService {
                 .orElseThrow(() -> new IllegalArgumentException("Publisher not found with ID: " + id));
     }
 
-
-
     public Publisher addPublisher(Publisher publisher) {
         if (publisherRepository.existsByName(publisher.getName())) {
             throw new IllegalArgumentException("Publisher with name " + publisher.getName() + " already exists");
         }
-
         return publisherRepository.save(publisher);
     }
 

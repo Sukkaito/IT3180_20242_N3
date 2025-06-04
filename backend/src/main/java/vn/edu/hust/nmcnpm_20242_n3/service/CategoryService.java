@@ -32,13 +32,10 @@ public class CategoryService {
                 .orElseThrow(() -> new IllegalArgumentException("Category not found with ID: " + id));
     }
 
-
-
     public Category addCategory(Category category) {
         if (categoryRepository.existsByName(category.getName())) {
             throw new IllegalArgumentException("Category with name " + category.getName() + " already exists");
         }
-
         return categoryRepository.save(category);
     }
 
