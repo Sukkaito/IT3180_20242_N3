@@ -95,6 +95,7 @@ INSERT INTO book_loans (id, book_copy_id, user_id, loan_date, return_date, actua
     ('86621cd0-4fad-47d8-947e-bf1025afaedf', 3, 'b24d5066-6321-4de8-af43-9a852d55a0a6', NOW() - INTERVAL '30 days', NOW(), NOW() - INTERVAL '2 days', 'RETURNED', NULL, NOW() - INTERVAL '30 days', NOW() - INTERVAL '2 days',30),
     ('46c9dd3c-7a59-4928-a0e0-830aff62294b', 4, 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', NOW() - INTERVAL '15 days', NOW() + INTERVAL '15 days', NULL, 'REQUEST_RETURNING', NULL, NOW() - INTERVAL '15 days', NOW(),30);
 
+
 -- Insert Book Requests
 INSERT INTO book_requests (id, book_loan_id, book_copy_id, user_id, status, type, created_at, updated_at) VALUES
     ('1', NULL, 1, 'b24d5066-6321-4de8-af43-9a852d55a0a6', 'PENDING', 'BORROWING', CURRENT_TIMESTAMP - INTERVAL '1 day', CURRENT_TIMESTAMP - INTERVAL '1 day'),
@@ -102,4 +103,8 @@ INSERT INTO book_requests (id, book_loan_id, book_copy_id, user_id, status, type
     ('3', '86621cd0-4fad-47d8-947e-bf1025afaedf', 3, 'b24d5066-6321-4de8-af43-9a852d55a0a6', 'PENDING', 'RETURNING', CURRENT_TIMESTAMP - INTERVAL '3 days', CURRENT_TIMESTAMP - INTERVAL '3 days'),
     ('4', '46c9dd3c-7a59-4928-a0e0-830aff62294b', 4, 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', 'DENIED', 'RETURNING', CURRENT_TIMESTAMP - INTERVAL '4 days', CURRENT_TIMESTAMP - INTERVAL '4 days'),
     ('5', NULL, 5, 'e1a9e224-5691-4a78-a219-1ef430ef2b3e', 'PENDING', 'BORROWING', CURRENT_TIMESTAMP - INTERVAL '5 days', CURRENT_TIMESTAMP - INTERVAL '5 days');
-
+-- Insert Fines
+INSERT INTO fines (id, user_id, book_loan_id, amount, created_at)
+VALUES
+    ('1', 'b24d5066-6321-4de8-af43-9a852d55a0a6', '86621cd0-4fad-47d8-947e-bf1025afaedf', 50000, NOW() - INTERVAL '1 day'),
+    ('2', 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', '46c9dd3c-7a59-4928-a0e0-830aff62294b', 30000, NOW() - INTERVAL '3 days');
