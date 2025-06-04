@@ -125,6 +125,7 @@ INSERT INTO status_logs (component, message, status, timestamp) VALUES
     ('server', 'Application started', 'OK', NOW() - INTERVAL '2 hours'),
     ('server', 'Application shutting down', 'NOT OK', NOW() - INTERVAL '1 hour');
 
+-- Insert Fines
 INSERT INTO fines (id, user_id, book_loan_id, amount, created_at, updated_at, description) VALUES
     ('1', 'b24d5066-6321-4de8-af43-9a852d55a0a6', '86621cd0-4fad-47d8-947e-bf1025afaedf', 5.00, NOW() - INTERVAL '2 days', NOW() - INTERVAL '2 days', 'Late return fine for Clean Code'),
     ('2', 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', '46c9dd3c-7a59-4928-a0e0-830aff62294b', 3.00, NOW() - INTERVAL '1 day', NOW() - INTERVAL '1 day', 'Late return fine for A Brief History of Time');

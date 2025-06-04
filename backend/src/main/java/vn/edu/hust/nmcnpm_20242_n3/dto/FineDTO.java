@@ -1,9 +1,11 @@
 package vn.edu.hust.nmcnpm_20242_n3.dto;
 
+import lombok.Data;
 import java.util.Date;
 
 import vn.edu.hust.nmcnpm_20242_n3.entity.Fine;
 
+@Data
 public class FineDTO {
     private String id;
     private double amount;

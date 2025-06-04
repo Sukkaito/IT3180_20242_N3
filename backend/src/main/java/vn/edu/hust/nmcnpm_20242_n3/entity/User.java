@@ -1,10 +1,10 @@
 package vn.edu.hust.nmcnpm_20242_n3.entity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookLoanStatusEnum;
 
@@ -22,10 +22,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(unique = true, nullable = false)
     private String userName;
 
     @Column(unique = true)
@@ -37,12 +37,12 @@ public class User {
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")
-    private Date createdAt;
+    private Date CreatedAt;
 
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
-    private Date updatedAt;
+    private Date UpdatedAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<BookLoan> bookLoans;
@@ -52,13 +52,13 @@ public class User {
 
     @PrePersist
     protected void onCreate() {
-        createdAt = new Date();
-        updatedAt = new Date();
+        CreatedAt = new Date();
+        UpdatedAt = new Date();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = new Date();
+        UpdatedAt = new Date();
     }
 
 }
