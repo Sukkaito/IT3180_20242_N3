@@ -47,5 +47,6 @@ public class User {
     protected void onUpdate() {
         UpdatedAt = new Date();
     }
+
 }
 

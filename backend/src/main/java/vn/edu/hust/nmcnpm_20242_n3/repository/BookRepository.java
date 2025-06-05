@@ -14,9 +14,7 @@ import java.util.Optional;
 @Repository
 public interface BookRepository extends CrudRepository<Book, Integer> {
     Optional<Book> findByTitle(String title);
-    Optional<Book> findById(int id);
 
-    void deleteById(int id);
     Page<Book> findAll(Pageable pageable);
 
     @Query("SELECT b FROM Book b WHERE b.title LIKE %:title%")
