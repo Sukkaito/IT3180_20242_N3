@@ -2,6 +2,8 @@ package vn.edu.hust.nmcnpm_20242_n3.dto;
 
 import java.util.Set;
 
+import vn.edu.hust.nmcnpm_20242_n3.entity.Fine;
+
 public class BookDTO {
 
     private int id;
@@ -15,7 +17,8 @@ public class BookDTO {
     public BookDTO() {
     }
 
-    public BookDTO(int id, String title, String description, int publisherId, Set<Integer> authorIds, Set<Integer> categoryIds) {
+    public BookDTO(int id, String title, String description, int publisherId, Set<Integer> authorIds,
+            Set<Integer> categoryIds) {
         this.title = title;
         this.description = description;
         this.publisherId = publisherId;
