@@ -8,6 +8,7 @@ import vn.edu.hust.nmcnpm_20242_n3.entity.User;
 import vn.edu.hust.nmcnpm_20242_n3.constant.RoleEnum;
 import vn.edu.hust.nmcnpm_20242_n3.repository.RoleRepository;
 import vn.edu.hust.nmcnpm_20242_n3.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +16,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserRepository userRepository;
@@ -34,7 +37,7 @@ public class UserService {
         user.setName(dto.getName());
         user.setUserName(dto.getUserName());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         RoleEnum roleEnum = RoleEnum.valueOf(dto.getRoleName());
         Role role = roleRepository.findByName(roleEnum)
