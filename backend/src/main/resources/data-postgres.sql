@@ -97,16 +97,20 @@ INSERT INTO users (id, name, user_name, email, password, created_at, updated_at,
      ('c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', 'Jane Smith', 'jane_smith', 'jane@example.com', 'password', NOW(), NOW(), 2),
      ('d3b5f975-43c0-42f5-9b5e-ed62a4f935d1', 'Alice Johnson', 'alice_johnson', 'alice@example.com', 'password', NOW(), NOW(), 2),
      ('f8e1c2b3-a4d5-6e7f-8090-abcdef123456', 'Michael Smith', 'michael_smith', 'michael@example.com', 'password', NOW(), NOW(), 3),
-     ('f0e1d2c3-b4a5-6789-0abc-def123456789', 'Bob Brown', 'bob_brown', 'bob@example.com', 'password', NOW(), NOW(), 3);
+     ('f0e1d2c3-b4a5-6789-0abc-def123456789', 'Bob Brown', 'bob_brown', 'bob@example.com', 'password', NOW(), NOW(), 3),
+     ('a7c84b31-e92f-4c7d-8456-98e2a521def0', 'Test User', 'test_user', 'test@example.com', 'password', NOW(), NOW(), 2);
 
 -- Note: Passwords are stored as plain text for development purposes
 
 -- Insert Book Loans
-INSERT INTO book_loans (id, book_copy_id, user_id, loan_date, return_date, actual_return_date, status, current_book_request_id, loaned_at, updated_at,loan_duration) VALUES
+INSERT INTO book_loans (id, book_copy_id, user_id, loan_date, due_date, actual_return_date, status, current_book_request_id, loaned_at, updated_at,loan_duration) VALUES
     ('1b6e6cbf-cd10-4a51-b3e7-aaae8364fc22', 1, 'b24d5066-6321-4de8-af43-9a852d55a0a6', NOW() - INTERVAL '10 days', NOW() + INTERVAL '20 days', NULL, 'BORROWED', NULL, NOW() - INTERVAL '10 days', NOW() - INTERVAL '10 days',30),
     ('cf9592e2-ec63-45d4-bacc-a51f8c4a5a38', 2, 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', NOW() - INTERVAL '5 days', NOW() + INTERVAL '25 days', NULL, 'BORROWED', NULL, NOW() - INTERVAL '5 days', NOW() - INTERVAL '5 days',30),
     ('86621cd0-4fad-47d8-947e-bf1025afaedf', 3, 'b24d5066-6321-4de8-af43-9a852d55a0a6', NOW() - INTERVAL '30 days', NOW(), NOW() - INTERVAL '2 days', 'RETURNED', NULL, NOW() - INTERVAL '30 days', NOW() - INTERVAL '2 days',30),
-    ('46c9dd3c-7a59-4928-a0e0-830aff62294b', 4, 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', NOW() - INTERVAL '15 days', NOW() + INTERVAL '15 days', NULL, 'REQUEST_RETURNING', NULL, NOW() - INTERVAL '15 days', NOW(),30);
+    ('46c9dd3c-7a59-4928-a0e0-830aff62294b', 4, 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', NOW() - INTERVAL '15 days', NOW() + INTERVAL '15 days', NULL, 'BORROWED', NULL, NOW() - INTERVAL '15 days', NOW(),30),
+    ('58d7e2f1-a30b-4b8c-9c5d-1e2f34a67b89', 5, 'a7c84b31-e92f-4c7d-8456-98e2a521def0', NOW() - INTERVAL '20 days', NOW() + INTERVAL '10 days', NULL, 'BORROWED', NULL, NOW() - INTERVAL '20 days', NOW() - INTERVAL '20 days',30),
+    ('69e8f3a2-b41c-5c9d-0d6e-2f35a78c90a1', 6, 'a7c84b31-e92f-4c7d-8456-98e2a521def0', NOW() - INTERVAL '35 days', NOW() - INTERVAL '5 days', NOW() - INTERVAL '7 days', 'RETURNED', NULL, NOW() - INTERVAL '35 days', NOW() - INTERVAL '7 days',30),
+    ('7af9e4b3-c52d-6d0e-1e7f-3g46b89d01b2', 7, 'a7c84b31-e92f-4c7d-8456-98e2a521def0', NOW() - INTERVAL '8 days', NOW() + INTERVAL '22 days', NULL, 'BORROWED', NULL, NOW() - INTERVAL '8 days', NOW(),30);
 
 -- Insert Book Requests
 INSERT INTO book_requests (id, book_loan_id, book_copy_id, user_id, status, type, created_at, updated_at) VALUES
@@ -114,7 +118,11 @@ INSERT INTO book_requests (id, book_loan_id, book_copy_id, user_id, status, type
     ('2', 'cf9592e2-ec63-45d4-bacc-a51f8c4a5a38', 2, 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', 'ACCEPTED', 'BORROWING', CURRENT_TIMESTAMP - INTERVAL '2 days', CURRENT_TIMESTAMP - INTERVAL '2 days'),
     ('3', '86621cd0-4fad-47d8-947e-bf1025afaedf', 3, 'b24d5066-6321-4de8-af43-9a852d55a0a6', 'PENDING', 'RETURNING', CURRENT_TIMESTAMP - INTERVAL '3 days', CURRENT_TIMESTAMP - INTERVAL '3 days'),
     ('4', '46c9dd3c-7a59-4928-a0e0-830aff62294b', 4, 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', 'DENIED', 'RETURNING', CURRENT_TIMESTAMP - INTERVAL '4 days', CURRENT_TIMESTAMP - INTERVAL '4 days'),
-    ('5', NULL, 5, 'e1a9e224-5691-4a78-a219-1ef430ef2b3e', 'PENDING', 'BORROWING', CURRENT_TIMESTAMP - INTERVAL '5 days', CURRENT_TIMESTAMP - INTERVAL '5 days');
+    ('5', NULL, 5, 'e1a9e224-5691-4a78-a219-1ef430ef2b3e', 'PENDING', 'BORROWING', CURRENT_TIMESTAMP - INTERVAL '5 days', CURRENT_TIMESTAMP - INTERVAL '5 days'),
+    ('6', '58d7e2f1-a30b-4b8c-9c5d-1e2f34a67b89', 5, 'a7c84b31-e92f-4c7d-8456-98e2a521def0', 'ACCEPTED', 'BORROWING', CURRENT_TIMESTAMP - INTERVAL '21 days', CURRENT_TIMESTAMP - INTERVAL '20 days'),
+    ('7', '69e8f3a2-b41c-5c9d-0d6e-2f35a78c90a1', 6, 'a7c84b31-e92f-4c7d-8456-98e2a521def0', 'ACCEPTED', 'RETURNING', CURRENT_TIMESTAMP - INTERVAL '8 days', CURRENT_TIMESTAMP - INTERVAL '7 days'),
+    ('8', '7af9e4b3-c52d-6d0e-1e7f-3g46b89d01b2', 7, 'a7c84b31-e92f-4c7d-8456-98e2a521def0', 'PENDING', 'RETURNING', CURRENT_TIMESTAMP - INTERVAL '1 day', CURRENT_TIMESTAMP - INTERVAL '1 day'),
+    ('9', NULL, 8, 'a7c84b31-e92f-4c7d-8456-98e2a521def0', 'PENDING', 'BORROWING', CURRENT_TIMESTAMP - INTERVAL '2 days', CURRENT_TIMESTAMP - INTERVAL '2 days');
 
 INSERT INTO status_logs (component, message, status, timestamp) VALUES
     ('database', 'Database connection re-established', 'OK', NOW() - INTERVAL '5 hours 1 minute'),
@@ -128,4 +136,6 @@ INSERT INTO status_logs (component, message, status, timestamp) VALUES
 -- Insert Fines
 INSERT INTO fines (id, user_id, book_loan_id, amount, created_at, updated_at, description) VALUES
     ('1', 'b24d5066-6321-4de8-af43-9a852d55a0a6', '86621cd0-4fad-47d8-947e-bf1025afaedf', 5.00, NOW() - INTERVAL '2 days', NOW() - INTERVAL '2 days', 'Late return fine for Clean Code'),
-    ('2', 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', '46c9dd3c-7a59-4928-a0e0-830aff62294b', 3.00, NOW() - INTERVAL '1 day', NOW() - INTERVAL '1 day', 'Late return fine for A Brief History of Time');
+    ('2', 'c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', '46c9dd3c-7a59-4928-a0e0-830aff62294b', 3.00, NOW() - INTERVAL '1 day', NOW() - INTERVAL '1 day', 'Late return fine for A Brief History of Time'),
+    ('3', 'a7c84b31-e92f-4c7d-8456-98e2a521def0', '69e8f3a2-b41c-5c9d-0d6e-2f35a78c90a1', 7.50, NOW() - INTERVAL '7 days', NOW() - INTERVAL '7 days', 'Late return fine for Harry Potter and the Philosopher''s Stone'),
+    ('4', 'a7c84b31-e92f-4c7d-8456-98e2a521def0', '58d7e2f1-a30b-4b8c-9c5d-1e2f34a67b89', 2.50, NOW() - INTERVAL '15 days', NOW() - INTERVAL '15 days', 'Book damage fee for 1984');

@@ -1,10 +1,11 @@
 package vn.edu.hust.nmcnpm_20242_n3.service;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vn.edu.hust.nmcnpm_20242_n3.dto.UserDTO;
-import vn.edu.hust.nmcnpm_20242_n3.entity.Role;
-import vn.edu.hust.nmcnpm_20242_n3.entity.User;
+import vn.edu.hust.nmcnpm_20242_n3.entity.*;
 import vn.edu.hust.nmcnpm_20242_n3.constant.RoleEnum;
 import vn.edu.hust.nmcnpm_20242_n3.repository.RoleRepository;
 import vn.edu.hust.nmcnpm_20242_n3.repository.UserRepository;
@@ -94,12 +95,28 @@ public class UserService {
         User updated = userRepository.save(user);
         return mapToDTO(updated);
     }
-    public void deleteUser(String id) {
-        if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found");
-        }
-        userRepository.deleteById(id);
+
+    @Transactional
+    public void deleteUser(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 1. Delete fines first
+        user.getFines().clear();
+
+        // 2. Delete book requests
+        user.getBookRequests().clear();
+
+        // 3. Delete book loans
+        user.getBookLoans().clear();
+
+        // 4. Delete subscriptions
+        user.getSubscriptions().clear();
+
+        // 5. Delete the user
+        userRepository.delete(user);
     }
+
     public List<UserDTO> searchUsers(String id, String email, String username) {
         List<User> users = userRepository.searchUsers(id, email, username);
         return users.stream()

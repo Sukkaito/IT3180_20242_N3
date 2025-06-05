@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class BookRequestDTO implements Serializable {
     private final String id;
     private final String bookLoanId;
+    private final String bookName;
     private final String username;
     private final BookRequestStatusEnum status;
     private final BookRequestTypeEnum type;

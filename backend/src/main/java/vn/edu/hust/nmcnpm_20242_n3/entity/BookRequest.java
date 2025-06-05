@@ -20,14 +20,13 @@ public class BookRequest {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private BookLoan bookLoan;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private BookCopy bookCopy;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-
+    @ManyToOne
     private User user;
 
     @Enumerated(EnumType.STRING)

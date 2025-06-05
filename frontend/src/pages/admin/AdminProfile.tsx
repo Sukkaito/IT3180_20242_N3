@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import UserNavbar from '../../components/UserNavbar';
+import AdminNavbar from '../../components/AdminNavbar';
 import { User } from '../../data/users';
-import userService from '../../services/userService';
-import authService from '../../services/authService';
+import staffService from '../../services/staffService';
 
-export default function UserProfile() {
-    // State for user profile data
+export default function AdminProfile() {
+    // State for admin profile data
     const [profile, setProfile] = useState<User | null>(null);
+    const [activityLogs, setActivityLogs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     
@@ -23,17 +23,21 @@ export default function UserProfile() {
     
     // Load profile data on component mount
     useEffect(() => {
-        const fetchProfile = async () => {
+        const fetchData = async () => {
             try {
                 setLoading(true);
-                const userId = authService.getCurrentUserId();
-                const userData = await userService.getUserById(userId);
                 
-                if (userData) {
-                    setProfile(userData);
-                    setEditedName(userData.name || '');
-                    setEditedEmail(userData.email || '');
+                // Fetch staff profile
+                const profileData = await staffService.getCurrentStaff();
+                if (profileData) {
+                    setProfile(profileData);
+                    setEditedName(profileData.name || '');
+                    setEditedEmail(profileData.email || '');
                 }
+                
+                // Fetch activity logs
+                const logs = await staffService.getActivityLogs();
+                setActivityLogs(logs);
                 
                 setError(null);
             } catch (err) {
@@ -44,7 +48,7 @@ export default function UserProfile() {
             }
         };
         
-        fetchProfile();
+        fetchData();
     }, []);
     
     // Handle profile edit save
@@ -59,7 +63,7 @@ export default function UserProfile() {
             }
             
             // Update profile
-            const updatedProfile = await userService.updateUser(profile.id, {
+            const updatedProfile = await staffService.updateProfile({
                 name: editedName,
                 email: editedEmail
             });
@@ -76,8 +80,6 @@ export default function UserProfile() {
     // Handle password change
     const handleChangePassword = async () => {
         try {
-            if (!profile) return;
-            
             // Validate passwords
             if (!currentPassword || !newPassword || !confirmPassword) {
                 alert('All password fields are required');
@@ -95,7 +97,7 @@ export default function UserProfile() {
             }
             
             // Change password
-            await userService.updatePassword(profile.id, newPassword);
+            await staffService.changePassword(currentPassword, newPassword);
             
             // Reset form
             setCurrentPassword('');
@@ -131,10 +133,10 @@ export default function UserProfile() {
     if (loading) {
         return (
             <>
-                <UserNavbar selected="profile" />
-                <div className="min-h-screen bg-blue-50 p-6">
+                <AdminNavbar selected="profile" />
+                <div className="min-h-screen bg-purple-50 p-6">
                     <div className="text-center py-10">
-                        <p className="text-blue-600">Loading profile data...</p>
+                        <p className="text-purple-600">Loading profile data...</p>
                     </div>
                 </div>
             </>
@@ -145,12 +147,12 @@ export default function UserProfile() {
     if (error || !profile) {
         return (
             <>
-                <UserNavbar selected="profile" />
-                <div className="min-h-screen bg-blue-50 p-6">
+                <AdminNavbar selected="profile" />
+                <div className="min-h-screen bg-purple-50 p-6">
                     <div className="text-center py-10">
                         <p className="text-red-600">{error || 'Profile not found'}</p>
                         <button 
-                            className="mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+                            className="mt-4 bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700"
                             onClick={() => window.location.reload()}
                         >
                             Retry
@@ -163,12 +165,12 @@ export default function UserProfile() {
     
     return (
         <>
-            <title>My Profile</title>
-            <UserNavbar selected="profile" />
+            <title>Admin Profile</title>
+            <AdminNavbar selected="profile" />
             
-            <div className="min-h-screen bg-blue-50 p-6">
+            <div className="min-h-screen bg-purple-50 p-6">
                 {/* Page header */}
-                <h2 className="text-2xl font-semibold text-blue-700 mb-4">My Profile</h2>
+                <h2 className="text-2xl font-semibold text-purple-700 mb-4">My Profile</h2>
                 <p className="text-gray-700 mb-6">
                     View and edit your profile information.
                 </p>
@@ -177,7 +179,7 @@ export default function UserProfile() {
                     {/* Profile information section */}
                     <div className="lg:col-span-2 bg-white shadow-md rounded-lg p-6">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-semibold text-blue-700">Profile Information</h3>
+                            <h3 className="text-lg font-semibold text-purple-700">Profile Information</h3>
                             {!isEditingProfile && (
                                 <button 
                                     className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
@@ -242,6 +244,11 @@ export default function UserProfile() {
                                     <p className="font-medium text-gray-900">{profile.email}</p>
                                 </div>
                                 
+                                <div className="border-b pb-3">
+                                    <p className="text-sm text-gray-600">Role</p>
+                                    <p className="font-medium text-gray-900">{profile.roleName}</p>
+                                </div>
+                                
                                 <div>
                                     <p className="text-sm text-gray-600">Member Since</p>
                                     <p className="font-medium text-gray-900">
@@ -254,7 +261,7 @@ export default function UserProfile() {
                     
                     {/* Password change section */}
                     <div className="bg-white shadow-md rounded-lg p-6">
-                        <h3 className="text-lg font-semibold text-blue-700 mb-4">Change Password</h3>
+                        <h3 className="text-lg font-semibold text-purple-700 mb-4">Change Password</h3>
                         
                         {isChangingPassword ? (
                             <div className="space-y-4">
@@ -317,6 +324,38 @@ export default function UserProfile() {
                             </div>
                         )}
                     </div>
+                </div>
+                
+                {/* Recent activity section */}
+                <div className="mt-6 bg-white shadow-md rounded-lg p-6">
+                    <h3 className="text-lg font-semibold text-purple-700 mb-4">Recent Activity</h3>
+                    
+                    {activityLogs.length === 0 ? (
+                        <p className="text-gray-500 py-4">No recent activity found.</p>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full">
+                                <thead className="bg-purple-100">
+                                    <tr>
+                                        <th className="py-2 px-4 text-left text-purple-700">Action</th>
+                                        <th className="py-2 px-4 text-left text-purple-700">Details</th>
+                                        <th className="py-2 px-4 text-left text-purple-700">Date & Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200">
+                                    {activityLogs.map((log) => (
+                                        <tr key={log.id} className="hover:bg-purple-50">
+                                            <td className="py-2 px-4 font-medium">{log.action}</td>
+                                            <td className="py-2 px-4">{log.details}</td>
+                                            <td className="py-2 px-4 text-gray-600">
+                                                {new Date(log.timestamp).toLocaleString()}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

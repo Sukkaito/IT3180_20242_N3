@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.hust.nmcnpm_20242_n3.dto.StaffDTO;
+import vn.edu.hust.nmcnpm_20242_n3.dto.UserDTO;
 import vn.edu.hust.nmcnpm_20242_n3.service.StaffService;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class StaffController {
     @GetMapping
     public ResponseEntity<?> getAllStaff() {
         try {
-            List<StaffDTO> staffList = staffService.getAllStaff();
+            List<UserDTO> staffList = staffService.getAllStaff();
             return ResponseEntity.ok().body(staffList);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: " + e.getMessage());
@@ -37,7 +38,7 @@ public class StaffController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getStaffById(@PathVariable String id) {
         try {
-            StaffDTO staff = staffService.findById(id);
+            UserDTO staff = staffService.findById(id);
             return ResponseEntity.ok().body(staff);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: " + e.getMessage());
@@ -51,7 +52,7 @@ public class StaffController {
     @PostMapping
     public ResponseEntity<?> addStaff(@RequestBody StaffDTO staffDTO) {
         try {
-            StaffDTO newStaff = staffService.addStaff(staffDTO);
+            UserDTO newStaff = staffService.addStaff(staffDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(newStaff);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: " + e.getMessage());
@@ -63,9 +64,9 @@ public class StaffController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateStaff(@PathVariable String id, @RequestBody StaffDTO staffDTO) {
+    public ResponseEntity<?> updateStaff(@PathVariable String id, @RequestBody UserDTO userDTO) {
         try {
-            StaffDTO updatedStaff = staffService.updateStaff(id, staffDTO);
+            UserDTO updatedStaff = staffService.updateStaff(id, userDTO);
             return ResponseEntity.ok().body(updatedStaff);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: " + e.getMessage());

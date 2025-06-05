@@ -54,7 +54,7 @@ export class GraphiteService {
      */
     private sendMetricToServer(): void {
         try {
-            fetch('http://localhost:8080/api/status/metrics/count', {
+            fetch('http://localhost:8080/api/metrics/count/visit', {
             method: 'POST'
             }).catch(err => console.warn('Failed to send UDP metrics:', err));
         } catch (error) {

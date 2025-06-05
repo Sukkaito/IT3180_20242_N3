@@ -9,9 +9,9 @@ import Register from './pages/auth/Register.tsx'
 import UserPage from './pages/user/UserPage.tsx'
 import UserProfile from './pages/user/UserProfile.tsx'
 import UserBookSearch from './pages/user/UserBookSearch.tsx'
-import UserLoan from './pages/user/UserLoan.tsx'
 import UserRequest from './pages/user/UserRequest.tsx'
-import UserFine from './pages/user/UserFine.tsx'
+import UserLoaned from './pages/user/UserLoaned.tsx'
+import UserFines from './pages/user/UserFines.tsx'
 import AdminDashboard from './pages/admin/AdminDashboard.tsx'
 import BookManage from './pages/admin/BookManage.tsx'
 import CategoryManage from './pages/admin/CategoryManage.tsx'
@@ -26,6 +26,7 @@ import BookDetail from './pages/admin/BookDetail.tsx'
 import NotFound from './pages/404.tsx'
 import AdminStatus from './pages/admin/AdminStatus.tsx'
 import UserRouteTracker from './components/UserRouteTracker.tsx'
+import AdminProfile from './pages/admin/AdminProfile.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -34,6 +35,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/" element={<App />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/logout" element={<Navigate to="/" replace />} />
 
         <Route path="/user" element={
           <div>
@@ -44,9 +46,9 @@ createRoot(document.getElementById('root')!).render(
           <Route index element={<Navigate to="home" replace />} />
           <Route path="home" element={<UserPage />} />
           <Route path="search" element={<UserBookSearch />} />
-          <Route path="loaned" element={<UserLoan />} />
+          <Route path="loaned" element={<UserLoaned />} />
           <Route path="requests" element={<UserRequest />} />
-          <Route path="fines" element={<UserFine />} />
+          <Route path="fines" element={<UserFines />} />
           <Route path="profile" element={<UserProfile />} />
         </Route>
 
@@ -64,6 +66,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="fines" element={<FinesManage />} />
           <Route path="manage/books/:bookId" element={<BookDetail />} />
           <Route path="status" element={<AdminStatus interval={10000}/>} />
+          <Route path="profile" element={<AdminProfile />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

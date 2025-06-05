@@ -1,6 +1,23 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 
+interface NavItem {
+    name: string;
+    path: string;
+    key: string;
+}
+
+const navItems: NavItem[] = [
+    { name: "Users", path: "/admin/users", key: "users" },
+    { name: "Loans", path: "/admin/loans", key: "loans" },
+    { name: "Requests", path: "/admin/requests", key: "requests" },
+    { name: "Fines", path: "/admin/fines", key: "fines" },
+    { name: "Expenses", path: "/admin/expense", key: "expense" },
+    { name: "Infrastructure", path: "/admin/status", key: "status" },
+    { name: "Profile", path: "/admin/profile", key: "profile" },
+    { name: "Logout", path: "/logout", key: "logout" }
+];
+
 export default function AdminNavbar({ selected = "dashboard" }: { selected?: string }) {
     const [showNavbar, setShowNavbar] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
@@ -33,7 +50,8 @@ export default function AdminNavbar({ selected = "dashboard" }: { selected?: str
                 <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
                     <h1 className="text-xl font-bold text-purple-700">Admin Portal</h1>
                     <div className="flex space-x-3 items-center">
-                        <Link to="/admin" className={getNavLinkClass("dashboard")}>
+
+                        <Link key="Dashboard" to="/admin" className={getNavLinkClass("dashboard")}>
                             Dashboard
                         </Link>
 
@@ -58,27 +76,11 @@ export default function AdminNavbar({ selected = "dashboard" }: { selected?: str
                             </div>
                         </div>
 
-                        <Link to="/admin/users" className={getNavLinkClass("users")}>
-                            Users
-                        </Link>
-                        <Link to="/admin/loans" className={getNavLinkClass("loans")}>
-                            Loans
-                        </Link>
-                        <Link to="/admin/requests" className={getNavLinkClass("requests")}>
-                            Requests
-                        </Link>
-                        <Link to="/admin/fines" className={getNavLinkClass("fines")}>
-                            Fines
-                        </Link>
-                        <Link to="/admin/expense" className={getNavLinkClass("expense")}>
-                            Expenses
-                        </Link>
-                        <Link to="/admin/status" className={getNavLinkClass("status")}>
-                            Infrastructure
-                        </Link>
-                        <Link to="/admin/profile" className={getNavLinkClass("profile")}>
-                            Profile
-                        </Link>
+                        {navItems.map((item) => (
+                            <Link key={item.key} to={item.path} className={getNavLinkClass(item.key)}>
+                                {item.name}
+                            </Link>
+                        ))}
                     </div>
                 </div>
             </nav>

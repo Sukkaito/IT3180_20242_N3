@@ -49,7 +49,7 @@ public class BookRequestController {
         }
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/user/{userId}")
     public List<BookRequestDTO> listAllRequestsFromUser(@PathVariable("userId") String userId) {
         return bookRequestService.listAllRequestsFromUser(userId);
     }
@@ -86,7 +86,7 @@ public class BookRequestController {
         try {
             return new ResponseEntity<>(bookRequestService.newReturningRequest(userId, bookCopyId), HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 

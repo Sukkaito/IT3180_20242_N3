@@ -32,6 +32,7 @@ export default function RequestManage() {
                     ...request,
                     username: request.username || "Unknown",
                     bookLoanId: request.bookLoanId || "Unknown",
+                    bookName: request.bookName || "Unknown",
                     status: request.status || "Unknown",
                     type: request.type || "Unknown",
                     createdAt: request.createdAt || new Date().toISOString(),
@@ -59,12 +60,13 @@ export default function RequestManage() {
         const matchesSearch =
             req.username.toLowerCase().includes(lowerSearch) ||
             String(req.bookLoanId).includes(lowerSearch);
+        const matchesBookName = req.bookName.toLowerCase().includes(lowerSearch);
         // Kiểm tra trạng thái nếu có bộ lọc, nếu không thì mặc định là true
         const matchesStatus = filterStatus ? req.status === filterStatus : true;
         // Kiểm tra loại yêu cầu nếu có bộ lọc, nếu không thì mặc định là true
         const matchesType = filterType ? req.type === filterType : true;
         // Trả về true nếu thỏa cả 3 điều kiện
-        return matchesSearch && matchesStatus && matchesType;
+        return (matchesSearch || matchesBookName) && matchesStatus && matchesType;
     });
 
     // Hàm trả về class màu sắc tương ứng với từng trạng thái của yêu cầu
@@ -103,7 +105,7 @@ export default function RequestManage() {
             setRequests(updatedRequests);
         } catch (error) {
             console.error("Error processing request:", error);
-            alert("Failed to process the request. Please try again.");
+            alert(error.message || "An error occurred while processing the request.");
         }
     };
 
@@ -192,6 +194,7 @@ export default function RequestManage() {
                                     {/* Các cột của bảng */}
                                     <th className="py-3 px-4">Username</th>
                                     <th className="py-3 px-4">Book Loan ID</th>
+                                    <th className="py-3 px-4">Book</th>
                                     <th className="py-3 px-4">Created At</th>
                                     <th className="py-3 px-4">Updated At</th>
                                     <th className="py-3 px-4">Type</th>
@@ -203,7 +206,7 @@ export default function RequestManage() {
                                 {/* Nếu không có yêu cầu nào khớp với bộ lọc, hiển thị thông báo */}
                                 {filteredRequests.length === 0 && (
                                     <tr>
-                                        <td colSpan={7} className="py-6 text-gray-500">
+                                        <td colSpan={8} className="py-6 text-gray-500">
                                             No requests found.
                                         </td>
                                     </tr>
@@ -212,7 +215,8 @@ export default function RequestManage() {
                                 {filteredRequests.map((req) => (
                                     <tr key={req.id} className="border-t hover:bg-purple-50 transition">
                                         <td className="py-3 px-4">{req.username}</td>
-                                        <td className="py-3 px-4">{req.bookLoanId}</td>
+                                        <td className="py-3 px-4">{req.bookLoanId || "Unknown"}</td>
+                                        <td className="py-3 px-4">{req.bookName || "Unknown"}</td>
                                         {/* Hiển thị ngày tạo, định dạng ngày tháng giờ */}
                                         <td className="py-3 px-4 text-sm text-gray-600">
                                             {new Date(req.createdAt).toLocaleString()}

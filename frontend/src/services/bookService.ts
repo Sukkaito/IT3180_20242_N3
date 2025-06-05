@@ -68,12 +68,20 @@ class BookService {
   // Search books by title
   async search(title: string): Promise<Book[]> {
     try {
-      const response = await api.get(`/api/books/search/title/${title}`);
+      if (!title.trim()) {
+        // If no search term, return all books
+        return this.getAll();
+      }
+      
+      const response = await api.get(`/api/books/search/title/${encodeURIComponent(title)}`);
       return response.data;
     } catch (error) {
       console.error(`Error searching books with term "${title}":`, error);
       // Perform client-side search on fallback data
       const term = title.toLowerCase();
+      if (!term) {
+        return this.fallbackData;
+      }
       return this.fallbackData.filter(book => 
         book.title.toLowerCase().includes(term) || 
         book.description.toLowerCase().includes(term)

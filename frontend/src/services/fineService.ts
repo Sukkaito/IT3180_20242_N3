@@ -23,15 +23,15 @@ export const FineService = {
   },
   
   // Get fines by user
-  getByUser: async (userName: string): Promise<Fine[]> => {
+  getByUser: async (userId: string): Promise<Fine[]> => {
     try {
-      const response = await api.get(`/api/fines/user/${userName}`);
+      const response = await api.get(`/api/fines/user/${userId}`);
       return response.data;
     } catch (error) {
-      console.error(`Error fetching fines for user ${userName}:`, error);
+      console.error(`Error fetching fines for user ${userId}:`, error);
       // Filter from fallback data
       const fines = await fineBaseService.getAll();
-      return fines.filter(fine => fine.username.toLowerCase() === userName.toLowerCase());
+      return fines.filter(fine => fine.username.toLowerCase() === userId.toLowerCase());
     }
   },
   

@@ -13,6 +13,7 @@ export enum BookRequestStatusEnum {
 export interface BookRequest {
     id: string;
     bookLoanId: string; // Changed to string to match DTO
+    bookName: string;   // Added bookName to match DTO
     username: string;   // Added username to match DTO
     status: BookRequestStatusEnum;
     type: BookRequestTypeEnum;
@@ -25,6 +26,7 @@ const bookRequests: BookRequest[] = [
     {
         id: "req-1",
         bookLoanId: "1",
+        bookName: "To Kill a Mockingbird",
         username: "johndoe",
         status: BookRequestStatusEnum.PENDING,
         type: BookRequestTypeEnum.BORROWING,
@@ -34,6 +36,7 @@ const bookRequests: BookRequest[] = [
     {
         id: "req-2",
         bookLoanId: "2",
+        bookName: "1984",
         username: "janedoe",
         status: BookRequestStatusEnum.ACCEPTED,
         type: BookRequestTypeEnum.BORROWING,
@@ -43,6 +46,7 @@ const bookRequests: BookRequest[] = [
     {
         id: "req-3",
         bookLoanId: "3",
+        bookName: "The Great Gatsby",
         username: "johndoe",
         status: BookRequestStatusEnum.DENIED,
         type: BookRequestTypeEnum.RETURNING,
@@ -52,6 +56,7 @@ const bookRequests: BookRequest[] = [
     {
         id: "req-4",
         bookLoanId: "4",
+        bookName: "Pride and Prejudice",
         username: "janedoe",
         status: BookRequestStatusEnum.PENDING,
         type: BookRequestTypeEnum.RETURNING,

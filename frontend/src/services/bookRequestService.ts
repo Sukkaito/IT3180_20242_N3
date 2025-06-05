@@ -10,15 +10,15 @@ export const BookRequestService = {
   getAll: () => bookRequestBaseService.getAll(),
   
   // Get requests by user
-  getByUser: async (username: string): Promise<BookRequest[]> => {
+  getByUser: async (userId: string): Promise<BookRequest[]> => {
     try {
-      const response = await api.get(`/api/requests/user/${username}`);
+      const response = await api.get(`/api/requests/user/${userId}`);
       return response.data;
     } catch (error) {
-      console.error(`Error fetching requests for user ${username}:`, error);
+      console.error(`Error fetching requests for user ${userId}:`, error);
       // Filter from fallback data
       const requests = await bookRequestBaseService.getAll();
-      return requests.filter(req => req.username.toLowerCase() === username.toLowerCase());
+      return requests.filter(req => req.username.toLowerCase() === userId.toLowerCase());
     }
   },
   
@@ -47,10 +47,23 @@ export const BookRequestService = {
   },
   
   // Create a new request
-  create: async (data: Omit<BookRequest, 'id' | 'status' | 'createdAt' | 'updatedAt'>): Promise<BookRequest> => {
-    return bookRequestBaseService.create({
-      ...data,
-      status: BookRequestStatusEnum.PENDING,
-    } as Partial<BookRequest>);
-  }
+  create: async (userId: string, bookCopyId: number): Promise<BookRequest> => {
+    try {
+      const response = await api.post(`/api/requests/${userId}/new/return?bookCopyId=${bookCopyId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error creating request for user ${userId}:`, error);
+      throw error;
+    }
+  },
+
+  // Cancel a request
+  cancelRequest: async (requestId: string): Promise<void> => {
+    try {
+      await api.put(`/api/requests/cancel?requestId=${requestId}`);
+    } catch (error) {
+      console.error(`Error cancelling request ${requestId}:`, error);
+      throw error;
+    }
+  },
 };

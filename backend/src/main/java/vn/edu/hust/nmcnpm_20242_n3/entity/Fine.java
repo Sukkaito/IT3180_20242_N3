@@ -24,6 +24,7 @@ public class Fine {
     @ManyToOne(optional = false)
     @JoinColumn(name = "book_loan_id", nullable = false)
     private BookLoan bookLoan;
+
     @Column(nullable = false)
     private double amount;
 

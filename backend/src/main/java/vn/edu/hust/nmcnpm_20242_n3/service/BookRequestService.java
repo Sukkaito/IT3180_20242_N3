@@ -204,6 +204,7 @@ public class BookRequestService {
         return new BookRequestDTO(
                 bookRequest.getId(),
                 bookRequest.getBookLoan() != null ? bookRequest.getBookLoan().getId() : null,
+                bookRequest.getBookCopy().getOriginalBook().getTitle(),
                 bookRequest.getUser() != null ? bookRequest.getUser().getUserName() : null,
                 bookRequest.getStatus(),
                 bookRequest.getType(),

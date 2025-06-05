@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -54,6 +55,9 @@ public class BookLoan {
     private Date UpdatedAt;
 
     private Date DueDate;
+
+    @OneToMany(mappedBy = "bookLoan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Fine> fines;
 
     @PrePersist
     protected void onCreate() {
