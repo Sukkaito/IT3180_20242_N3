@@ -79,7 +79,7 @@ INSERT INTO roles_permissions (role_id, permission_id) VALUES
 
 -- Insert Users
 INSERT INTO users (id, name, user_name, email, password, created_at, updated_at, role_id) VALUES
-     ('e1a9e224-5691-4a78-a219-1ef430ef2b3e', 'Administrator', 'admin', 'admin@library.com', 'password', NOW(), NOW(), 1),
+     ('e1a9e224-5691-4a78-a219-1ef430ef2b3e', 'Administrator', 'admin', 'admin@library.com', '$2a$12$xHrkyUePDp3DqFWeMjW7x.S8xArwJafU0mBSVoAHHt1eqcS0B4nNe', NOW(), NOW(), 1),
      ('b24d5066-6321-4de8-af43-9a852d55a0a6', 'John Doe', 'john_doe', 'john@example.com', 'password', NOW(), NOW(), 2),
      ('c9b5f975-43c0-42f5-9b5e-ed62a4f935d1', 'Jane Smith', 'jane_smith', 'jane@example.com', 'password', NOW(), NOW(), 2),
      ('d3b5f975-43c0-42f5-9b5e-ed62a4f935d1', 'Alice Johnson', 'alice_johnson', 'alice@example.com', 'password', NOW(), NOW(), 2),

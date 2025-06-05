@@ -2,6 +2,7 @@ package vn.edu.hust.nmcnpm_20242_n3.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import vn.edu.hust.nmcnpm_20242_n3.dto.RoleDTO;
 import vn.edu.hust.nmcnpm_20242_n3.dto.StaffDTO;
@@ -17,7 +18,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class StaffService {
-
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
@@ -52,7 +54,7 @@ public class StaffService {
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setUserName(dto.getUserName());
-        user.setPassword(dto.getPassword());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setCreatedAt(dto.getCreatedAt());
         user.setUpdatedAt(dto.getUpdatedAt());
         return user;
@@ -149,7 +151,7 @@ public class StaffService {
             existingUser.setUserName(staffDTO.getUserName());
         }
         if (staffDTO.getPassword() != null && !staffDTO.getPassword().trim().isEmpty()) {
-            existingUser.setPassword(staffDTO.getPassword());
+            existingUser.setPassword(passwordEncoder.encode(staffDTO.getPassword()));
         }
         if (staffDTO.getRole() != null && (staffDTO.getRole().getId() != null || staffDTO.getRole().getName() != null)) {
             Role role = null;
