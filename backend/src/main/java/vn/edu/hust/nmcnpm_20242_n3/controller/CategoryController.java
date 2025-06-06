@@ -1,6 +1,7 @@
 package vn.edu.hust.nmcnpm_20242_n3.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.hust.nmcnpm_20242_n3.dto.CategoryDTO;
 import vn.edu.hust.nmcnpm_20242_n3.service.CategoryService;
@@ -30,16 +31,19 @@ public class CategoryController {
     }
 
     @PostMapping // Add New
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CategoryDTO addCategory(@RequestBody CategoryDTO dto) {
         return categoryService.addCategory(dto);
     }
 
     @PutMapping("/update/{id}") // Update By Id
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CategoryDTO updateCategory(@PathVariable int id, @RequestBody CategoryDTO dto) {
         return categoryService.updateById(id, dto);
     }
 
     @DeleteMapping("/delete/{id}") // Delete By Id
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deleteCategory(@PathVariable int id) {
         categoryService.deleteById(id);
     }

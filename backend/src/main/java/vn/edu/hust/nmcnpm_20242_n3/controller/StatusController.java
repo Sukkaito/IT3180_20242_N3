@@ -2,6 +2,7 @@ package vn.edu.hust.nmcnpm_20242_n3.controller;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.hust.nmcnpm_20242_n3.service.StatusService;
 
@@ -10,6 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/status")
+@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
 public class StatusController {
 
     private final StatusService statusService;

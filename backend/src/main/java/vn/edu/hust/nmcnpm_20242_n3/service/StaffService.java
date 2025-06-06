@@ -34,7 +34,7 @@ public class StaffService {
         dto.setId(user.getId());
         dto.setName(user.getName());
         dto.setEmail(user.getEmail());
-        dto.setUserName(user.getUserName());
+        dto.setUserName(user.getUsername());
         dto.setCreatedAt(user.getCreatedAt());
         dto.setUpdatedAt(user.getUpdatedAt());
         if (user.getRole() != null) {

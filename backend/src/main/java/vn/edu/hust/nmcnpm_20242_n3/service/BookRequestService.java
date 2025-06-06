@@ -205,7 +205,7 @@ public class BookRequestService {
                 bookRequest.getId(),
                 bookRequest.getBookLoan() != null ? bookRequest.getBookLoan().getId() : null,
                 bookRequest.getBookCopy().getOriginalBook().getTitle(),
-                bookRequest.getUser() != null ? bookRequest.getUser().getUserName() : null,
+                bookRequest.getUser() != null ? bookRequest.getUser().getUsername() : null,
                 bookRequest.getStatus(),
                 bookRequest.getType(),
                 bookRequest.getCreatedAt(),

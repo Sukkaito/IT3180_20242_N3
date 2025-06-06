@@ -118,7 +118,7 @@ public class BookLoanService {
             bookLoan.getId(),
             bookLoan.getBookCopy() != null ? bookLoan.getBookCopy().getId() : -1,
             bookLoan.getBookCopy() != null ? bookLoan.getBookCopy().getOriginalBook().getTitle() : null,
-            bookLoan.getUser().getUserName(),
+            bookLoan.getUser().getUsername(),
             bookLoan.getLoanedAt(),
             bookLoan.getDueDate(),
             bookLoan.getActualReturnDate(),

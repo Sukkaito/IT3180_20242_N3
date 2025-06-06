@@ -1,9 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import authService from "../services/authService";
 
 export default function UserNavbar({ selected = "home" }: { selected?: string }) {
+  const navigate = useNavigate();
   const [showNavbar, setShowNavbar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+
+  const handleLogout = async () => {
+    await authService.logout();
+    navigate('/login');
+  };
 
   const handleScroll = useCallback(() => {
     const currentScrollY = window.scrollY;
@@ -35,7 +42,7 @@ export default function UserNavbar({ selected = "home" }: { selected?: string })
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
           <h1 className="text-xl font-bold text-blue-700">Library Portal</h1>
           <div className="flex space-x-3">
-          <Link to="/user" className={getNavLinkClass("home")}>
+            <Link to="/user" className={getNavLinkClass("home")}>
               Home
             </Link>
             <Link to="/user/search" className={getNavLinkClass("search")}>
@@ -47,12 +54,21 @@ export default function UserNavbar({ selected = "home" }: { selected?: string })
             <Link to="/user/requests" className={getNavLinkClass("request")}>
               Requests
             </Link>
+            <Link to="/user/subscriptions" className={getNavLinkClass("subscriptions")}>
+              Subscriptions
+            </Link>
             <Link to="/user/fines" className={getNavLinkClass("fine")}>
               Fines
             </Link>
             <Link to="/user/profile" className={getNavLinkClass("profile")}>
               Profile
             </Link>
+            <button 
+              onClick={handleLogout}
+              className="px-4 py-2 rounded-lg transition duration-200 bg-red-100 text-red-700 hover:bg-red-200"
+            >
+              Logout
+            </button>
           </div>
         </div>
       </nav>

@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import authService from "../services/authService";
 
 interface NavItem {
     name: string;
@@ -15,18 +16,23 @@ const navItems: NavItem[] = [
     { name: "Expenses", path: "/admin/expense", key: "expense" },
     { name: "Infrastructure", path: "/admin/status", key: "status" },
     { name: "Profile", path: "/admin/profile", key: "profile" },
-    { name: "Logout", path: "/logout", key: "logout" }
 ];
 
 export default function AdminNavbar({ selected = "dashboard" }: { selected?: string }) {
     const [showNavbar, setShowNavbar] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
+    const navigate = useNavigate();
 
     const handleScroll = useCallback(() => {
         const currentScrollY = window.scrollY;
         setShowNavbar(currentScrollY < lastScrollY || currentScrollY < 10);
         setLastScrollY(currentScrollY);
     }, [lastScrollY]);
+
+    const handleLogout = async () => {
+    await authService.logout();
+    navigate('/login');
+  };
 
     useEffect(() => {
         window.addEventListener("scroll", handleScroll);
@@ -81,6 +87,10 @@ export default function AdminNavbar({ selected = "dashboard" }: { selected?: str
                                 {item.name}
                             </Link>
                         ))}
+                        <button key="logout" 
+                            onClick={handleLogout} 
+                            className="px-4 py-2 rounded-lg transition duration-200 bg-red-100 text-red-700 hover:bg-red-200"
+                        > Logout </button>
                     </div>
                 </div>
             </nav>

@@ -121,7 +121,7 @@ public class BookService {
         bookRepository.deleteById(id);
     }
 
-    public Book updateByTitle(Integer id, BookDTO bookDTO){
+    public Book updateById(Integer id, BookDTO bookDTO){
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Book not found"));
         // Get or create publisher

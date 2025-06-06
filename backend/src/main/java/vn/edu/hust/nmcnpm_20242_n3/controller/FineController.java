@@ -1,8 +1,10 @@
 package vn.edu.hust.nmcnpm_20242_n3.controller;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -11,6 +13,7 @@ import vn.edu.hust.nmcnpm_20242_n3.entity.User;
 import vn.edu.hust.nmcnpm_20242_n3.entity.BookLoan;
 import vn.edu.hust.nmcnpm_20242_n3.repository.UserRepository;
 import vn.edu.hust.nmcnpm_20242_n3.repository.BookLoanRepository;
+import vn.edu.hust.nmcnpm_20242_n3.service.AuthenticationService;
 import vn.edu.hust.nmcnpm_20242_n3.service.FineService;
 import vn.edu.hust.nmcnpm_20242_n3.dto.FineDTO;
 
@@ -20,21 +23,16 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/fines")
+@AllArgsConstructor
 public class FineController {
 
     private final FineService fineService;
     private final UserRepository userRepository;
     private final BookLoanRepository bookLoanRepository;
-
-    @Autowired
-    public FineController(FineService fineService, UserRepository userRepository,
-            BookLoanRepository bookLoanRepository) {
-        this.fineService = fineService;
-        this.userRepository = userRepository;
-        this.bookLoanRepository = bookLoanRepository;
-    }
+    private final AuthenticationService authenticationService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
     public ResponseEntity<List<FineDTO>> getAllFines() {
         List<FineDTO> dtos = fineService.getAllFines()
                 .stream()
@@ -44,6 +42,7 @@ public class FineController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF') or @authenticationService.isAuthorizedUser(#id)")
     public ResponseEntity<?> getFineById(@PathVariable String id) {
         try {
             Fine fine = fineService.getFineById(id);
@@ -56,6 +55,7 @@ public class FineController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
     public ResponseEntity<?> addFine(@RequestBody FineDTO fineDTO) {
         try {
             if (fineDTO.getUsername() == null) {
@@ -89,6 +89,7 @@ public class FineController {
     }
 
     @PutMapping("/update/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
     public ResponseEntity<?> updateFine(@PathVariable String id, @RequestBody FineDTO fineDTO) {
         try {
 
@@ -102,6 +103,7 @@ public class FineController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
     public ResponseEntity<String> deleteFine(@PathVariable(name = "id") String id) {
         try {
             fineService.deleteFine(id);
@@ -114,6 +116,7 @@ public class FineController {
     }
 
     @GetMapping("/user/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF') or @authenticationService.isAuthorizedUser(#userId)")
     public ResponseEntity<List<FineDTO>> getFinesByUserId(@PathVariable(name = "userId") String userId) {
         List<FineDTO> dtos = fineService.getFinesByUserId(userId)
                 .stream()
@@ -123,6 +126,7 @@ public class FineController {
     }
 
     @GetMapping("/date-range")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
     public ResponseEntity<List<FineDTO>> getFinesByDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {

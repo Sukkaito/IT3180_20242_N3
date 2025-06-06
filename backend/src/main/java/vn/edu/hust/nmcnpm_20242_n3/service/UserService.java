@@ -3,6 +3,9 @@ package vn.edu.hust.nmcnpm_20242_n3.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import vn.edu.hust.nmcnpm_20242_n3.dto.UserDTO;
 import vn.edu.hust.nmcnpm_20242_n3.entity.*;
@@ -15,13 +18,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    @Lazy
+    private PasswordEncoder passwordEncoder;
 
     public UserDTO createUser(UserDTO dto) throws IllegalArgumentException {
         if (userRepository.existsByEmail(dto.getEmail())) {
@@ -35,7 +42,7 @@ public class UserService {
         user.setName(dto.getName());
         user.setUserName(dto.getUserName());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
+        user.setPassword(passwordEncoder.encode(dto.getPassword())); // Encode password
 
         RoleEnum roleEnum = RoleEnum.valueOf(dto.getRoleName());
         Role role = roleRepository.findByName(roleEnum)
@@ -66,7 +73,7 @@ public class UserService {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
         dto.setName(user.getName());
-        dto.setUserName(user.getUserName());
+        dto.setUserName(user.getUsername());
         dto.setEmail(user.getEmail());
         dto.setPassword(null);
         dto.setRoleName(user.getRole().getName().name());
@@ -80,7 +87,7 @@ public class UserService {
         if (!user.getEmail().equals(dto.getEmail()) && userRepository.existsByEmail(dto.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
         }
-        if (!user.getUserName().equals(dto.getUserName()) && userRepository.existsByUserName(dto.getUserName())) {
+        if (!user.getUsername().equals(dto.getUserName()) && userRepository.existsByUserName(dto.getUserName())) {
             throw new IllegalArgumentException("Username already exists");
         }
         user.setName(dto.getName());
@@ -122,5 +129,21 @@ public class UserService {
         return users.stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public User loadUserByUsername(String username) throws EntityNotFoundException {
+        return userRepository.findByUserName(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + username));
+    }
+
+    public UserDTO createUser(String name, String username, String password, String email) {
+        UserDTO dto = new UserDTO();
+        dto.setName(name);
+        dto.setUserName(username);
+        dto.setPassword(password);
+        dto.setEmail(email);
+        dto.setRoleName(RoleEnum.USER.name()); // Default role
+        return createUser(dto);
     }
 }

@@ -1,8 +1,6 @@
 export type LoanStatus =
     | "REJECTED"
-    | "REQUEST_BORROWING"
     | "BORROWED"
-    | "REQUEST_RETURNING"
     | "RETURNED"
     | "NONRETURNABLE";
 
@@ -66,7 +64,7 @@ const bookLoans: BookLoan[] = [
         loanDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
         dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
         actualReturnDate: null,
-        status: "REQUEST_RETURNING",
+        status: "BORROWED",
         loanedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
         updatedAt: new Date().toISOString(),
     },

@@ -38,7 +38,7 @@ public class FineDTO {
         dto.setCreatedAt(fine.getCreatedAt());
         dto.setUpdatedAt(fine.getUpdatedAt());
         if (fine.getUser() != null)
-            dto.setUsername(fine.getUser().getUserName());
+            dto.setUsername(fine.getUser().getUsername());
         if (fine.getBookLoan() != null)
             dto.setBookLoanId(fine.getBookLoan().getId());
         return dto;

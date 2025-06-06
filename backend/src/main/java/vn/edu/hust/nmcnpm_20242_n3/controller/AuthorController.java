@@ -1,6 +1,7 @@
 package vn.edu.hust.nmcnpm_20242_n3.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.hust.nmcnpm_20242_n3.dto.AuthorDTO;
 import vn.edu.hust.nmcnpm_20242_n3.entity.Author;
@@ -31,16 +32,19 @@ public class AuthorController {
     }
 
     @PostMapping // Add New
+    @PreAuthorize("hasRole('ROLE_ADMIN')") // Only admin can add authors
     public AuthorDTO addAuthor(@RequestBody AuthorDTO dto) {
         return authorService.addAuthor(dto);
     }
 
     @PutMapping("/update/{id}") // Update By Id
+    @PreAuthorize("hasRole('ROLE_ADMIN')") // Only admin can update authors
     public AuthorDTO updateAuthor(@PathVariable int id, @RequestBody AuthorDTO dto) {
         return authorService.updateById(id, dto);
     }
 
     @DeleteMapping("/delete/{id}") // Delete By Id
+    @PreAuthorize("hasRole('ROLE_ADMIN')") // Only admin can delete authors
     public void deleteAuthor(@PathVariable int id) {
         authorService.deleteById(id);
     }

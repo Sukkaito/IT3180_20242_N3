@@ -3,6 +3,7 @@ package vn.edu.hust.nmcnpm_20242_n3.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.hust.nmcnpm_20242_n3.dto.PublisherDTO;
 import vn.edu.hust.nmcnpm_20242_n3.service.PublisherService;
@@ -32,16 +33,19 @@ public class PublisherController {
     }
 
     @PostMapping // Add New
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public PublisherDTO addPublisher(@RequestBody PublisherDTO dto) {
         return publisherService.addPublisher(dto);
     }
 
     @PutMapping("/update/{id}") // Update By Id
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public PublisherDTO updatePublisher(@PathVariable int id, @RequestBody PublisherDTO dto) {
         return publisherService.updateById(id, dto);
     }
 
     @DeleteMapping("/delete/{id}") // Delete By Id
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deletePublisher(@PathVariable int id) {
         publisherService.deleteById(id);
     }

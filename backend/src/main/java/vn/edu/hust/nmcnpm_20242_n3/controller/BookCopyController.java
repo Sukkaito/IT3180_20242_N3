@@ -3,6 +3,7 @@ package vn.edu.hust.nmcnpm_20242_n3.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookCopyStatusEnum;
 import vn.edu.hust.nmcnpm_20242_n3.dto.BookCopyDTO;
@@ -38,6 +39,7 @@ public class BookCopyController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
     public ResponseEntity<?> createBookCopy(@RequestBody BookCopyDTO bookCopyDTO) {
         try {
             BookCopyDTO createdBookCopy = bookCopyService.createBookCopy(bookCopyDTO);
@@ -48,6 +50,7 @@ public class BookCopyController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
     public ResponseEntity<?> deleteBookCopy(@PathVariable int id) {
         try {
             bookCopyService.deleteBookCopy(id);

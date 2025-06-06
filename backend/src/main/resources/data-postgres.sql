@@ -40,11 +40,11 @@ SELECT setval('books_seq', (SELECT MAX(book_id) FROM books));
 
 -- Insert Book Copies
 INSERT INTO book_copies (id, original_book_book_id, status) VALUES
-    ('1', 1, 'AVAILABLE'),
+    ('1', 1, 'UNAVAILABLE'),
     ('2', 2, 'AVAILABLE'),
     ('3', 3, 'AVAILABLE'),
     ('4', 4, 'AVAILABLE'),
-    ('5', 1, 'AVAILABLE'),
+    ('5', 1, 'UNAVAILABLE'),
     ('6', 2, 'AVAILABLE'),
     ('7', 3, 'AVAILABLE'),
     ('8', 4, 'AVAILABLE');

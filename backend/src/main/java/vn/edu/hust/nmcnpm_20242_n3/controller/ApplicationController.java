@@ -1,10 +1,12 @@
 package vn.edu.hust.nmcnpm_20242_n3.controller;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.edu.hust.nmcnpm_20242_n3.service.ApplicationService;
 
 @RestController
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class ApplicationController {
 
     private final ApplicationService applicationService;

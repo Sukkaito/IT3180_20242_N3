@@ -8,9 +8,14 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import vn.edu.hust.nmcnpm_20242_n3.constant.BookLoanStatusEnum;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 // Needed for HTTP requests and responses
@@ -19,7 +24,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -76,5 +81,14 @@ public class User {
         UpdatedAt = new Date();
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+    }
+
+    @Override
+    public String getUsername() {
+        return userName;
+    }
 }
 

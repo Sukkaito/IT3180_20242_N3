@@ -6,9 +6,7 @@ import { Category } from '../../data/categories';
 import { Publisher } from '../../data/publishers';
 import bookService from '../../services/bookService';
 import { STORAGE_KEY_PREFIX } from '../../services/baseService';
-import { BookRequestService } from '../../services/bookRequestService';
-import { BookRequestTypeEnum } from '../../data/bookRequests';
-import authService from '../../services/authService';
+import BookBorrowModal from '../../components/BookBorrowModal';
 
 // Local storage keys
 const AUTHORS_STORAGE_KEY = `${STORAGE_KEY_PREFIX}authors`;
@@ -33,6 +31,10 @@ export default function UserBookSearch() {
     // State for requesting books
     const [requestingBookId, setRequestingBookId] = useState<number | null>(null);
     const [processingRequest, setProcessingRequest] = useState(false);
+    
+    // State for borrowing books
+    const [isBorrowModalOpen, setIsBorrowModalOpen] = useState(false);
+    const [selectedBook, setSelectedBook] = useState<Book | null>(null);
     
     // Load initial data
     useEffect(() => {
@@ -125,28 +127,17 @@ export default function UserBookSearch() {
         
         setFilteredBooks(results);
     }, [selectedCategory, selectedAuthor, books, searchTerm]);
+        
+    // Handle opening borrow modal
+    const handleBorrowBook = (book: Book) => {
+        setSelectedBook(book);
+        setIsBorrowModalOpen(true);
+    };
     
-    // Handle requesting a book
-    const handleRequestBook = async (bookId: number) => {
-        try {
-            setRequestingBookId(bookId);
-            setProcessingRequest(true);
-            
-            // Create a borrowing request
-            await BookRequestService.create({
-                bookLoanId: bookId.toString(), // Using bookId as placeholder for bookLoanId
-                username: authService.getCurrentUsername(),
-                type: BookRequestTypeEnum.BORROWING
-            });
-            
-            alert('Book request submitted successfully');
-        } catch (error) {
-            console.error('Error requesting book:', error);
-            alert('Failed to request book. Please try again.');
-        } finally {
-            setRequestingBookId(null);
-            setProcessingRequest(false);
-        }
+    // Handle successful borrowing
+    const handleBorrowSuccess = () => {
+        // You could update the UI or fetch latest data if needed
+        alert('Book borrowing request successful!');
     };
     
     // Get author names for a book
@@ -296,14 +287,14 @@ export default function UserBookSearch() {
                                             </p>
                                         </div>
                                         
-                                        {/* Request button */}
+                                        {/* Borrow button */}
                                         <div className="mt-4 md:mt-0 md:ml-4 flex items-start">
                                             <button 
                                                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-blue-300 whitespace-nowrap"
-                                                onClick={() => handleRequestBook(book.id)}
+                                                onClick={() => handleBorrowBook(book)}
                                                 disabled={processingRequest || requestingBookId === book.id}
                                             >
-                                                {requestingBookId === book.id ? 'Requesting...' : 'Request Book'}
+                                                Borrow Book
                                             </button>
                                         </div>
                                     </div>
@@ -313,6 +304,14 @@ export default function UserBookSearch() {
                     )}
                 </div>
             </div>
+            
+            {/* Borrow Modal */}
+            <BookBorrowModal 
+                isOpen={isBorrowModalOpen}
+                onClose={() => setIsBorrowModalOpen(false)}
+                book={selectedBook}
+                onSuccess={handleBorrowSuccess}
+            />
         </>
     );
 }

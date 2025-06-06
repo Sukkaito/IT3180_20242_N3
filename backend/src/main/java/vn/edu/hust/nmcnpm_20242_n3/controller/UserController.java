@@ -2,8 +2,10 @@ package vn.edu.hust.nmcnpm_20242_n3.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.hust.nmcnpm_20242_n3.dto.UserDTO;
+import vn.edu.hust.nmcnpm_20242_n3.service.AuthenticationService;
 import vn.edu.hust.nmcnpm_20242_n3.service.UserService;
 
 import java.util.List;
@@ -15,6 +17,8 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody UserDTO dto) {
@@ -28,11 +32,13 @@ public class UserController {
 
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
     public ResponseEntity<?> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF') or @authenticationService.isAuthorizedUser(#id)")
     public ResponseEntity<?> getUserById(@PathVariable String id) {
         return userService.getUserById(id)
                 .map(ResponseEntity::ok)
@@ -52,6 +58,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF') or @authenticationService.isAuthorizedUser(#id)")
     public ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody UserDTO dto) {
         try {
             UserDTO updated = userService.updateUser(id, dto);
@@ -61,6 +68,7 @@ public class UserController {
         }
     }
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF') or @authenticationService.isAuthorizedUser(#id)")
     public ResponseEntity<?> deleteUser(@PathVariable String id) {
         try {
             userService.deleteUser(id);

@@ -34,8 +34,7 @@ export const DashboardService = {
       
       // Fetch metrics in parallel
       const results = await Promise.allSettled(
-        metricTypes.map(type => 
-          api.get(`/api/metrics/count/${type}`)
+        metricTypes.map(type => api.get(`/api/metrics/count/${type}`)
             .then(response => ({ type, count: response.data }))
         )
       );

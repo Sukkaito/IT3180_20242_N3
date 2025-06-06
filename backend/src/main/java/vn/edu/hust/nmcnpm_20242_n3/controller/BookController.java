@@ -3,6 +3,7 @@ package vn.edu.hust.nmcnpm_20242_n3.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.hust.nmcnpm_20242_n3.dto.BookDTO;
 import vn.edu.hust.nmcnpm_20242_n3.entity.Book;
@@ -23,6 +24,7 @@ public class BookController {
     }
 
     @PostMapping // Add New
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
     public ResponseEntity<?> addBook(@RequestBody BookDTO bookDTO) {
         try {
             Book book = bookService.addBook(bookDTO);
@@ -122,9 +124,10 @@ public class BookController {
     }
 
     @PutMapping("/update/{id}") // Update By Id
-    public ResponseEntity<?> updateBookByTitle(@PathVariable int id, @RequestBody BookDTO bookDTO){
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
+    public ResponseEntity<?> updateBookById(@PathVariable int id, @RequestBody BookDTO bookDTO){
         try{
-            Book updatedBook= bookService.updateByTitle(id, bookDTO);
+            Book updatedBook= bookService.updateById(id, bookDTO);
             return new ResponseEntity<>(updatedBook, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
@@ -132,6 +135,7 @@ public class BookController {
     }
 
     @DeleteMapping("/delete/{id}") // Delete By Id
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteBookById(@PathVariable int id) {
         try {
             bookService.deleteById(id);

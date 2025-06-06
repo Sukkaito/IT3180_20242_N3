@@ -10,7 +10,7 @@ export const BookRequestService = {
   getAll: () => bookRequestBaseService.getAll(),
   
   // Get requests by user
-  getByUser: async (userId: string): Promise<BookRequest[]> => {
+  getByUser: async (userId: string | null): Promise<BookRequest[]> => {
     try {
       const response = await api.get(`/api/requests/user/${userId}`);
       return response.data;
@@ -46,7 +46,29 @@ export const BookRequestService = {
     }
   },
   
-  // Create a new request
+  // Create a new borrow request for specific copy
+  createBorrowRequest: async (userId: string, bookCopyId: number): Promise<BookRequest> => {
+    try {
+      const response = await api.post(`/api/requests/${userId}/new/borrow?bookCopyId=${bookCopyId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error creating borrow request for user ${userId}:`, error);
+      throw error;
+    }
+  },
+
+  // Create a new borrow request for random copy
+  createRandomBorrowRequest: async (userId: string, bookId: number): Promise<BookRequest> => {
+    try {
+      const response = await api.post(`/api/requests/${userId}/new/borrow/rand?bookId=${bookId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error creating random borrow request for user ${userId}:`, error);
+      throw error;
+    }
+  },
+  
+  // Create a new return request
   create: async (userId: string, bookCopyId: number): Promise<BookRequest> => {
     try {
       const response = await api.post(`/api/requests/${userId}/new/return?bookCopyId=${bookCopyId}`);

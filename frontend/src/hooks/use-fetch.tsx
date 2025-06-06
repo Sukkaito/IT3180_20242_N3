@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import api from '../api/axios';
 
 // Generic fetch function (private to this file)
 const fetchData = async <T,> (
@@ -11,12 +12,12 @@ const fetchData = async <T,> (
     const defaultHeaders = { 'Content-Type': 'application/json' };
     const headers = { ...defaultHeaders, ...options?.headers };
 
-    const response = await fetch("http://localhost:8080" + endpoint, { headers });
-    if (!response.ok) {
+    const response = await api.get(`${endpoint}`, { headers: headers });
+    if (!(response.status >= 200 && response.status < 300)) {
       throw new Error("HTTP error " + response.status);
     }
 
-    const data: T = await response.json();
+    const data: T = response.data;
     if (setData) setData(data);
     if (setError) setError(null);
     return data;
