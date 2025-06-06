@@ -52,7 +52,7 @@ public class SubscriptionController {
 
     // API để thông báo cho người dùng về bản sao sách
     @PostMapping("/notify")
-@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
     public ResponseEntity<?> notifyUsers(@RequestParam Integer bookCopyId) {
         try {
             subscriptionService.notifyUsersByBookCopy(bookCopyId);
@@ -76,7 +76,7 @@ public class SubscriptionController {
 
 
 
-    @GetMapping("/subscriptions/{userId}")
+    @GetMapping("/user/{userId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF') or @authenticationService.isAuthorizedUser(#userId)")
     public ResponseEntity<List<SubscriptionDTO>> getUserSubscriptions(@PathVariable String userId) {
         try {

@@ -7,6 +7,7 @@ import {
     BookRequestTypeEnum,
 } from "../../data/bookRequests";
 import { BookRequestService } from "../../services/bookRequestService";
+import { SubscriptionService } from "../../services/subscriptionService";
 
 export default function RequestManage() {
     // State để lưu giá trị tìm kiếm theo username hoặc Book Loan ID
@@ -19,6 +20,9 @@ export default function RequestManage() {
     const [requests, setRequests] = useState<BookRequest[]>([]);
     // Loading state
     const [loading, setLoading] = useState(true);
+    // Notification state
+    const [notifying, setNotifying] = useState(false);
+    const [notificationResult, setNotificationResult] = useState<{ success: boolean, message: string } | null>(null);
 
     // Load requests on component mount
     useEffect(() => {
@@ -50,7 +54,28 @@ export default function RequestManage() {
         loadRequests();
     }, []);
 
-
+    // Handle sending subscription notifications
+    const handleSendNotifications = async () => {
+        try {
+            setNotifying(true);
+            setNotificationResult(null);
+            const result = await SubscriptionService.notifyAll();
+            setNotificationResult(result);
+            
+            // Auto-hide notification after 5 seconds
+            setTimeout(() => {
+                setNotificationResult(null);
+            }, 5000);
+        } catch (err) {
+            console.error("Error sending notifications:", err);
+            setNotificationResult({ 
+                success: false, 
+                message: "An unexpected error occurred while sending notifications." 
+            });
+        } finally {
+            setNotifying(false);
+        }
+    };
 
     // Lọc requests dựa trên giá trị tìm kiếm, trạng thái và loại yêu cầu
     const filteredRequests = requests.filter((req) => {
@@ -133,14 +158,39 @@ export default function RequestManage() {
             {/* Container chính của trang với nền tím nhạt */}
             <div className="min-h-screen bg-purple-50">
                 <div className="p-4">
-                    {/* Tiêu đề trang */}
-                    <h2 className="text-2xl font-semibold text-purple-700 mb-2">
-                        Manage Book Requests
-                    </h2>
-                    {/* Mô tả ngắn gọn về trang */}
-                    <p className="text-gray-700 mb-4">
-                        View, search and filter book requests from the system.
-                    </p>
+                    {/* Tiêu đề trang và nút thông báo */}
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
+                        <div>
+                            <h2 className="text-2xl font-semibold text-purple-700 mb-2">
+                                Manage Book Requests
+                            </h2>
+                            {/* Mô tả ngắn gọn về trang */}
+                            <p className="text-gray-700 mb-4">
+                                View, search and filter book requests from the system.
+                            </p>
+                        </div>
+                        
+                        {/* Notification button */}
+                        <div className="mb-4 md:mb-0">
+                            <button
+                                onClick={handleSendNotifications}
+                                disabled={notifying}
+                                className={`px-4 py-2 rounded text-white font-medium 
+                                    ${notifying 
+                                        ? 'bg-purple-400 cursor-not-allowed' 
+                                        : 'bg-purple-600 hover:bg-purple-700'}`}
+                            >
+                                {notifying ? 'Sending Notifications...' : 'Send Subscription Notifications'}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Notification result message */}
+                    {notificationResult && (
+                        <div className={`p-4 mb-6 rounded-lg ${notificationResult.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            {notificationResult.message}
+                        </div>
+                    )}
 
                     {/* Khu vực tìm kiếm và bộ lọc */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">

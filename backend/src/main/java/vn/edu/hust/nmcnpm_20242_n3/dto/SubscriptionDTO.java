@@ -1,6 +1,11 @@
 package vn.edu.hust.nmcnpm_20242_n3.dto;
 
-public class SubscriptionDTO {
+import lombok.Data;
+
+import java.io.Serializable;
+
+@Data
+public class SubscriptionDTO implements Serializable {
         private Integer id;
         private String title;
 
